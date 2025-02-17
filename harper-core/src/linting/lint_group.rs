@@ -47,7 +47,7 @@ use super::phrase_corrections::MutePoint;
 use super::phrase_corrections::StateOfTheArt;
 use super::phrase_corrections::WantBe;
 use super::phrase_corrections::{
-    AndAlike, BadRap, BatedBreath, BeckAndCall, ChangeTack, EnMasse, HumanLife, HungerPang,
+    AndTheLike, BadRap, BatedBreath, BeckAndCall, ChangeTack, EnMasse, HumanLife, HungerPang,
     LetAlone, LoAndBehold, NeedHelp, NoLonger, OfCourse, SneakingSuspicion, SpecialAttention,
     SupposedTo, ThanOthers, ThatChallenged, TurnItOff,
 };
@@ -55,6 +55,10 @@ use super::pique_interest::PiqueInterest;
 use super::plural_conjugate::PluralConjugate;
 use super::possessive_your::PossessiveYour;
 use super::pronoun_contraction::PronounContraction;
+use super::proper_noun_capitalization_linters::DayOneNames;
+use super::proper_noun_capitalization_linters::JetpackNames;
+use super::proper_noun_capitalization_linters::PocketCastsNames;
+use super::proper_noun_capitalization_linters::TumblrNames;
 use super::proper_noun_capitalization_linters::{
     AmazonNames, Americas, AppleNames, Australia, AzureNames, Canada, ChineseCommunistParty,
     GoogleNames, Holidays, Koreas, Malaysia, MetaNames, MicrosoftNames, UnitedOrganizations,
@@ -72,6 +76,7 @@ use super::unclosed_quotes::UnclosedQuotes;
 use super::use_genitive::UseGenitive;
 use super::was_aloud::WasAloud;
 use super::whereas::Whereas;
+use super::wordpress_dotcom::WordPressDotcom;
 use super::wrong_quotes::WrongQuotes;
 use super::{CurrencyPlacement, Lint, Linter, NoOxfordComma, OxfordComma};
 use crate::{Dictionary, Document};
@@ -195,6 +200,11 @@ macro_rules! create_lint_group_config {
 }
 
 create_lint_group_config!(
+    WordPressDotcom => true,
+    DayOneNames => true,
+    PocketCastsNames => true,
+    TumblrNames => true,
+    JetpackNames => true,
     OutOfDate => true,
     Desktop => true,
     Laptop => true,
@@ -312,7 +322,7 @@ create_lint_group_config!(
     ThatChallenged => true,
     TurnItOff => true,
     OfCourse => true,
-    AndAlike => true,
+    AndTheLike => true,
     BadRap => true,
     BatedBreath => true,
     BeckAndCall => true,

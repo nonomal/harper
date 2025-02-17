@@ -78,7 +78,7 @@ create_linter_for_phrase!(ThatChallenged, "that challenged", 2);
 create_linter_for_phrase!(NoLonger, "no longer", 1);
 create_linter_for_phrase!(NeedHelp, "need help", 1);
 create_linter_for_phrase!(OfCourse, "of course", 1);
-create_linter_for_phrase!(AndAlike, "and alike", 1);
+create_linter_for_phrase!(AndTheLike, "and the like", 1);
 create_linter_for_phrase!(BadRap, "bad rap", 1);
 create_linter_for_phrase!(BatedBreath, "bated breath", 1);
 create_linter_for_phrase!(BeckAndCall, "beck and call", 1);

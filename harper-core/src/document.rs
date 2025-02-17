@@ -129,7 +129,10 @@ impl Document {
         for token in self.tokens.iter_mut() {
             if let TokenKind::Word(meta) = &mut token.kind {
                 let word_source = token.span.get_content(&self.source);
-                let found_meta = dictionary.get_word_metadata(word_source);
+                let found_meta = dictionary
+                    .get_correct_capitalization_of(word_source)
+                    .map(|canonical_caps| dictionary.get_word_metadata(canonical_caps))
+                    .unwrap_or_default();
                 *meta = meta.or(&found_meta);
             }
         }
@@ -535,6 +538,7 @@ macro_rules! create_fns_on_doc {
 
 impl TokenStringExt for Document {
     create_fns_on_doc!(word);
+    create_fns_on_doc!(hostname);
     create_fns_on_doc!(word_like);
     create_fns_on_doc!(conjunction);
     create_fns_on_doc!(space);

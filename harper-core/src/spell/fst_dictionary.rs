@@ -212,6 +212,18 @@ impl Dictionary for FstDictionary {
     fn words_with_len_iter(&self, len: usize) -> Box<dyn Iterator<Item = &'_ [char]> + Send + '_> {
         self.full_dict.words_with_len_iter(len)
     }
+
+    fn contains_exact_word(&self, word: &[char]) -> bool {
+        self.full_dict.contains_exact_word(word)
+    }
+
+    fn contains_exact_word_str(&self, word: &str) -> bool {
+        self.full_dict.contains_exact_word_str(word)
+    }
+
+    fn get_correct_capitalization_of(&self, word: &[char]) -> Option<&'_ [char]> {
+        self.full_dict.get_correct_capitalization_of(word)
+    }
 }
 
 #[cfg(test)]

@@ -56,6 +56,7 @@ mod unclosed_quotes;
 mod use_genitive;
 mod was_aloud;
 mod whereas;
+mod wordpress_dotcom;
 mod wrong_quotes;
 
 pub use an_a::AnA;
@@ -109,7 +110,7 @@ pub use phrase_corrections::MutePoint;
 pub use phrase_corrections::StateOfTheArt;
 pub use phrase_corrections::WantBe;
 pub use phrase_corrections::{
-    AndAlike, BadRap, BatedBreath, BeckAndCall, ChangeTack, EnMasse, HumanLife, HungerPang,
+    AndTheLike, BadRap, BatedBreath, BeckAndCall, ChangeTack, EnMasse, HumanLife, HungerPang,
     LetAlone, LoAndBehold, NeedHelp, NoLonger, OfCourse, SneakingSuspicion, SpecialAttention,
     SupposedTo, ThanOthers, ThatChallenged, TurnItOff,
 };
@@ -117,6 +118,10 @@ pub use pique_interest::PiqueInterest;
 pub use plural_conjugate::PluralConjugate;
 pub use possessive_your::PossessiveYour;
 pub use pronoun_contraction::PronounContraction;
+pub use proper_noun_capitalization_linters::DayOneNames;
+pub use proper_noun_capitalization_linters::JetpackNames;
+pub use proper_noun_capitalization_linters::PocketCastsNames;
+pub use proper_noun_capitalization_linters::TumblrNames;
 pub use proper_noun_capitalization_linters::{
     AmazonNames, Americas, AppleNames, Australia, AzureNames, Canada, ChineseCommunistParty,
     GoogleNames, Holidays, Koreas, Malaysia, MetaNames, MicrosoftNames, UnitedOrganizations,
@@ -135,6 +140,7 @@ pub use unclosed_quotes::UnclosedQuotes;
 pub use use_genitive::UseGenitive;
 pub use was_aloud::WasAloud;
 pub use whereas::Whereas;
+pub use wordpress_dotcom::WordPressDotcom;
 pub use wrong_quotes::WrongQuotes;
 
 use crate::Document;

@@ -34,35 +34,24 @@ impl SplitCompoundWord {
         word_b: Token,
         source: &[char],
     ) -> Option<CharString> {
-        let mut a_chars: CharString = word_a.span.get_content(source).into();
-        let mut b_chars: CharString = word_b.span.get_content(source).into();
+        let a_chars: CharString = word_a.span.get_content(source).into();
+        let b_chars: CharString = word_b.span.get_content(source).into();
 
         let mut buffer = CharString::new();
 
-        macro_rules! attempt {
-            () => {
+        buffer.clear();
+        buffer.extend_from_slice(&a_chars);
+        buffer.extend_from_slice(&b_chars);
+
+        if self.dict.contains_word(&buffer) {
+            let metadata = self.dict.get_word_metadata(&buffer);
+            if (self.predicate)(metadata) {
+                let correct = self.dict.get_correct_capitalization_of(&buffer).unwrap();
                 buffer.clear();
-                buffer.extend_from_slice(&a_chars);
-                buffer.extend_from_slice(&b_chars);
-
-                if self.dict.contains_word(&buffer) {
-                    let metadata = self.dict.get_word_metadata(&buffer);
-                    if (self.predicate)(metadata) {
-                        return Some(buffer);
-                    }
-                }
-            };
+                buffer.extend_from_slice(correct);
+                return Some(buffer);
+            }
         }
-
-        attempt!();
-        a_chars[0] = a_chars[0].to_ascii_uppercase();
-        attempt!();
-        b_chars[0] = b_chars[0].to_ascii_uppercase();
-        attempt!();
-        a_chars[0] = a_chars[0].to_ascii_lowercase();
-        attempt!();
-        b_chars[0] = b_chars[0].to_ascii_lowercase();
-        attempt!();
 
         None
     }

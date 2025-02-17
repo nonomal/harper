@@ -235,7 +235,7 @@ addnoun noun:
   fi
 
   if [[ "{{noun}}" =~ ^[A-Z] ]]; then
-    echo "{{noun}}/M" >> $DICT_FILE
+    echo "{{noun}}/2M" >> $DICT_FILE
   else
     echo "{{noun}}/SM" >> $DICT_FILE
   fi

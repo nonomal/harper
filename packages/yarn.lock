@@ -2553,22 +2553,23 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@rollup/plugin-commonjs@npm:^25.0.7":
-  version: 25.0.8
-  resolution: "@rollup/plugin-commonjs@npm:25.0.8"
+"@rollup/plugin-commonjs@npm:^28.0.1":
+  version: 28.0.2
+  resolution: "@rollup/plugin-commonjs@npm:28.0.2"
   dependencies:
     "@rollup/pluginutils": "npm:^5.0.1"
     commondir: "npm:^1.0.1"
     estree-walker: "npm:^2.0.2"
-    glob: "npm:^8.0.3"
+    fdir: "npm:^6.2.0"
     is-reference: "npm:1.2.1"
     magic-string: "npm:^0.30.3"
+    picomatch: "npm:^4.0.2"
   peerDependencies:
     rollup: ^2.68.0||^3.0.0||^4.0.0
   peerDependenciesMeta:
     rollup:
       optional: true
-  checksum: 10c0/00d6fe41c33476dcb4b4ac3068f869b8537153646ea18f1fb9d0dfd5592792148567dd735d58ac15e2fdd4ed6c98453d20fe5343105f8cfa93d291198c9a90f5
+  checksum: 10c0/e90a443e63bfed567d5a4854960240d256818a0b3c69a45e95e196c40a755959406dabe4fbccb886eeb45d3445ddc8f966632563a7d590808be7eee8084384f1
   languageName: node
   linkType: hard
 
@@ -2601,6 +2602,24 @@ __metadata:
     rollup:
       optional: true
   checksum: 10c0/ecf3abe890fc98ad665fdbfb1ea245253e0d1f2bc6d9f4e8f496f212c76a2ce7cd4b9bc0abd21e6bcaa16f72d1c67cc6b322ea12a6ec68e8a8834df8242a5ecd
+  languageName: node
+  linkType: hard
+
+"@rollup/plugin-node-resolve@npm:^16.0.0":
+  version: 16.0.0
+  resolution: "@rollup/plugin-node-resolve@npm:16.0.0"
+  dependencies:
+    "@rollup/pluginutils": "npm:^5.0.1"
+    "@types/resolve": "npm:1.20.2"
+    deepmerge: "npm:^4.2.2"
+    is-module: "npm:^1.0.0"
+    resolve: "npm:^1.22.1"
+  peerDependencies:
+    rollup: ^2.78.0||^3.0.0||^4.0.0
+  peerDependenciesMeta:
+    rollup:
+      optional: true
+  checksum: 10c0/b63deb6fc14b37070ccaffacc8c10c9720f28ce7632f4fe2ee77064c0c79bcc3fe060fb77160e673c9fd847307252f25a2983030bd54f1888324063c69ae1399
   languageName: node
   linkType: hard
 
@@ -3130,17 +3149,17 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@sveltejs/adapter-node@npm:^3.0.3":
-  version: 3.0.3
-  resolution: "@sveltejs/adapter-node@npm:3.0.3"
+"@sveltejs/adapter-node@npm:^5.2.12":
+  version: 5.2.12
+  resolution: "@sveltejs/adapter-node@npm:5.2.12"
   dependencies:
-    "@rollup/plugin-commonjs": "npm:^25.0.7"
+    "@rollup/plugin-commonjs": "npm:^28.0.1"
     "@rollup/plugin-json": "npm:^6.1.0"
-    "@rollup/plugin-node-resolve": "npm:^15.2.3"
+    "@rollup/plugin-node-resolve": "npm:^16.0.0"
     rollup: "npm:^4.9.5"
   peerDependencies:
-    "@sveltejs/kit": ^2.0.0
-  checksum: 10c0/d52f198ebc690fde94195b6a593bc00d2c5dec1ccab8daa55b26c03c1420ee2fd66aa1affa819e8d0663d95755d56ba3c15979fdc5498c661d7851618c4d4b5a
+    "@sveltejs/kit": ^2.4.0
+  checksum: 10c0/74d69795ce21511dc29d8bb7b3ef0d473d444f27e9f281c2c8a4edf0242b1579092ee556cbd868b4ebf902a09326df92916edc7d11ccf286f041b284a5532090
   languageName: node
   linkType: hard
 
@@ -3312,90 +3331,90 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@swc/core-darwin-arm64@npm:1.10.12":
-  version: 1.10.12
-  resolution: "@swc/core-darwin-arm64@npm:1.10.12"
+"@swc/core-darwin-arm64@npm:1.10.16":
+  version: 1.10.16
+  resolution: "@swc/core-darwin-arm64@npm:1.10.16"
   conditions: os=darwin & cpu=arm64
   languageName: node
   linkType: hard
 
-"@swc/core-darwin-x64@npm:1.10.12":
-  version: 1.10.12
-  resolution: "@swc/core-darwin-x64@npm:1.10.12"
+"@swc/core-darwin-x64@npm:1.10.16":
+  version: 1.10.16
+  resolution: "@swc/core-darwin-x64@npm:1.10.16"
   conditions: os=darwin & cpu=x64
   languageName: node
   linkType: hard
 
-"@swc/core-linux-arm-gnueabihf@npm:1.10.12":
-  version: 1.10.12
-  resolution: "@swc/core-linux-arm-gnueabihf@npm:1.10.12"
+"@swc/core-linux-arm-gnueabihf@npm:1.10.16":
+  version: 1.10.16
+  resolution: "@swc/core-linux-arm-gnueabihf@npm:1.10.16"
   conditions: os=linux & cpu=arm
   languageName: node
   linkType: hard
 
-"@swc/core-linux-arm64-gnu@npm:1.10.12":
-  version: 1.10.12
-  resolution: "@swc/core-linux-arm64-gnu@npm:1.10.12"
+"@swc/core-linux-arm64-gnu@npm:1.10.16":
+  version: 1.10.16
+  resolution: "@swc/core-linux-arm64-gnu@npm:1.10.16"
   conditions: os=linux & cpu=arm64 & libc=glibc
   languageName: node
   linkType: hard
 
-"@swc/core-linux-arm64-musl@npm:1.10.12":
-  version: 1.10.12
-  resolution: "@swc/core-linux-arm64-musl@npm:1.10.12"
+"@swc/core-linux-arm64-musl@npm:1.10.16":
+  version: 1.10.16
+  resolution: "@swc/core-linux-arm64-musl@npm:1.10.16"
   conditions: os=linux & cpu=arm64 & libc=musl
   languageName: node
   linkType: hard
 
-"@swc/core-linux-x64-gnu@npm:1.10.12":
-  version: 1.10.12
-  resolution: "@swc/core-linux-x64-gnu@npm:1.10.12"
+"@swc/core-linux-x64-gnu@npm:1.10.16":
+  version: 1.10.16
+  resolution: "@swc/core-linux-x64-gnu@npm:1.10.16"
   conditions: os=linux & cpu=x64 & libc=glibc
   languageName: node
   linkType: hard
 
-"@swc/core-linux-x64-musl@npm:1.10.12":
-  version: 1.10.12
-  resolution: "@swc/core-linux-x64-musl@npm:1.10.12"
+"@swc/core-linux-x64-musl@npm:1.10.16":
+  version: 1.10.16
+  resolution: "@swc/core-linux-x64-musl@npm:1.10.16"
   conditions: os=linux & cpu=x64 & libc=musl
   languageName: node
   linkType: hard
 
-"@swc/core-win32-arm64-msvc@npm:1.10.12":
-  version: 1.10.12
-  resolution: "@swc/core-win32-arm64-msvc@npm:1.10.12"
+"@swc/core-win32-arm64-msvc@npm:1.10.16":
+  version: 1.10.16
+  resolution: "@swc/core-win32-arm64-msvc@npm:1.10.16"
   conditions: os=win32 & cpu=arm64
   languageName: node
   linkType: hard
 
-"@swc/core-win32-ia32-msvc@npm:1.10.12":
-  version: 1.10.12
-  resolution: "@swc/core-win32-ia32-msvc@npm:1.10.12"
+"@swc/core-win32-ia32-msvc@npm:1.10.16":
+  version: 1.10.16
+  resolution: "@swc/core-win32-ia32-msvc@npm:1.10.16"
   conditions: os=win32 & cpu=ia32
   languageName: node
   linkType: hard
 
-"@swc/core-win32-x64-msvc@npm:1.10.12":
-  version: 1.10.12
-  resolution: "@swc/core-win32-x64-msvc@npm:1.10.12"
+"@swc/core-win32-x64-msvc@npm:1.10.16":
+  version: 1.10.16
+  resolution: "@swc/core-win32-x64-msvc@npm:1.10.16"
   conditions: os=win32 & cpu=x64
   languageName: node
   linkType: hard
 
-"@swc/core@npm:^1.7.0":
-  version: 1.10.12
-  resolution: "@swc/core@npm:1.10.12"
+"@swc/core@npm:^1.10.16":
+  version: 1.10.16
+  resolution: "@swc/core@npm:1.10.16"
   dependencies:
-    "@swc/core-darwin-arm64": "npm:1.10.12"
-    "@swc/core-darwin-x64": "npm:1.10.12"
-    "@swc/core-linux-arm-gnueabihf": "npm:1.10.12"
-    "@swc/core-linux-arm64-gnu": "npm:1.10.12"
-    "@swc/core-linux-arm64-musl": "npm:1.10.12"
-    "@swc/core-linux-x64-gnu": "npm:1.10.12"
-    "@swc/core-linux-x64-musl": "npm:1.10.12"
-    "@swc/core-win32-arm64-msvc": "npm:1.10.12"
-    "@swc/core-win32-ia32-msvc": "npm:1.10.12"
-    "@swc/core-win32-x64-msvc": "npm:1.10.12"
+    "@swc/core-darwin-arm64": "npm:1.10.16"
+    "@swc/core-darwin-x64": "npm:1.10.16"
+    "@swc/core-linux-arm-gnueabihf": "npm:1.10.16"
+    "@swc/core-linux-arm64-gnu": "npm:1.10.16"
+    "@swc/core-linux-arm64-musl": "npm:1.10.16"
+    "@swc/core-linux-x64-gnu": "npm:1.10.16"
+    "@swc/core-linux-x64-musl": "npm:1.10.16"
+    "@swc/core-win32-arm64-msvc": "npm:1.10.16"
+    "@swc/core-win32-ia32-msvc": "npm:1.10.16"
+    "@swc/core-win32-x64-msvc": "npm:1.10.16"
     "@swc/counter": "npm:^0.1.3"
     "@swc/types": "npm:^0.1.17"
   peerDependencies:
@@ -3424,7 +3443,7 @@ __metadata:
   peerDependenciesMeta:
     "@swc/helpers":
       optional: true
-  checksum: 10c0/ce46f64bd66d21dd1fea3afa7f82dcc28520ccac13f2b6c580d37b58b97a3b97281300bed24a20294d3dd4eeb2e50fb5a3e5d15a278aa80a9474e362c83fa5ff
+  checksum: 10c0/155f4a2db6e1342084fa205883a9628d34ee2c14e511125630f5531fead732de2c4569d40545cd7b8976072cfed0e5ddf5cd72067abd24ce81e237dd90d8ee69
   languageName: node
   linkType: hard
 
@@ -6887,15 +6906,15 @@ __metadata:
   languageName: node
   linkType: hard
 
-"flowbite@npm:^3.0.0":
-  version: 3.1.1
-  resolution: "flowbite@npm:3.1.1"
+"flowbite@npm:^3.1.2":
+  version: 3.1.2
+  resolution: "flowbite@npm:3.1.2"
   dependencies:
     "@popperjs/core": "npm:^2.9.3"
     flowbite-datepicker: "npm:^1.3.1"
     mini-svg-data-uri: "npm:^1.4.3"
     postcss: "npm:^8.5.1"
-  checksum: 10c0/4b38a7f696df9f8a59eb40f023b23b5c0bb9eb23268f06bd9929cb9d196ce2f935930949b2b891e0ba1c34b3be2783bc05fcade4394d827adbbdf606ee5b3340
+  checksum: 10c0/5e617695162e8800f874281fe9ac205cbadc1c1413eccc760efb19c51bc6cfb337e3af70bfda6ed49b586b24e6af01a99b3a87c633688a77924516bc4d08795b
   languageName: node
   linkType: hard
 
@@ -7195,19 +7214,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"glob@npm:^8.0.3":
-  version: 8.1.0
-  resolution: "glob@npm:8.1.0"
-  dependencies:
-    fs.realpath: "npm:^1.0.0"
-    inflight: "npm:^1.0.4"
-    inherits: "npm:2"
-    minimatch: "npm:^5.0.1"
-    once: "npm:^1.3.0"
-  checksum: 10c0/cb0b5cab17a59c57299376abe5646c7070f8acb89df5595b492dba3bfb43d301a46c01e5695f01154e6553168207cb60d4eaf07d3be4bc3eb9b0457c5c561d0f
-  languageName: node
-  linkType: hard
-
 "globals@npm:^11.1.0":
   version: 11.12.0
   resolution: "globals@npm:11.12.0"
@@ -7296,14 +7302,14 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "harper-web@workspace:web"
   dependencies:
-    "@sveltejs/adapter-node": "npm:^3.0.3"
+    "@sveltejs/adapter-node": "npm:^5.2.12"
     "@sveltejs/kit": "npm:^2.17.1"
     "@sveltejs/vite-plugin-svelte": "npm:^5.0.3"
     "@sveltepress/theme-default": "npm:^5.0.7"
     "@sveltepress/vite": "npm:^1.1.2"
     "@types/reveal.js": "npm:^5.0.3"
     autoprefixer: "npm:^10.4.16"
-    flowbite: "npm:^3.0.0"
+    flowbite: "npm:^3.1.2"
     flowbite-svelte: "npm:^0.44.18"
     harper.js: "link:../harper.js"
     lodash-es: "npm:^4.17.21"
@@ -7317,7 +7323,7 @@ __metadata:
     typescript: "npm:^5.7.3"
     vite: "npm:^6.0.9"
     vite-plugin-pwa: "npm:^0.21.1"
-    vite-plugin-top-level-await: "npm:^1.4.4"
+    vite-plugin-top-level-await: "npm:^1.5.0"
     vite-plugin-wasm: "npm:^3.3.0"
   languageName: unknown
   linkType: soft
@@ -12908,16 +12914,16 @@ __metadata:
   languageName: node
   linkType: hard
 
-"vite-plugin-top-level-await@npm:^1.4.4":
-  version: 1.4.4
-  resolution: "vite-plugin-top-level-await@npm:1.4.4"
+"vite-plugin-top-level-await@npm:^1.5.0":
+  version: 1.5.0
+  resolution: "vite-plugin-top-level-await@npm:1.5.0"
   dependencies:
     "@rollup/plugin-virtual": "npm:^3.0.2"
-    "@swc/core": "npm:^1.7.0"
+    "@swc/core": "npm:^1.10.16"
     uuid: "npm:^10.0.0"
   peerDependencies:
     vite: ">=2.8"
-  checksum: 10c0/013e7b2e28632d93d04c4061187198e699064fc208a1657c100354b32da30921fa835879fc17779d5e0b074855237408da2fadd720fa0f4571137427a1efd5e3
+  checksum: 10c0/e582091e9cb020415d243937073a137bf30b6a2fd9af85fa7f96610d113ecab7bdb1aed2c4f35df22c54aaf4209be4d607bcb7de532e04e4e2619f9e22e395f6
   languageName: node
   linkType: hard
 

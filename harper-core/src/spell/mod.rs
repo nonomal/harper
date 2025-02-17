@@ -17,9 +17,9 @@ mod mutable_dictionary;
 
 #[derive(PartialEq, Debug, Hash, Eq)]
 pub struct FuzzyMatchResult<'a> {
-    word: &'a [char],
-    edit_distance: u8,
-    metadata: WordMetadata,
+    pub word: &'a [char],
+    pub edit_distance: u8,
+    pub metadata: WordMetadata,
 }
 
 impl PartialOrd for FuzzyMatchResult<'_> {

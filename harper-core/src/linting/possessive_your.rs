@@ -39,7 +39,7 @@ impl PatternLinter for PossessiveYour {
                 Suggestion::replace_with_match_case("your".chars().collect(), orig_chars),
                 Suggestion::replace_with_match_case("you're an".chars().collect(), orig_chars),
             ],
-            message: "The possesive version of this word is more common in this context."
+            message: "The possessive version of this word is more common in this context."
                 .to_owned(),
             ..Default::default()
         }

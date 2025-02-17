@@ -37,9 +37,27 @@ impl Default for MergedDictionary {
 }
 
 impl Dictionary for MergedDictionary {
+    fn get_correct_capitalization_of(&self, word: &[char]) -> Option<&'_ [char]> {
+        for child in &self.children {
+            if let Some(word) = child.get_correct_capitalization_of(word) {
+                return Some(word);
+            }
+        }
+        None
+    }
+
     fn contains_word(&self, word: &[char]) -> bool {
         for child in &self.children {
             if child.contains_word(word) {
+                return true;
+            }
+        }
+        false
+    }
+
+    fn contains_exact_word(&self, word: &[char]) -> bool {
+        for child in &self.children {
+            if child.contains_exact_word(word) {
                 return true;
             }
         }
@@ -68,6 +86,11 @@ impl Dictionary for MergedDictionary {
     }
 
     fn contains_word_str(&self, word: &str) -> bool {
+        let chars: CharString = word.chars().collect();
+        self.contains_word(&chars)
+    }
+
+    fn contains_exact_word_str(&self, word: &str) -> bool {
         let chars: CharString = word.chars().collect();
         self.contains_word(&chars)
     }

@@ -226,7 +226,7 @@ mod tests {
     #[test]
     fn web_socket() {
         let test_sentence = "Real-time updates are sent via a web socket.";
-        let expected = "Real-time updates are sent via a WebSocket.";
+        let expected = "Real-time updates are sent via a websocket.";
         assert_suggestion_result(test_sentence, CompoundNouns::default(), expected);
     }
 

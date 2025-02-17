@@ -65,6 +65,7 @@ pub trait TokenStringExt {
     create_decl_for!(number);
     create_decl_for!(at);
     create_decl_for!(ellipsis);
+    create_decl_for!(hostname);
     create_decl_for!(unlintable);
     create_decl_for!(sentence_terminator);
     create_decl_for!(paragraph_break);
@@ -99,6 +100,7 @@ pub trait TokenStringExt {
 impl TokenStringExt for [Token] {
     create_fns_for!(word);
     create_fns_for!(word_like);
+    create_fns_for!(hostname);
     create_fns_for!(conjunction);
     create_fns_for!(space);
     create_fns_for!(apostrophe);

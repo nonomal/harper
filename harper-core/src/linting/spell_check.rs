@@ -5,7 +5,7 @@ use super::Suggestion;
 use super::{Lint, LintKind, Linter};
 use crate::document::Document;
 use crate::spell::suggest_correct_spelling;
-use crate::{CharString, Dictionary, TokenStringExt};
+use crate::{CharString, CharStringExt, Dictionary, TokenStringExt};
 
 pub struct SpellCheck<T>
 where
@@ -56,7 +56,9 @@ impl<T: Dictionary> Linter for SpellCheck<T> {
 
         for word in document.iter_words() {
             let word_chars = document.get_span_content(word.span);
-            if self.dictionary.contains_word(word_chars) {
+            if self.dictionary.contains_exact_word(word_chars)
+                || self.dictionary.contains_exact_word(&word_chars.to_lower())
+            {
                 continue;
             }
 

@@ -8,10 +8,14 @@ use crate::WordMetadata;
 /// See also: [`super::FstDictionary`] and [`super::MutableDictionary`].
 #[blanket(derive(Arc))]
 pub trait Dictionary: Send + Sync {
-    /// Check if the dictionary contains a given word.
+    /// Check if the dictionary contains any capitalization of a given word.
     fn contains_word(&self, word: &[char]) -> bool;
-    /// Check if the dictionary contains a given word.
+    /// Check if the dictionary contains any capitalization of a given word.
     fn contains_word_str(&self, word: &str) -> bool;
+    /// Check if the dictionary contains the exact capitalization of a given word.
+    fn contains_exact_word(&self, word: &[char]) -> bool;
+    /// Check if the dictionary contains the exact capitalization of a given word.
+    fn contains_exact_word_str(&self, word: &str) -> bool;
     /// Gets best fuzzy match from dictionary
     fn fuzzy_match(
         &self,
@@ -26,15 +30,15 @@ pub trait Dictionary: Send + Sync {
         max_distance: u8,
         max_results: usize,
     ) -> Vec<FuzzyMatchResult>;
-    /// Get the associated [`WordMetadata`] for a given word.
+    fn get_correct_capitalization_of(&self, word: &[char]) -> Option<&'_ [char]>;
+    /// Get the associated [`WordMetadata`] for any capitalization of a given word.
     /// If the word isn't in the dictionary, the resulting metadata will be
     /// empty.
     fn get_word_metadata(&self, word: &[char]) -> WordMetadata;
-    /// Get the associated [`WordMetadata`] for a given word.
+    /// Get the associated [`WordMetadata`] for any capitalization of a given word.
     /// If the word isn't in the dictionary, the resulting metadata will be
     /// empty.
     fn get_word_metadata_str(&self, word: &str) -> WordMetadata;
-
     /// Iterate over the words in the dictionary.
     fn words_iter(&self) -> Box<dyn Iterator<Item = &'_ [char]> + Send + '_>;
 

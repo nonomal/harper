@@ -14,7 +14,7 @@ use crate::{CharString, CharStringExt, WordMetadata};
 use super::dictionary::Dictionary;
 use super::FuzzyMatchResult;
 
-/// A basic dictionary that allows words to be added.
+/// A basic dictionary that allows words to be added after instantiating.
 /// This is useful for user and file dictionaries that may change at runtime.
 ///
 /// For immutable use-cases, such as the curated dictionary, prefer [`super::FstDictionary`],
@@ -37,6 +37,12 @@ pub struct MutableDictionary {
     word_len_starts: Vec<usize>,
     /// All English words
     word_map: HashMap<CharString, WordMetadata>,
+    /// A map from the lowercase versions of a word to the correct capitalization
+    /// of that same word.
+    ///
+    /// It can be used to check if a word is correctly capitalized, or if it is valid, regardless of
+    /// capitalization.
+    word_map_lowercase: HashMap<CharString, CharString>,
 }
 
 /// The uncached function that is used to produce the original copy of the
@@ -56,8 +62,14 @@ fn uncached_inner_new() -> Arc<MutableDictionary> {
     words.dedup();
     words.sort_unstable_by_key(|w| w.len());
 
+    let mut word_map_lowercase = HashMap::with_capacity(word_map.len());
+    for key in word_map.keys() {
+        word_map_lowercase.insert(key.to_lower(), key.clone());
+    }
+
     Arc::new(MutableDictionary {
         word_map,
+        word_map_lowercase,
         word_len_starts: MutableDictionary::create_len_starts(&words),
         words,
     })
@@ -73,6 +85,7 @@ impl MutableDictionary {
             words: Vec::new(),
             word_len_starts: Vec::new(),
             word_map: HashMap::new(),
+            word_map_lowercase: HashMap::new(),
         }
     }
 
@@ -98,6 +111,8 @@ impl MutableDictionary {
         self.words.extend(pairs.iter().map(|(v, _)| v.clone()));
         self.words.sort_by_key(|w| w.len());
         self.word_len_starts = Self::create_len_starts(&self.words);
+        self.word_map_lowercase
+            .extend(pairs.iter().map(|(key, _)| (key.to_lower(), key.clone())));
         self.word_map.extend(pairs);
     }
 
@@ -145,12 +160,13 @@ impl Default for MutableDictionary {
 impl Dictionary for MutableDictionary {
     fn get_word_metadata(&self, word: &[char]) -> WordMetadata {
         let normalized = seq_to_normalized(word);
-        let lowercase: CharString = normalized.to_lower();
+        let Some(correct_caps) = self.get_correct_capitalization_of(&normalized) else {
+            return WordMetadata::default();
+        };
 
         self.word_map
-            .get(normalized.as_ref())
+            .get(correct_caps)
             .cloned()
-            .or(self.word_map.get(lowercase.as_ref()).cloned())
             .unwrap_or(WordMetadata::default())
     }
 
@@ -158,7 +174,7 @@ impl Dictionary for MutableDictionary {
         let normalized = seq_to_normalized(word);
         let lowercase: CharString = normalized.to_lower();
 
-        self.word_map.contains_key(normalized.as_ref()) || self.word_map.contains_key(&lowercase)
+        self.word_map_lowercase.contains_key(&lowercase)
     }
 
     fn contains_word_str(&self, word: &str) -> bool {
@@ -169,6 +185,15 @@ impl Dictionary for MutableDictionary {
     fn get_word_metadata_str(&self, word: &str) -> WordMetadata {
         let chars: CharString = word.chars().collect();
         self.get_word_metadata(&chars)
+    }
+
+    fn get_correct_capitalization_of(&self, word: &[char]) -> Option<&'_ [char]> {
+        let normalized = seq_to_normalized(word);
+        let lowercase: CharString = normalized.to_lower();
+
+        self.word_map_lowercase
+            .get(&lowercase)
+            .map(|v| v.as_slice())
     }
 
     /// Suggest a correct spelling for a given misspelled word.
@@ -257,6 +282,15 @@ impl Dictionary for MutableDictionary {
         };
 
         Box::new(self.words[start..end].iter().map(|v| v.as_slice()))
+    }
+
+    fn contains_exact_word(&self, word: &[char]) -> bool {
+        self.word_map.contains_key(seq_to_normalized(word).as_ref())
+    }
+
+    fn contains_exact_word_str(&self, word: &str) -> bool {
+        let word: CharString = word.chars().collect();
+        self.contains_exact_word(word.as_ref())
     }
 }
 
