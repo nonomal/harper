@@ -1,934 +1,933 @@
 {
-	"name": "harper",
-	"displayName": "Harper",
-	"description": "The grammar checker for developers",
-	"version": "0.21.1",
-	"private": true,
-	"author": "Elijah Potter",
-	"publisher": "elijah-potter",
-	"license": "Apache-2.0",
-	"icon": "icon.png",
-	"galleryBanner": {
-		"color": "#F2F2F2",
-		"theme": "light"
-	},
-	"repository": {
-		"type": "git",
-		"url": "https://github.com/automattic/harper"
-	},
-	"bugs": {
-		"url": "https://github.com/automattic/harper/issues"
-	},
-	"engines": {
-		"vscode": "^1.89.0"
-	},
-	"categories": [
-		"Other"
-	],
-	"keywords": [
-		"grammar",
-		"spellcheck",
-		"writing"
-	],
-	"activationEvents": [
-		"onLanguage:c",
-		"onLanguage:cmake",
-		"onLanguage:cpp",
-		"onLanguage:csharp",
-		"onLanguage:dart",
-		"onLanguage:git-commit",
-		"onLanguage:go",
-		"onLanguage:haskell",
-		"onLanguage:html",
-		"onLanguage:java",
-		"onLanguage:javascript",
-		"onLanguage:javascriptreact",
-		"onLanguage:literate haskell",
-		"onLanguage:lua",
-		"onLanguage:markdown",
-		"onLanguage:nix",
-		"onLanguage:php",
-		"onLanguage:plaintext",
-		"onLanguage:python",
-		"onLanguage:ruby",
-		"onLanguage:rust",
-		"onLanguage:shellscript",
-		"onLanguage:swift",
-		"onLanguage:toml",
-		"onLanguage:typescript",
-		"onLanguage:typescriptreact",
-		"onLanguage:typst"
-	],
-	"main": "./build/extension.js",
-	"contributes": {
-		"commands": [
-			{
-				"command": "harper.languageserver.restart",
-				"title": "Harper: Restart Language Server",
-				"description": "Restart harper-ls"
-			}
-		],
-		"configuration": {
-			"type": "object",
-			"title": "Harper",
-			"properties": {
-				"harper-ls.path": {
-					"scope": "resource",
-					"type": "string",
-					"description": "Optional path to a harper-ls executable to use."
-				},
-				"harper-ls.codeActions.forceStable": {
-					"scope": "resource",
-					"type": "boolean",
-					"default": false,
-					"description": "Make code actions appear in \"stable\" positions by placing code actions that should always be available like adding misspelled words in the dictionary first."
-				},
-				"harper-ls.diagnosticSeverity": {
-					"scope": "resource",
-					"type": "string",
-					"enum": [
-						"error",
-						"hint",
-						"information",
-						"warning"
-					],
-					"default": "information",
-					"description": "How severe do you want diagnostics to appear in the editor?"
-				},
-				"harper-ls.fileDictPath": {
-					"scope": "resource",
-					"type": "string",
-					"description": "Optional path to a file dictionary directory to use."
-				},
-				"harper-ls.isolateEnglish": {
-					"scope": "resource",
-					"type": "boolean",
-					"default": false,
-					"description": "Only lint English text in documents that are a mixture of English and another language."
-				},
-				"harper-ls.markdown.ignore_link_title": {
-					"scope": "resource",
-					"type": "boolean",
-					"default": false,
-					"description": "Skip linting link titles."
-				},
-				"harper-ls.userDictPath": {
-					"scope": "resource",
-					"type": "string",
-					"description": "Optional path to a global dictionary file to use."
-				},
-				"harper-ls.linters.amazon_names": {
-					"scope": "resource",
-					"type": "boolean",
-					"default": true,
-					"description": "When referring to the various products of Amazon.com, make sure to treat them as a proper noun."
-				},
-				"harper-ls.linters.americas": {
-					"scope": "resource",
-					"type": "boolean",
-					"default": true,
-					"description": "When referring to North, Central, and South America, make sure to treat them as a proper noun."
-				},
-				"harper-ls.linters.an_a": {
-					"scope": "resource",
-					"type": "boolean",
-					"default": true,
-					"description": "A rule that looks for incorrect indefinite articles. For example, `this is an mule` would be flagged as incorrect."
-				},
-				"harper-ls.linters.and_alike": {
-					"scope": "resource",
-					"type": "boolean",
-					"default": true,
-					"description": "Looks for slight improper modifications to the phrase `and alike`."
-				},
-				"harper-ls.linters.anybody": {
-					"scope": "resource",
-					"type": "boolean",
-					"default": true,
-					"description": "Looks for incorrect spacing inside the closed compound `anybody`."
-				},
-				"harper-ls.linters.anyhow": {
-					"scope": "resource",
-					"type": "boolean",
-					"default": true,
-					"description": "Looks for incorrect spacing inside the closed compound `anyhow`."
-				},
-				"harper-ls.linters.anywhere": {
-					"scope": "resource",
-					"type": "boolean",
-					"default": true,
-					"description": "Looks for incorrect spacing inside the closed compound `anywhere`."
-				},
-				"harper-ls.linters.apple_names": {
-					"scope": "resource",
-					"type": "boolean",
-					"default": true,
-					"description": "When referring to Apple products and services, make sure to treat them as proper nouns."
-				},
-				"harper-ls.linters.australia": {
-					"scope": "resource",
-					"type": "boolean",
-					"default": true,
-					"description": "When referring to the states of Australia, make sure to treat them as a proper noun."
-				},
-				"harper-ls.linters.avoid_curses": {
-					"scope": "resource",
-					"type": "boolean",
-					"default": true,
-					"description": "A rule that looks for common offensive language."
-				},
-				"harper-ls.linters.azure_names": {
-					"scope": "resource",
-					"type": "boolean",
-					"default": true,
-					"description": "When referring to Azure cloud services, make sure to treat them as proper nouns."
-				},
-				"harper-ls.linters.backplane": {
-					"scope": "resource",
-					"type": "boolean",
-					"default": true,
-					"description": "Looks for incorrect spacing inside the closed compound `backplane`."
-				},
-				"harper-ls.linters.bad_rap": {
-					"scope": "resource",
-					"type": "boolean",
-					"default": true,
-					"description": "Looks for slight improper modifications to the phrase `bad rap`."
-				},
-				"harper-ls.linters.baited_breath": {
-					"scope": "resource",
-					"type": "boolean",
-					"default": true,
-					"description": "Ensures `bated breath` is written correctly, as `baited breath` is incorrect."
-				},
-				"harper-ls.linters.bare_in_mind": {
-					"scope": "resource",
-					"type": "boolean",
-					"default": true,
-					"description": "Ensures the phrase `bear in mind` is used correctly instead of `bare in mind`."
-				},
-				"harper-ls.linters.bated_breath": {
-					"scope": "resource",
-					"type": "boolean",
-					"default": true,
-					"description": "Looks for slight improper modifications to the phrase `bated breath`."
-				},
-				"harper-ls.linters.beck_and_call": {
-					"scope": "resource",
-					"type": "boolean",
-					"default": true,
-					"description": "Looks for slight improper modifications to the phrase `beck and call`."
-				},
-				"harper-ls.linters.boring_words": {
-					"scope": "resource",
-					"type": "boolean",
-					"default": false,
-					"description": "This rule looks for particularly boring or overused words. Using varied language is an easy way to keep a reader's attention."
-				},
-				"harper-ls.linters.canada": {
-					"scope": "resource",
-					"type": "boolean",
-					"default": true,
-					"description": "When referring to the provinces of Canada, make sure to treat them as a proper noun."
-				},
-				"harper-ls.linters.capitalize_personal_pronouns": {
-					"scope": "resource",
-					"type": "boolean",
-					"default": true,
-					"description": "Forgetting to capitalize personal pronouns, like \"I\" or \"I'm\" is one of the most common errors. This rule helps with that."
-				},
-				"harper-ls.linters.change_tack": {
-					"scope": "resource",
-					"type": "boolean",
-					"default": true,
-					"description": "Looks for slight improper modifications to the phrase `change tack`."
-				},
-				"harper-ls.linters.chinese_communist_party": {
-					"scope": "resource",
-					"type": "boolean",
-					"default": true,
-					"description": "When referring to the political party, make sure to treat them as a proper noun."
-				},
-				"harper-ls.linters.chock_full": {
-					"scope": "resource",
-					"type": "boolean",
-					"default": true,
-					"description": "Flags common soundalikes of \"chock-full\" and makes sure they're hyphenated."
-				},
-				"harper-ls.linters.compound_nouns": {
-					"scope": "resource",
-					"type": "boolean",
-					"default": true,
-					"description": "Detects compound nouns split by a space and suggests merging them when both parts form a valid noun."
-				},
-				"harper-ls.linters.correct_number_suffix": {
-					"scope": "resource",
-					"type": "boolean",
-					"default": true,
-					"description": "When making quick edits, it is common for authors to change the value of a number without changing its suffix. This rule looks for these cases, for example: `2st`."
-				},
-				"harper-ls.linters.currency_placement": {
-					"scope": "resource",
-					"type": "boolean",
-					"default": true,
-					"description": "The location of currency symbols varies by country. The rule looks for and corrects improper positioning."
-				},
-				"harper-ls.linters.desktop": {
-					"scope": "resource",
-					"type": "boolean",
-					"default": true,
-					"description": "Looks for incorrect spacing inside the closed compound `desktop`."
-				},
-				"harper-ls.linters.despite_of": {
-					"scope": "resource",
-					"type": "boolean",
-					"default": true,
-					"description": "Corrects the misuse of `despite of` and suggests the proper alternatives `despite` or `in spite of`."
-				},
-				"harper-ls.linters.devops": {
-					"scope": "resource",
-					"type": "boolean",
-					"default": true,
-					"description": "Looks for incorrect spacing inside the closed compound `devops`."
-				},
-				"harper-ls.linters.dot_initialisms": {
-					"scope": "resource",
-					"type": "boolean",
-					"default": true,
-					"description": "Ensures common initialisms (like \"i.e.\") are properly dot-separated."
-				},
-				"harper-ls.linters.ellipsis_length": {
-					"scope": "resource",
-					"type": "boolean",
-					"default": true,
-					"description": "Make sure you have the correct number of dots in your ellipsis."
-				},
-				"harper-ls.linters.eluded_to": {
-					"scope": "resource",
-					"type": "boolean",
-					"default": true,
-					"description": "Corrects `eluded to` to `alluded to` in contexts referring to indirect references."
-				},
-				"harper-ls.linters.en_masse": {
-					"scope": "resource",
-					"type": "boolean",
-					"default": true,
-					"description": "Looks for slight improper modifications to the phrase `en masse`."
-				},
-				"harper-ls.linters.everywhere": {
-					"scope": "resource",
-					"type": "boolean",
-					"default": true,
-					"description": "Looks for incorrect spacing inside the closed compound `everywhere`."
-				},
-				"harper-ls.linters.face_first": {
-					"scope": "resource",
-					"type": "boolean",
-					"default": true,
-					"description": "Ensures `face first` is correctly hyphenated as `face-first` when used before `into`."
-				},
-				"harper-ls.linters.fast_paste": {
-					"scope": "resource",
-					"type": "boolean",
-					"default": true,
-					"description": "Detects incorrect usage of `fast paste` or `fast-paste` and suggests `fast-paced` as the correct phrase."
-				},
-				"harper-ls.linters.furthermore": {
-					"scope": "resource",
-					"type": "boolean",
-					"default": true,
-					"description": "Looks for incorrect spacing inside the closed compound `furthermore`."
-				},
-				"harper-ls.linters.google_names": {
-					"scope": "resource",
-					"type": "boolean",
-					"default": true,
-					"description": "When referring to Google products and services, make sure to treat them as proper nouns."
-				},
-				"harper-ls.linters.henceforth": {
-					"scope": "resource",
-					"type": "boolean",
-					"default": true,
-					"description": "Looks for incorrect spacing inside the closed compound `henceforth`."
-				},
-				"harper-ls.linters.hereby": {
-					"scope": "resource",
-					"type": "boolean",
-					"default": true,
-					"description": "`Here by` in some contexts should be `hereby`"
-				},
-				"harper-ls.linters.holidays": {
-					"scope": "resource",
-					"type": "boolean",
-					"default": true,
-					"description": "When referring to holidays, make sure to treat them as a proper noun."
-				},
-				"harper-ls.linters.hop_hope": {
-					"scope": "resource",
-					"type": "boolean",
-					"default": true,
-					"description": "Handles common errors involving `hop` and `hope`. Ensures `hop` is used correctly in phrases like `hop on a bus` while correcting mistaken uses of `hope` in contexts where `hop` is expected."
-				},
-				"harper-ls.linters.however": {
-					"scope": "resource",
-					"type": "boolean",
-					"default": true,
-					"description": "Looks for incorrect spacing inside the closed compound `however`."
-				},
-				"harper-ls.linters.human_life": {
-					"scope": "resource",
-					"type": "boolean",
-					"default": true,
-					"description": "Looks for slight improper modifications to the phrase `human life`."
-				},
-				"harper-ls.linters.hunger_pang": {
-					"scope": "resource",
-					"type": "boolean",
-					"default": true,
-					"description": "Looks for slight improper modifications to the phrase `hunger pang`."
-				},
-				"harper-ls.linters.hyphenate_number_day": {
-					"scope": "resource",
-					"type": "boolean",
-					"default": true,
-					"description": "Ensures a hyphen is used in `X-day` when it is part of a compound adjective, such as `4-day work week`."
-				},
-				"harper-ls.linters.insofar": {
-					"scope": "resource",
-					"type": "boolean",
-					"default": true,
-					"description": "Looks for incorrect spacing inside the closed compound `insofar`."
-				},
-				"harper-ls.linters.instead": {
-					"scope": "resource",
-					"type": "boolean",
-					"default": true,
-					"description": "Looks for incorrect spacing inside the closed compound `instead`."
-				},
-				"harper-ls.linters.intact": {
-					"scope": "resource",
-					"type": "boolean",
-					"default": true,
-					"description": "Looks for incorrect spacing inside the closed compound `intact`."
-				},
-				"harper-ls.linters.into": {
-					"scope": "resource",
-					"type": "boolean",
-					"default": true,
-					"description": "Looks for incorrect spacing inside the closed compound `into`."
-				},
-				"harper-ls.linters.itself": {
-					"scope": "resource",
-					"type": "boolean",
-					"default": true,
-					"description": "Looks for incorrect spacing inside the closed compound `itself`."
-				},
-				"harper-ls.linters.koreas": {
-					"scope": "resource",
-					"type": "boolean",
-					"default": true,
-					"description": "When referring to the nations, make sure to treat them as a proper noun."
-				},
-				"harper-ls.linters.laptop": {
-					"scope": "resource",
-					"type": "boolean",
-					"default": true,
-					"description": "Looks for incorrect spacing inside the closed compound `laptop`."
-				},
-				"harper-ls.linters.left_right_hand": {
-					"scope": "resource",
-					"type": "boolean",
-					"default": true,
-					"description": "Ensures `left hand` and `right hand` are hyphenated when used as adjectives before a noun, such as in `left-hand side` or `right-hand corner`."
-				},
-				"harper-ls.linters.let_alone": {
-					"scope": "resource",
-					"type": "boolean",
-					"default": true,
-					"description": "Looks for slight improper modifications to the phrase `let alone`."
-				},
-				"harper-ls.linters.lets_confusion": {
-					"scope": "resource",
-					"type": "boolean",
-					"default": true,
-					"description": "It's often hard to determine where the subject should go with the word `let`. This rule attempts to find common errors with redundancy and contractions that may lead to confusion for readers."
-				},
-				"harper-ls.linters.likewise": {
-					"scope": "resource",
-					"type": "boolean",
-					"default": true,
-					"description": "Looks for incorrect spacing inside the closed compound `likewise`."
-				},
-				"harper-ls.linters.linking_verbs": {
-					"scope": "resource",
-					"type": "boolean",
-					"default": false,
-					"description": "Linking verbs connect nouns to other ideas. Make sure you do not accidentally link words that aren't nouns."
-				},
-				"harper-ls.linters.lo_and_behold": {
-					"scope": "resource",
-					"type": "boolean",
-					"default": true,
-					"description": "Detects the exact phrase `long and behold` and suggests replacing it with the idiomatically correct `lo and behold`"
-				},
-				"harper-ls.linters.long_sentences": {
-					"scope": "resource",
-					"type": "boolean",
-					"default": true,
-					"description": "This rule looks for run-on sentences, which can make your work harder to grok."
-				},
-				"harper-ls.linters.malaysia": {
-					"scope": "resource",
-					"type": "boolean",
-					"default": true,
-					"description": "When referring to the states of Malaysia and their capitals, make sure to treat them as a proper noun."
-				},
-				"harper-ls.linters.matcher": {
-					"scope": "resource",
-					"type": "boolean",
-					"default": true,
-					"description": "A collection of curated rules. A catch-all that will be removed in the future."
-				},
-				"harper-ls.linters.merge_words": {
-					"scope": "resource",
-					"type": "boolean",
-					"default": true,
-					"description": "Accidentally inserting a space inside a word is common. This rule looks for valid words that are split by whitespace."
-				},
-				"harper-ls.linters.meta_names": {
-					"scope": "resource",
-					"type": "boolean",
-					"default": true,
-					"description": "When referring to Meta products and services, make sure to treat them as proper nouns."
-				},
-				"harper-ls.linters.microsoft_names": {
-					"scope": "resource",
-					"type": "boolean",
-					"default": true,
-					"description": "When referring to Microsoft products and services, make sure to treat them as proper nouns."
-				},
-				"harper-ls.linters.middleware": {
-					"scope": "resource",
-					"type": "boolean",
-					"default": true,
-					"description": "Looks for incorrect spacing inside the closed compound `middleware`."
-				},
-				"harper-ls.linters.misunderstand": {
-					"scope": "resource",
-					"type": "boolean",
-					"default": true,
-					"description": "Looks for incorrect spacing inside the closed compound `misunderstand`."
-				},
-				"harper-ls.linters.misunderstood": {
-					"scope": "resource",
-					"type": "boolean",
-					"default": true,
-					"description": "Looks for incorrect spacing inside the closed compound `misunderstood`."
-				},
-				"harper-ls.linters.misuse": {
-					"scope": "resource",
-					"type": "boolean",
-					"default": true,
-					"description": "Looks for incorrect spacing inside the closed compound `misuse`."
-				},
-				"harper-ls.linters.misused": {
-					"scope": "resource",
-					"type": "boolean",
-					"default": true,
-					"description": "Looks for incorrect spacing inside the closed compound `misused`."
-				},
-				"harper-ls.linters.multicore": {
-					"scope": "resource",
-					"type": "boolean",
-					"default": true,
-					"description": "Looks for incorrect spacing inside the closed compound `multicore`."
-				},
-				"harper-ls.linters.multimedia": {
-					"scope": "resource",
-					"type": "boolean",
-					"default": true,
-					"description": "Looks for incorrect spacing inside the closed compound `multimedia`."
-				},
-				"harper-ls.linters.multiple_sequential_pronouns": {
-					"scope": "resource",
-					"type": "boolean",
-					"default": true,
-					"description": "When editing work to change point of view (i.e. first-person or third-person) it is common to add pronouns while neglecting to remove old ones. This rule catches cases where you have multiple disparate pronouns in sequence."
-				},
-				"harper-ls.linters.multithreading": {
-					"scope": "resource",
-					"type": "boolean",
-					"default": true,
-					"description": "Looks for incorrect spacing inside the closed compound `multithreading`."
-				},
-				"harper-ls.linters.mute_point": {
-					"scope": "resource",
-					"type": "boolean",
-					"default": true,
-					"description": "Ensures `moot point` is used instead of `mute point`, as `moot` means debatable or irrelevant."
-				},
-				"harper-ls.linters.myself": {
-					"scope": "resource",
-					"type": "boolean",
-					"default": true,
-					"description": "Looks for incorrect spacing inside the closed compound `myself`."
-				},
-				"harper-ls.linters.need_help": {
-					"scope": "resource",
-					"type": "boolean",
-					"default": true,
-					"description": "Looks for slight improper modifications to the phrase `need help`."
-				},
-				"harper-ls.linters.no_longer": {
-					"scope": "resource",
-					"type": "boolean",
-					"default": true,
-					"description": "Looks for slight improper modifications to the phrase `no longer`."
-				},
-				"harper-ls.linters.no_oxford_comma": {
-					"scope": "resource",
-					"type": "boolean",
-					"default": false,
-					"description": "The Oxford comma is one of the more controversial rules in common use today. Enabling this lint checks that there is no comma before `and`, `or` or `nor` when listing out more than two ideas."
-				},
-				"harper-ls.linters.nobody": {
-					"scope": "resource",
-					"type": "boolean",
-					"default": true,
-					"description": "Looks for incorrect spacing inside the closed compound `nobody`."
-				},
-				"harper-ls.linters.nonetheless": {
-					"scope": "resource",
-					"type": "boolean",
-					"default": true,
-					"description": "Looks for incorrect spacing inside the closed compound `nonetheless`."
-				},
-				"harper-ls.linters.nothing": {
-					"scope": "resource",
-					"type": "boolean",
-					"default": true,
-					"description": "Looks for incorrect spacing inside the closed compound `nothing`."
-				},
-				"harper-ls.linters.notwithstanding": {
-					"scope": "resource",
-					"type": "boolean",
-					"default": true,
-					"description": "Looks for incorrect spacing inside the closed compound `notwithstanding`."
-				},
-				"harper-ls.linters.number_suffix_capitalization": {
-					"scope": "resource",
-					"type": "boolean",
-					"default": true,
-					"description": "You should never capitalize number suffixes."
-				},
-				"harper-ls.linters.of_course": {
-					"scope": "resource",
-					"type": "boolean",
-					"default": true,
-					"description": "Looks for slight improper modifications to the phrase `of course`."
-				},
-				"harper-ls.linters.overall": {
-					"scope": "resource",
-					"type": "boolean",
-					"default": true,
-					"description": "Looks for incorrect spacing inside the closed compound `overall`."
-				},
-				"harper-ls.linters.overclocking": {
-					"scope": "resource",
-					"type": "boolean",
-					"default": true,
-					"description": "Looks for incorrect spacing inside the closed compound `overclocking`."
-				},
-				"harper-ls.linters.overload": {
-					"scope": "resource",
-					"type": "boolean",
-					"default": true,
-					"description": "Looks for incorrect spacing inside the closed compound `overload`."
-				},
-				"harper-ls.linters.overnight": {
-					"scope": "resource",
-					"type": "boolean",
-					"default": true,
-					"description": "Looks for incorrect spacing inside the closed compound `overnight`."
-				},
-				"harper-ls.linters.oxford_comma": {
-					"scope": "resource",
-					"type": "boolean",
-					"default": true,
-					"description": "The Oxford comma is one of the more controversial rules in common use today. Enabling this lint checks that there is a comma before `and`, `or`, or `nor` when listing out more than two ideas."
-				},
-				"harper-ls.linters.pique_interest": {
-					"scope": "resource",
-					"type": "boolean",
-					"default": true,
-					"description": "Detects incorrect usage of `peak` or `peek` when the intended word is `pique`, as in the phrase `you've peaked my interest`."
-				},
-				"harper-ls.linters.plural_conjugate": {
-					"scope": "resource",
-					"type": "boolean",
-					"default": false,
-					"description": "Make sure you use the correct conjugation of the verb \"to be\" in plural contexts."
-				},
-				"harper-ls.linters.possessive_your": {
-					"scope": "resource",
-					"type": "boolean",
-					"default": true,
-					"description": "The possessive version of `you` is more common before nouns."
-				},
-				"harper-ls.linters.postpone": {
-					"scope": "resource",
-					"type": "boolean",
-					"default": true,
-					"description": "Looks for incorrect spacing inside the closed compound `postpone`."
-				},
-				"harper-ls.linters.pronoun_contraction": {
-					"scope": "resource",
-					"type": "boolean",
-					"default": true,
-					"description": "Choosing when to contract pronouns is a challenging art. This rule looks for faults."
-				},
-				"harper-ls.linters.proofread": {
-					"scope": "resource",
-					"type": "boolean",
-					"default": true,
-					"description": "Looks for incorrect spacing inside the closed compound `proofread`."
-				},
-				"harper-ls.linters.regardless": {
-					"scope": "resource",
-					"type": "boolean",
-					"default": true,
-					"description": "Looks for incorrect spacing inside the closed compound `regardless`."
-				},
-				"harper-ls.linters.repeated_words": {
-					"scope": "resource",
-					"type": "boolean",
-					"default": true,
-					"description": "This rule looks for repetitions of words that are not homographs."
-				},
-				"harper-ls.linters.sentence_capitalization": {
-					"scope": "resource",
-					"type": "boolean",
-					"default": true,
-					"description": "The opening word of a sentence should almost always be capitalized."
-				},
-				"harper-ls.linters.sneaking_suspicion": {
-					"scope": "resource",
-					"type": "boolean",
-					"default": true,
-					"description": "Looks for slight improper modifications to the phrase `sneaking suspicion`."
-				},
-				"harper-ls.linters.somebody": {
-					"scope": "resource",
-					"type": "boolean",
-					"default": true,
-					"description": "Looks for incorrect spacing inside the closed compound `somebody`."
-				},
-				"harper-ls.linters.somehow": {
-					"scope": "resource",
-					"type": "boolean",
-					"default": true,
-					"description": "Looks for incorrect spacing inside the closed compound `somehow`."
-				},
-				"harper-ls.linters.somewhat_something": {
-					"scope": "resource",
-					"type": "boolean",
-					"default": true,
-					"description": "When describing a single instance of a noun, use `something` rather than `somewhat`."
-				},
-				"harper-ls.linters.somewhere": {
-					"scope": "resource",
-					"type": "boolean",
-					"default": true,
-					"description": "Looks for incorrect spacing inside the closed compound `somewhere`."
-				},
-				"harper-ls.linters.spaces": {
-					"scope": "resource",
-					"type": "boolean",
-					"default": true,
-					"description": "Words should be separated by at most one space."
-				},
-				"harper-ls.linters.special_attention": {
-					"scope": "resource",
-					"type": "boolean",
-					"default": true,
-					"description": "Looks for slight improper modifications to the phrase `special attention`."
-				},
-				"harper-ls.linters.spell_check": {
-					"scope": "resource",
-					"type": "boolean",
-					"default": true,
-					"description": "Looks and provides corrections for misspelled words."
-				},
-				"harper-ls.linters.spelled_numbers": {
-					"scope": "resource",
-					"type": "boolean",
-					"default": false,
-					"description": "Most style guides recommend that you spell out numbers less than ten."
-				},
-				"harper-ls.linters.state_of_the_art": {
-					"scope": "resource",
-					"type": "boolean",
-					"default": true,
-					"description": "Detects incorrect usage of `state of art` and suggests `state of the art` as the correct phrase."
-				},
-				"harper-ls.linters.supposed_to": {
-					"scope": "resource",
-					"type": "boolean",
-					"default": true,
-					"description": "Looks for slight improper modifications to the phrase `supposed to`."
-				},
-				"harper-ls.linters.terminating_conjunctions": {
-					"scope": "resource",
-					"type": "boolean",
-					"default": true,
-					"description": "Subordinating conjunctions are words that create a grammatical space for another idea or clause. As such, they should never appear at the end of a clause."
-				},
-				"harper-ls.linters.than_others": {
-					"scope": "resource",
-					"type": "boolean",
-					"default": true,
-					"description": "Looks for slight improper modifications to the phrase `than others`."
-				},
-				"harper-ls.linters.that_challenged": {
-					"scope": "resource",
-					"type": "boolean",
-					"default": true,
-					"description": "Looks for slight improper modifications to the phrase `that challenged`."
-				},
-				"harper-ls.linters.that_which": {
-					"scope": "resource",
-					"type": "boolean",
-					"default": true,
-					"description": "Repeating the word \"that\" is often redundant. The phrase `that which` is easier to read."
-				},
-				"harper-ls.linters.then_than": {
-					"scope": "resource",
-					"type": "boolean",
-					"default": true,
-					"description": "Corrects the misuse of `then` to `than`."
-				},
-				"harper-ls.linters.therefore": {
-					"scope": "resource",
-					"type": "boolean",
-					"default": true,
-					"description": "Looks for incorrect spacing inside the closed compound `therefore`."
-				},
-				"harper-ls.linters.thereupon": {
-					"scope": "resource",
-					"type": "boolean",
-					"default": true,
-					"description": "Looks for incorrect spacing inside the closed compound `thereupon`."
-				},
-				"harper-ls.linters.turn_it_off": {
-					"scope": "resource",
-					"type": "boolean",
-					"default": true,
-					"description": "Looks for slight improper modifications to the phrase `turn it off`."
-				},
-				"harper-ls.linters.unclosed_quotes": {
-					"scope": "resource",
-					"type": "boolean",
-					"default": true,
-					"description": "Quotation marks should always be closed. Unpaired quotation marks are a hallmark of sloppy work."
-				},
-				"harper-ls.linters.underclock": {
-					"scope": "resource",
-					"type": "boolean",
-					"default": true,
-					"description": "Looks for incorrect spacing inside the closed compound `underclock`."
-				},
-				"harper-ls.linters.united_organizations": {
-					"scope": "resource",
-					"type": "boolean",
-					"default": true,
-					"description": "When referring to national or international organizations, make sure to treat them as a proper noun."
-				},
-				"harper-ls.linters.upset": {
-					"scope": "resource",
-					"type": "boolean",
-					"default": true,
-					"description": "Looks for incorrect spacing inside the closed compound `upset`."
-				},
-				"harper-ls.linters.upward": {
-					"scope": "resource",
-					"type": "boolean",
-					"default": true,
-					"description": "Looks for incorrect spacing inside the closed compound `upward`."
-				},
-				"harper-ls.linters.use_genitive": {
-					"scope": "resource",
-					"type": "boolean",
-					"default": false,
-					"description": "Looks for situations where the genitive case of \"there\" should be used."
-				},
-				"harper-ls.linters.want_be": {
-					"scope": "resource",
-					"type": "boolean",
-					"default": true,
-					"description": "Detects incorrect usage of `want be` and suggests `won't be` or `want to be` based on context."
-				},
-				"harper-ls.linters.was_aloud": {
-					"scope": "resource",
-					"type": "boolean",
-					"default": true,
-					"description": "Ensures `was aloud` and `were aloud` are corrected to `was allowed` or `were allowed` when referring to permission."
-				},
-				"harper-ls.linters.whereas": {
-					"scope": "resource",
-					"type": "boolean",
-					"default": true,
-					"description": "The Whereas rule is designed to identify instances where the phrase `where as` is used in text and suggests replacing it with the single word `whereas`."
-				},
-				"harper-ls.linters.whereupon": {
-					"scope": "resource",
-					"type": "boolean",
-					"default": true,
-					"description": "Looks for incorrect spacing inside the closed compound `whereupon`."
-				},
-				"harper-ls.linters.widespread": {
-					"scope": "resource",
-					"type": "boolean",
-					"default": true,
-					"description": "Looks for incorrect spacing inside the closed compound `widespread`."
-				},
-				"harper-ls.linters.worldwide": {
-					"scope": "resource",
-					"type": "boolean",
-					"default": true,
-					"description": "Looks for incorrect spacing inside the closed compound `worldwide`."
-				},
-				"harper-ls.linters.wrong_quotes": {
-					"scope": "resource",
-					"type": "boolean",
-					"default": false,
-					"description": "The key on the keyboard often used as a quotation mark is actually a double-apostrophe. Use the correct character."
-				}
-			}
-		}
-	},
-	"scripts": {
-		"watch:esbuild": "node esbuild.cjs --watch",
-		"watch:tsc": "tsc --noEmit --watch",
-		"pretest": "yarn lint && tsc && node esbuild.cjs",
-		"test": "node build/tests/runTests.js",
-		"vscode:prepublish": "yarn lint && tsc --noEmit && node esbuild.cjs --production",
-		"package": "vsce package",
-		"lint": "eslint src --ext ts"
-	},
-	"devDependencies": {
-		"@types/jasmine": "^5.1.4",
-		"@types/node": "22.x",
-		"@types/vscode": "^1.89.0",
-		"@typescript-eslint/eslint-plugin": "^7.7.1",
-		"@typescript-eslint/parser": "^7.7.1",
-		"@vscode/test-electron": "^2.3.9",
-		"@vscode/vsce": "^3.0.0",
-		"esbuild": "^0.25.0",
-		"eslint": "^8.57.0",
-		"jasmine": "^5.3.0",
-		"typescript": "^5.7.3"
-	},
-	"dependencies": {
-		"vscode-languageclient": "^9.0.1"
-	}
+  "name": "harper",
+  "displayName": "Harper",
+  "description": "The grammar checker for developers",
+  "version": "0.21.1",
+  "private": true,
+  "author": "Elijah Potter",
+  "publisher": "elijah-potter",
+  "license": "Apache-2.0",
+  "icon": "icon.png",
+  "galleryBanner": {
+    "color": "#F2F2F2",
+    "theme": "light"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/automattic/harper"
+  },
+  "bugs": {
+    "url": "https://github.com/automattic/harper/issues"
+  },
+  "engines": {
+    "vscode": "^1.89.0"
+  },
+  "categories": [
+    "Other"
+  ],
+  "keywords": [
+    "grammar",
+    "spellcheck",
+    "writing"
+  ],
+  "activationEvents": [
+    "onLanguage:c",
+    "onLanguage:cmake",
+    "onLanguage:cpp",
+    "onLanguage:csharp",
+    "onLanguage:dart",
+    "onLanguage:git-commit",
+    "onLanguage:go",
+    "onLanguage:haskell",
+    "onLanguage:html",
+    "onLanguage:java",
+    "onLanguage:javascript",
+    "onLanguage:javascriptreact",
+    "onLanguage:literate haskell",
+    "onLanguage:lua",
+    "onLanguage:markdown",
+    "onLanguage:nix",
+    "onLanguage:php",
+    "onLanguage:plaintext",
+    "onLanguage:python",
+    "onLanguage:ruby",
+    "onLanguage:rust",
+    "onLanguage:shellscript",
+    "onLanguage:swift",
+    "onLanguage:toml",
+    "onLanguage:typescript",
+    "onLanguage:typescriptreact",
+    "onLanguage:typst"
+  ],
+  "main": "./build/extension.js",
+  "contributes": {
+    "commands": [
+      {
+        "command": "harper.languageserver.restart",
+        "title": "Harper: Restart Language Server",
+        "description": "Restart harper-ls"
+      }
+    ],
+    "configuration": {
+      "type": "object",
+      "title": "Harper",
+      "properties": {
+        "harper-ls.path": {
+          "scope": "resource",
+          "type": "string",
+          "description": "Optional path to a harper-ls executable to use."
+        },
+        "harper-ls.codeActions.forceStable": {
+          "scope": "resource",
+          "type": "boolean",
+          "default": false,
+          "description": "Make code actions appear in \"stable\" positions by placing code actions that should always be available like adding misspelled words in the dictionary first."
+        },
+        "harper-ls.diagnosticSeverity": {
+          "scope": "resource",
+          "type": "string",
+          "enum": [
+            "error",
+            "hint",
+            "information",
+            "warning"
+          ],
+          "default": "information",
+          "description": "How severe do you want diagnostics to appear in the editor?"
+        },
+        "harper-ls.fileDictPath": {
+          "scope": "resource",
+          "type": "string",
+          "description": "Optional path to a file dictionary directory to use."
+        },
+        "harper-ls.isolateEnglish": {
+          "scope": "resource",
+          "type": "boolean",
+          "default": false,
+          "description": "Only lint English text in documents that are a mixture of English and another language."
+        },
+        "harper-ls.markdown.ignore_link_title": {
+          "scope": "resource",
+          "type": "boolean",
+          "default": false,
+          "description": "Skip linting link titles."
+        },
+        "harper-ls.userDictPath": {
+          "scope": "resource",
+          "type": "string",
+          "description": "Optional path to a global dictionary file to use."
+        },
+        "harper-ls.linters.amazon_names": {
+          "scope": "resource",
+          "type": "boolean",
+          "default": true,
+          "description": "When referring to the various products of Amazon.com, make sure to treat them as a proper noun."
+        },
+        "harper-ls.linters.americas": {
+          "scope": "resource",
+          "type": "boolean",
+          "default": true,
+          "description": "When referring to North, Central, and South America, make sure to treat them as a proper noun."
+        },
+        "harper-ls.linters.an_a": {
+          "scope": "resource",
+          "type": "boolean",
+          "default": true,
+          "description": "A rule that looks for incorrect indefinite articles. For example, `this is an mule` would be flagged as incorrect."
+        },
+        "harper-ls.linters.and_alike": {
+          "scope": "resource",
+          "type": "boolean",
+          "default": true,
+          "description": "Looks for slight improper modifications to the phrase `and alike`."
+        },
+        "harper-ls.linters.anybody": {
+          "scope": "resource",
+          "type": "boolean",
+          "default": true,
+          "description": "Looks for incorrect spacing inside the closed compound `anybody`."
+        },
+        "harper-ls.linters.anyhow": {
+          "scope": "resource",
+          "type": "boolean",
+          "default": true,
+          "description": "Looks for incorrect spacing inside the closed compound `anyhow`."
+        },
+        "harper-ls.linters.anywhere": {
+          "scope": "resource",
+          "type": "boolean",
+          "default": true,
+          "description": "Looks for incorrect spacing inside the closed compound `anywhere`."
+        },
+        "harper-ls.linters.apple_names": {
+          "scope": "resource",
+          "type": "boolean",
+          "default": true,
+          "description": "When referring to Apple products and services, make sure to treat them as proper nouns."
+        },
+        "harper-ls.linters.australia": {
+          "scope": "resource",
+          "type": "boolean",
+          "default": true,
+          "description": "When referring to the states of Australia, make sure to treat them as a proper noun."
+        },
+        "harper-ls.linters.avoid_curses": {
+          "scope": "resource",
+          "type": "boolean",
+          "default": true,
+          "description": "A rule that looks for common offensive language."
+        },
+        "harper-ls.linters.azure_names": {
+          "scope": "resource",
+          "type": "boolean",
+          "default": true,
+          "description": "When referring to Azure cloud services, make sure to treat them as proper nouns."
+        },
+        "harper-ls.linters.backplane": {
+          "scope": "resource",
+          "type": "boolean",
+          "default": true,
+          "description": "Looks for incorrect spacing inside the closed compound `backplane`."
+        },
+        "harper-ls.linters.bad_rap": {
+          "scope": "resource",
+          "type": "boolean",
+          "default": true,
+          "description": "Looks for slight improper modifications to the phrase `bad rap`."
+        },
+        "harper-ls.linters.baited_breath": {
+          "scope": "resource",
+          "type": "boolean",
+          "default": true,
+          "description": "Ensures `bated breath` is written correctly, as `baited breath` is incorrect."
+        },
+        "harper-ls.linters.bare_in_mind": {
+          "scope": "resource",
+          "type": "boolean",
+          "default": true,
+          "description": "Ensures the phrase `bear in mind` is used correctly instead of `bare in mind`."
+        },
+        "harper-ls.linters.bated_breath": {
+          "scope": "resource",
+          "type": "boolean",
+          "default": true,
+          "description": "Looks for slight improper modifications to the phrase `bated breath`."
+        },
+        "harper-ls.linters.beck_and_call": {
+          "scope": "resource",
+          "type": "boolean",
+          "default": true,
+          "description": "Looks for slight improper modifications to the phrase `beck and call`."
+        },
+        "harper-ls.linters.boring_words": {
+          "scope": "resource",
+          "type": "boolean",
+          "default": false,
+          "description": "This rule looks for particularly boring or overused words. Using varied language is an easy way to keep a reader's attention."
+        },
+        "harper-ls.linters.canada": {
+          "scope": "resource",
+          "type": "boolean",
+          "default": true,
+          "description": "When referring to the provinces of Canada, make sure to treat them as a proper noun."
+        },
+        "harper-ls.linters.capitalize_personal_pronouns": {
+          "scope": "resource",
+          "type": "boolean",
+          "default": true,
+          "description": "Forgetting to capitalize personal pronouns, like \"I\" or \"I'm\" is one of the most common errors. This rule helps with that."
+        },
+        "harper-ls.linters.change_tack": {
+          "scope": "resource",
+          "type": "boolean",
+          "default": true,
+          "description": "Looks for slight improper modifications to the phrase `change tack`."
+        },
+        "harper-ls.linters.chinese_communist_party": {
+          "scope": "resource",
+          "type": "boolean",
+          "default": true,
+          "description": "When referring to the political party, make sure to treat them as a proper noun."
+        },
+        "harper-ls.linters.chock_full": {
+          "scope": "resource",
+          "type": "boolean",
+          "default": true,
+          "description": "Flags common soundalikes of \"chock-full\" and makes sure they're hyphenated."
+        },
+        "harper-ls.linters.compound_nouns": {
+          "scope": "resource",
+          "type": "boolean",
+          "default": true,
+          "description": "Detects compound nouns split by a space and suggests merging them when both parts form a valid noun."
+        },
+        "harper-ls.linters.correct_number_suffix": {
+          "scope": "resource",
+          "type": "boolean",
+          "default": true,
+          "description": "When making quick edits, it is common for authors to change the value of a number without changing its suffix. This rule looks for these cases, for example: `2st`."
+        },
+        "harper-ls.linters.currency_placement": {
+          "scope": "resource",
+          "type": "boolean",
+          "default": true,
+          "description": "The location of currency symbols varies by country. The rule looks for and corrects improper positioning."
+        },
+        "harper-ls.linters.desktop": {
+          "scope": "resource",
+          "type": "boolean",
+          "default": true,
+          "description": "Looks for incorrect spacing inside the closed compound `desktop`."
+        },
+        "harper-ls.linters.despite_of": {
+          "scope": "resource",
+          "type": "boolean",
+          "default": true,
+          "description": "Corrects the misuse of `despite of` and suggests the proper alternatives `despite` or `in spite of`."
+        },
+        "harper-ls.linters.devops": {
+          "scope": "resource",
+          "type": "boolean",
+          "default": true,
+          "description": "Looks for incorrect spacing inside the closed compound `devops`."
+        },
+        "harper-ls.linters.dot_initialisms": {
+          "scope": "resource",
+          "type": "boolean",
+          "default": true,
+          "description": "Ensures common initialisms (like \"i.e.\") are properly dot-separated."
+        },
+        "harper-ls.linters.ellipsis_length": {
+          "scope": "resource",
+          "type": "boolean",
+          "default": true,
+          "description": "Make sure you have the correct number of dots in your ellipsis."
+        },
+        "harper-ls.linters.eluded_to": {
+          "scope": "resource",
+          "type": "boolean",
+          "default": true,
+          "description": "Corrects `eluded to` to `alluded to` in contexts referring to indirect references."
+        },
+        "harper-ls.linters.en_masse": {
+          "scope": "resource",
+          "type": "boolean",
+          "default": true,
+          "description": "Looks for slight improper modifications to the phrase `en masse`."
+        },
+        "harper-ls.linters.everywhere": {
+          "scope": "resource",
+          "type": "boolean",
+          "default": true,
+          "description": "Looks for incorrect spacing inside the closed compound `everywhere`."
+        },
+        "harper-ls.linters.face_first": {
+          "scope": "resource",
+          "type": "boolean",
+          "default": true,
+          "description": "Ensures `face first` is correctly hyphenated as `face-first` when used before `into`."
+        },
+        "harper-ls.linters.fast_paste": {
+          "scope": "resource",
+          "type": "boolean",
+          "default": true,
+          "description": "Detects incorrect usage of `fast paste` or `fast-paste` and suggests `fast-paced` as the correct phrase."
+        },
+        "harper-ls.linters.furthermore": {
+          "scope": "resource",
+          "type": "boolean",
+          "default": true,
+          "description": "Looks for incorrect spacing inside the closed compound `furthermore`."
+        },
+        "harper-ls.linters.google_names": {
+          "scope": "resource",
+          "type": "boolean",
+          "default": true,
+          "description": "When referring to Google products and services, make sure to treat them as proper nouns."
+        },
+        "harper-ls.linters.henceforth": {
+          "scope": "resource",
+          "type": "boolean",
+          "default": true,
+          "description": "Looks for incorrect spacing inside the closed compound `henceforth`."
+        },
+        "harper-ls.linters.hereby": {
+          "scope": "resource",
+          "type": "boolean",
+          "default": true,
+          "description": "`Here by` in some contexts should be `hereby`"
+        },
+        "harper-ls.linters.holidays": {
+          "scope": "resource",
+          "type": "boolean",
+          "default": true,
+          "description": "When referring to holidays, make sure to treat them as a proper noun."
+        },
+        "harper-ls.linters.hop_hope": {
+          "scope": "resource",
+          "type": "boolean",
+          "default": true,
+          "description": "Handles common errors involving `hop` and `hope`. Ensures `hop` is used correctly in phrases like `hop on a bus` while correcting mistaken uses of `hope` in contexts where `hop` is expected."
+        },
+        "harper-ls.linters.however": {
+          "scope": "resource",
+          "type": "boolean",
+          "default": true,
+          "description": "Looks for incorrect spacing inside the closed compound `however`."
+        },
+        "harper-ls.linters.human_life": {
+          "scope": "resource",
+          "type": "boolean",
+          "default": true,
+          "description": "Looks for slight improper modifications to the phrase `human life`."
+        },
+        "harper-ls.linters.hunger_pang": {
+          "scope": "resource",
+          "type": "boolean",
+          "default": true,
+          "description": "Looks for slight improper modifications to the phrase `hunger pang`."
+        },
+        "harper-ls.linters.hyphenate_number_day": {
+          "scope": "resource",
+          "type": "boolean",
+          "default": true,
+          "description": "Ensures a hyphen is used in `X-day` when it is part of a compound adjective, such as `4-day work week`."
+        },
+        "harper-ls.linters.insofar": {
+          "scope": "resource",
+          "type": "boolean",
+          "default": true,
+          "description": "Looks for incorrect spacing inside the closed compound `insofar`."
+        },
+        "harper-ls.linters.instead": {
+          "scope": "resource",
+          "type": "boolean",
+          "default": true,
+          "description": "Looks for incorrect spacing inside the closed compound `instead`."
+        },
+        "harper-ls.linters.intact": {
+          "scope": "resource",
+          "type": "boolean",
+          "default": true,
+          "description": "Looks for incorrect spacing inside the closed compound `intact`."
+        },
+        "harper-ls.linters.into": {
+          "scope": "resource",
+          "type": "boolean",
+          "default": true,
+          "description": "Looks for incorrect spacing inside the closed compound `into`."
+        },
+        "harper-ls.linters.itself": {
+          "scope": "resource",
+          "type": "boolean",
+          "default": true,
+          "description": "Looks for incorrect spacing inside the closed compound `itself`."
+        },
+        "harper-ls.linters.koreas": {
+          "scope": "resource",
+          "type": "boolean",
+          "default": true,
+          "description": "When referring to the nations, make sure to treat them as a proper noun."
+        },
+        "harper-ls.linters.laptop": {
+          "scope": "resource",
+          "type": "boolean",
+          "default": true,
+          "description": "Looks for incorrect spacing inside the closed compound `laptop`."
+        },
+        "harper-ls.linters.left_right_hand": {
+          "scope": "resource",
+          "type": "boolean",
+          "default": true,
+          "description": "Ensures `left hand` and `right hand` are hyphenated when used as adjectives before a noun, such as in `left-hand side` or `right-hand corner`."
+        },
+        "harper-ls.linters.let_alone": {
+          "scope": "resource",
+          "type": "boolean",
+          "default": true,
+          "description": "Looks for slight improper modifications to the phrase `let alone`."
+        },
+        "harper-ls.linters.lets_confusion": {
+          "scope": "resource",
+          "type": "boolean",
+          "default": true,
+          "description": "It's often hard to determine where the subject should go with the word `let`. This rule attempts to find common errors with redundancy and contractions that may lead to confusion for readers."
+        },
+        "harper-ls.linters.likewise": {
+          "scope": "resource",
+          "type": "boolean",
+          "default": true,
+          "description": "Looks for incorrect spacing inside the closed compound `likewise`."
+        },
+        "harper-ls.linters.linking_verbs": {
+          "scope": "resource",
+          "type": "boolean",
+          "default": false,
+          "description": "Linking verbs connect nouns to other ideas. Make sure you do not accidentally link words that aren't nouns."
+        },
+        "harper-ls.linters.lo_and_behold": {
+          "scope": "resource",
+          "type": "boolean",
+          "default": true,
+          "description": "Detects the exact phrase `long and behold` and suggests replacing it with the idiomatically correct `lo and behold`"
+        },
+        "harper-ls.linters.long_sentences": {
+          "scope": "resource",
+          "type": "boolean",
+          "default": true,
+          "description": "This rule looks for run-on sentences, which can make your work harder to grok."
+        },
+        "harper-ls.linters.malaysia": {
+          "scope": "resource",
+          "type": "boolean",
+          "default": true,
+          "description": "When referring to the states of Malaysia and their capitals, make sure to treat them as a proper noun."
+        },
+        "harper-ls.linters.matcher": {
+          "scope": "resource",
+          "type": "boolean",
+          "default": true,
+          "description": "A collection of curated rules. A catch-all that will be removed in the future."
+        },
+        "harper-ls.linters.merge_words": {
+          "scope": "resource",
+          "type": "boolean",
+          "default": true,
+          "description": "Accidentally inserting a space inside a word is common. This rule looks for valid words that are split by whitespace."
+        },
+        "harper-ls.linters.meta_names": {
+          "scope": "resource",
+          "type": "boolean",
+          "default": true,
+          "description": "When referring to Meta products and services, make sure to treat them as proper nouns."
+        },
+        "harper-ls.linters.microsoft_names": {
+          "scope": "resource",
+          "type": "boolean",
+          "default": true,
+          "description": "When referring to Microsoft products and services, make sure to treat them as proper nouns."
+        },
+        "harper-ls.linters.middleware": {
+          "scope": "resource",
+          "type": "boolean",
+          "default": true,
+          "description": "Looks for incorrect spacing inside the closed compound `middleware`."
+        },
+        "harper-ls.linters.misunderstand": {
+          "scope": "resource",
+          "type": "boolean",
+          "default": true,
+          "description": "Looks for incorrect spacing inside the closed compound `misunderstand`."
+        },
+        "harper-ls.linters.misunderstood": {
+          "scope": "resource",
+          "type": "boolean",
+          "default": true,
+          "description": "Looks for incorrect spacing inside the closed compound `misunderstood`."
+        },
+        "harper-ls.linters.misuse": {
+          "scope": "resource",
+          "type": "boolean",
+          "default": true,
+          "description": "Looks for incorrect spacing inside the closed compound `misuse`."
+        },
+        "harper-ls.linters.misused": {
+          "scope": "resource",
+          "type": "boolean",
+          "default": true,
+          "description": "Looks for incorrect spacing inside the closed compound `misused`."
+        },
+        "harper-ls.linters.multicore": {
+          "scope": "resource",
+          "type": "boolean",
+          "default": true,
+          "description": "Looks for incorrect spacing inside the closed compound `multicore`."
+        },
+        "harper-ls.linters.multimedia": {
+          "scope": "resource",
+          "type": "boolean",
+          "default": true,
+          "description": "Looks for incorrect spacing inside the closed compound `multimedia`."
+        },
+        "harper-ls.linters.multiple_sequential_pronouns": {
+          "scope": "resource",
+          "type": "boolean",
+          "default": true,
+          "description": "When editing work to change point of view (i.e. first-person or third-person) it is common to add pronouns while neglecting to remove old ones. This rule catches cases where you have multiple disparate pronouns in sequence."
+        },
+        "harper-ls.linters.multithreading": {
+          "scope": "resource",
+          "type": "boolean",
+          "default": true,
+          "description": "Looks for incorrect spacing inside the closed compound `multithreading`."
+        },
+        "harper-ls.linters.mute_point": {
+          "scope": "resource",
+          "type": "boolean",
+          "default": true,
+          "description": "Ensures `moot point` is used instead of `mute point`, as `moot` means debatable or irrelevant."
+        },
+        "harper-ls.linters.myself": {
+          "scope": "resource",
+          "type": "boolean",
+          "default": true,
+          "description": "Looks for incorrect spacing inside the closed compound `myself`."
+        },
+        "harper-ls.linters.need_help": {
+          "scope": "resource",
+          "type": "boolean",
+          "default": true,
+          "description": "Looks for slight improper modifications to the phrase `need help`."
+        },
+        "harper-ls.linters.no_longer": {
+          "scope": "resource",
+          "type": "boolean",
+          "default": true,
+          "description": "Looks for slight improper modifications to the phrase `no longer`."
+        },
+        "harper-ls.linters.no_oxford_comma": {
+          "scope": "resource",
+          "type": "boolean",
+          "default": false,
+          "description": "The Oxford comma is one of the more controversial rules in common use today. Enabling this lint checks that there is no comma before `and`, `or` or `nor` when listing out more than two ideas."
+        },
+        "harper-ls.linters.nobody": {
+          "scope": "resource",
+          "type": "boolean",
+          "default": true,
+          "description": "Looks for incorrect spacing inside the closed compound `nobody`."
+        },
+        "harper-ls.linters.nonetheless": {
+          "scope": "resource",
+          "type": "boolean",
+          "default": true,
+          "description": "Looks for incorrect spacing inside the closed compound `nonetheless`."
+        },
+        "harper-ls.linters.nothing": {
+          "scope": "resource",
+          "type": "boolean",
+          "default": true,
+          "description": "Looks for incorrect spacing inside the closed compound `nothing`."
+        },
+        "harper-ls.linters.notwithstanding": {
+          "scope": "resource",
+          "type": "boolean",
+          "default": true,
+          "description": "Looks for incorrect spacing inside the closed compound `notwithstanding`."
+        },
+        "harper-ls.linters.number_suffix_capitalization": {
+          "scope": "resource",
+          "type": "boolean",
+          "default": true,
+          "description": "You should never capitalize number suffixes."
+        },
+        "harper-ls.linters.of_course": {
+          "scope": "resource",
+          "type": "boolean",
+          "default": true,
+          "description": "Looks for slight improper modifications to the phrase `of course`."
+        },
+        "harper-ls.linters.overall": {
+          "scope": "resource",
+          "type": "boolean",
+          "default": true,
+          "description": "Looks for incorrect spacing inside the closed compound `overall`."
+        },
+        "harper-ls.linters.overclocking": {
+          "scope": "resource",
+          "type": "boolean",
+          "default": true,
+          "description": "Looks for incorrect spacing inside the closed compound `overclocking`."
+        },
+        "harper-ls.linters.overload": {
+          "scope": "resource",
+          "type": "boolean",
+          "default": true,
+          "description": "Looks for incorrect spacing inside the closed compound `overload`."
+        },
+        "harper-ls.linters.overnight": {
+          "scope": "resource",
+          "type": "boolean",
+          "default": true,
+          "description": "Looks for incorrect spacing inside the closed compound `overnight`."
+        },
+        "harper-ls.linters.oxford_comma": {
+          "scope": "resource",
+          "type": "boolean",
+          "default": true,
+          "description": "The Oxford comma is one of the more controversial rules in common use today. Enabling this lint checks that there is a comma before `and`, `or`, or `nor` when listing out more than two ideas."
+        },
+        "harper-ls.linters.pique_interest": {
+          "scope": "resource",
+          "type": "boolean",
+          "default": true,
+          "description": "Detects incorrect usage of `peak` or `peek` when the intended word is `pique`, as in the phrase `you've peaked my interest`."
+        },
+        "harper-ls.linters.plural_conjugate": {
+          "scope": "resource",
+          "type": "boolean",
+          "default": false,
+          "description": "Make sure you use the correct conjugation of the verb \"to be\" in plural contexts."
+        },
+        "harper-ls.linters.possessive_your": {
+          "scope": "resource",
+          "type": "boolean",
+          "default": true,
+          "description": "The possessive version of `you` is more common before nouns."
+        },
+        "harper-ls.linters.postpone": {
+          "scope": "resource",
+          "type": "boolean",
+          "default": true,
+          "description": "Looks for incorrect spacing inside the closed compound `postpone`."
+        },
+        "harper-ls.linters.pronoun_contraction": {
+          "scope": "resource",
+          "type": "boolean",
+          "default": true,
+          "description": "Choosing when to contract pronouns is a challenging art. This rule looks for faults."
+        },
+        "harper-ls.linters.proofread": {
+          "scope": "resource",
+          "type": "boolean",
+          "default": true,
+          "description": "Looks for incorrect spacing inside the closed compound `proofread`."
+        },
+        "harper-ls.linters.regardless": {
+          "scope": "resource",
+          "type": "boolean",
+          "default": true,
+          "description": "Looks for incorrect spacing inside the closed compound `regardless`."
+        },
+        "harper-ls.linters.repeated_words": {
+          "scope": "resource",
+          "type": "boolean",
+          "default": true,
+          "description": "This rule looks for repetitions of words that are not homographs."
+        },
+        "harper-ls.linters.sentence_capitalization": {
+          "scope": "resource",
+          "type": "boolean",
+          "default": true,
+          "description": "The opening word of a sentence should almost always be capitalized."
+        },
+        "harper-ls.linters.sneaking_suspicion": {
+          "scope": "resource",
+          "type": "boolean",
+          "default": true,
+          "description": "Looks for slight improper modifications to the phrase `sneaking suspicion`."
+        },
+        "harper-ls.linters.somebody": {
+          "scope": "resource",
+          "type": "boolean",
+          "default": true,
+          "description": "Looks for incorrect spacing inside the closed compound `somebody`."
+        },
+        "harper-ls.linters.somehow": {
+          "scope": "resource",
+          "type": "boolean",
+          "default": true,
+          "description": "Looks for incorrect spacing inside the closed compound `somehow`."
+        },
+        "harper-ls.linters.somewhat_something": {
+          "scope": "resource",
+          "type": "boolean",
+          "default": true,
+          "description": "When describing a single instance of a noun, use `something` rather than `somewhat`."
+        },
+        "harper-ls.linters.somewhere": {
+          "scope": "resource",
+          "type": "boolean",
+          "default": true,
+          "description": "Looks for incorrect spacing inside the closed compound `somewhere`."
+        },
+        "harper-ls.linters.spaces": {
+          "scope": "resource",
+          "type": "boolean",
+          "default": true,
+          "description": "Words should be separated by at most one space."
+        },
+        "harper-ls.linters.special_attention": {
+          "scope": "resource",
+          "type": "boolean",
+          "default": true,
+          "description": "Looks for slight improper modifications to the phrase `special attention`."
+        },
+        "harper-ls.linters.spell_check": {
+          "scope": "resource",
+          "type": "boolean",
+          "default": true,
+          "description": "Looks and provides corrections for misspelled words."
+        },
+        "harper-ls.linters.spelled_numbers": {
+          "scope": "resource",
+          "type": "boolean",
+          "default": false,
+          "description": "Most style guides recommend that you spell out numbers less than ten."
+        },
+        "harper-ls.linters.state_of_the_art": {
+          "scope": "resource",
+          "type": "boolean",
+          "default": true,
+          "description": "Detects incorrect usage of `state of art` and suggests `state of the art` as the correct phrase."
+        },
+        "harper-ls.linters.supposed_to": {
+          "scope": "resource",
+          "type": "boolean",
+          "default": true,
+          "description": "Looks for slight improper modifications to the phrase `supposed to`."
+        },
+        "harper-ls.linters.terminating_conjunctions": {
+          "scope": "resource",
+          "type": "boolean",
+          "default": true,
+          "description": "Subordinating conjunctions are words that create a grammatical space for another idea or clause. As such, they should never appear at the end of a clause."
+        },
+        "harper-ls.linters.than_others": {
+          "scope": "resource",
+          "type": "boolean",
+          "default": true,
+          "description": "Looks for slight improper modifications to the phrase `than others`."
+        },
+        "harper-ls.linters.that_challenged": {
+          "scope": "resource",
+          "type": "boolean",
+          "default": true,
+          "description": "Looks for slight improper modifications to the phrase `that challenged`."
+        },
+        "harper-ls.linters.that_which": {
+          "scope": "resource",
+          "type": "boolean",
+          "default": true,
+          "description": "Repeating the word \"that\" is often redundant. The phrase `that which` is easier to read."
+        },
+        "harper-ls.linters.then_than": {
+          "scope": "resource",
+          "type": "boolean",
+          "default": true,
+          "description": "Corrects the misuse of `then` to `than`."
+        },
+        "harper-ls.linters.therefore": {
+          "scope": "resource",
+          "type": "boolean",
+          "default": true,
+          "description": "Looks for incorrect spacing inside the closed compound `therefore`."
+        },
+        "harper-ls.linters.thereupon": {
+          "scope": "resource",
+          "type": "boolean",
+          "default": true,
+          "description": "Looks for incorrect spacing inside the closed compound `thereupon`."
+        },
+        "harper-ls.linters.turn_it_off": {
+          "scope": "resource",
+          "type": "boolean",
+          "default": true,
+          "description": "Looks for slight improper modifications to the phrase `turn it off`."
+        },
+        "harper-ls.linters.unclosed_quotes": {
+          "scope": "resource",
+          "type": "boolean",
+          "default": true,
+          "description": "Quotation marks should always be closed. Unpaired quotation marks are a hallmark of sloppy work."
+        },
+        "harper-ls.linters.underclock": {
+          "scope": "resource",
+          "type": "boolean",
+          "default": true,
+          "description": "Looks for incorrect spacing inside the closed compound `underclock`."
+        },
+        "harper-ls.linters.united_organizations": {
+          "scope": "resource",
+          "type": "boolean",
+          "default": true,
+          "description": "When referring to national or international organizations, make sure to treat them as a proper noun."
+        },
+        "harper-ls.linters.upset": {
+          "scope": "resource",
+          "type": "boolean",
+          "default": true,
+          "description": "Looks for incorrect spacing inside the closed compound `upset`."
+        },
+        "harper-ls.linters.upward": {
+          "scope": "resource",
+          "type": "boolean",
+          "default": true,
+          "description": "Looks for incorrect spacing inside the closed compound `upward`."
+        },
+        "harper-ls.linters.use_genitive": {
+          "scope": "resource",
+          "type": "boolean",
+          "default": false,
+          "description": "Looks for situations where the genitive case of \"there\" should be used."
+        },
+        "harper-ls.linters.want_be": {
+          "scope": "resource",
+          "type": "boolean",
+          "default": true,
+          "description": "Detects incorrect usage of `want be` and suggests `won't be` or `want to be` based on context."
+        },
+        "harper-ls.linters.was_aloud": {
+          "scope": "resource",
+          "type": "boolean",
+          "default": true,
+          "description": "Ensures `was aloud` and `were aloud` are corrected to `was allowed` or `were allowed` when referring to permission."
+        },
+        "harper-ls.linters.whereas": {
+          "scope": "resource",
+          "type": "boolean",
+          "default": true,
+          "description": "The Whereas rule is designed to identify instances where the phrase `where as` is used in text and suggests replacing it with the single word `whereas`."
+        },
+        "harper-ls.linters.whereupon": {
+          "scope": "resource",
+          "type": "boolean",
+          "default": true,
+          "description": "Looks for incorrect spacing inside the closed compound `whereupon`."
+        },
+        "harper-ls.linters.widespread": {
+          "scope": "resource",
+          "type": "boolean",
+          "default": true,
+          "description": "Looks for incorrect spacing inside the closed compound `widespread`."
+        },
+        "harper-ls.linters.worldwide": {
+          "scope": "resource",
+          "type": "boolean",
+          "default": true,
+          "description": "Looks for incorrect spacing inside the closed compound `worldwide`."
+        },
+        "harper-ls.linters.wrong_quotes": {
+          "scope": "resource",
+          "type": "boolean",
+          "default": false,
+          "description": "The key on the keyboard often used as a quotation mark is actually a double-apostrophe. Use the correct character."
+        }
+      }
+    }
+  },
+  "scripts": {
+    "watch:esbuild": "node esbuild.cjs --watch",
+    "watch:tsc": "tsc --noEmit --watch",
+    "test": "yarn lint && tsc && node esbuild.cjs && node build/tests/runTests.js",
+    "vscode:prepublish": "yarn lint && tsc --noEmit && node esbuild.cjs --production",
+    "package": "vsce package",
+    "lint": "eslint src --ext ts"
+  },
+  "devDependencies": {
+    "@types/jasmine": "^5.1.4",
+    "@types/node": "22.x",
+    "@types/vscode": "^1.89.0",
+    "@typescript-eslint/eslint-plugin": "^7.7.1",
+    "@typescript-eslint/parser": "^7.7.1",
+    "@vscode/test-electron": "^2.3.9",
+    "@vscode/vsce": "^3.0.0",
+    "esbuild": "^0.25.0",
+    "eslint": "^8.57.0",
+    "jasmine": "^5.3.0",
+    "typescript": "^5.7.3"
+  },
+  "dependencies": {
+    "vscode-languageclient": "^9.0.1"
+  }
 }
