@@ -163,12 +163,13 @@ In the above example, "spellcheckd", "this this", and other spelling or grammar 
 }
 ```
 
-### Dictionaries
+## Directories 
 
 | Config         | Type     | Default Value | Description                                                     |
 | -------------- | -------- | ------------- | --------------------------------------------------------------- |
 | `userDictPath` | `string` | `""`          | Set the file path where the user dictionary is located          |
 | `fileDictPath` | `string` | `""`          | Set the directory where the file-local dictionaries are located |
+| `ignoredLintsPath` | `string` | `""`          | Set the directory where the ignored lint lists are located |
 
 ### Linters
 
@@ -285,6 +286,7 @@ These configs are under the `markdown` key:
 | TypeScript        |         `typescript`          |            ✅ |
 | TypeScript React  |       `typescriptreact`       |            ✅ |
 | Typst             |            `typst`            |               |
+| Kotlin            |            `kotlin`           |            ✅ |
 
 Want your language added?
 Let us know by [commenting on this issue](https://github.com/Automattic/harper/issues/79).

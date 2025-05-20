@@ -9,6 +9,7 @@ import {
 	type GetDomainStatusResponse,
 	type GetLintDescriptionsRequest,
 	type GetLintDescriptionsResponse,
+	type IgnoreLintRequest,
 	type LintRequest,
 	type LintResponse,
 	type Request,
@@ -53,6 +54,16 @@ async function enableDefaultDomains() {
 		'outlook.live.com',
 		'www.reddit.com',
 		'www.linkedin.com',
+		'bsky.app',
+		'pootlewriter.com',
+		'www.tumblr.com',
+		'dayone.me',
+		'medium.com',
+		'x.com',
+		'www.notion.so',
+		'hashnode.com',
+		'www.slatejs.org',
+		'localhost',
 	];
 
 	for (const item of defaultEnabledDomains) {
@@ -84,6 +95,8 @@ function handleRequest(message: Request): Promise<Response> {
 			return handleSetDomainStatus(message);
 		case 'addToUserDictionary':
 			return handleAddToUserDictionary(message);
+		case 'ignoreLint':
+			return handleIgnoreLint(message);
 	}
 }
 
@@ -94,7 +107,7 @@ async function handleLint(req: LintRequest): Promise<LintResponse> {
 	}
 
 	const lints = await linter.lint(req.text);
-	const unpackedLints = lints.map(unpackLint);
+	const unpackedLints = await Promise.all(lints.map((l) => unpackLint(req.text, l, linter)));
 	return { kind: 'lints', lints: unpackedLints };
 }
 
@@ -118,6 +131,12 @@ async function handleGetDialect(req: GetDialectRequest): Promise<GetDialectRespo
 	return { kind: 'getDialect', dialect: await getDialect() };
 }
 
+async function handleIgnoreLint(req: IgnoreLintRequest): Promise<UnitResponse> {
+	await linter.ignoreLintHash(BigInt(req.contextHash));
+	await setIgnoredLints(await linter.exportIgnoredLints());
+
+	return createUnitResponse();
+}
 async function handleGetDomainStatus(
 	req: GetDomainStatusRequest,
 ): Promise<GetDomainStatusResponse> {
@@ -137,7 +156,7 @@ async function handleSetDomainStatus(req: SetDomainStatusRequest): Promise<UnitR
 async function handleGetLintDescriptions(
 	req: GetLintDescriptionsRequest,
 ): Promise<GetLintDescriptionsResponse> {
-	return { kind: 'getLintDescriptions', descriptions: await linter.getLintDescriptions() };
+	return { kind: 'getLintDescriptions', descriptions: await linter.getLintDescriptionsHTML() };
 }
 
 async function handleAddToUserDictionary(req: AddToUserDictionaryRequest): Promise<UnitResponse> {
@@ -162,6 +181,22 @@ async function getLintConfig(): Promise<LintConfig> {
 	return JSON.parse(resp.lintConfig);
 }
 
+/** Get the ignored lint state from permanent storage. */
+async function setIgnoredLints(state: string): Promise<void> {
+	await linter.importIgnoredLints(state);
+
+	const json = await linter.exportIgnoredLints();
+
+	await chrome.storage.local.set({ ignoredLints: json });
+}
+
+/** Get the ignored lint state from permanent storage. */
+async function getIgnoredLints(): Promise<string> {
+	const state = await linter.exportIgnoredLints();
+	const resp = await chrome.storage.local.get({ ignoredLints: state });
+	return resp.ignoredLints;
+}
+
 async function getDialect(): Promise<Dialect> {
 	const resp = await chrome.storage.local.get({ dialect: Dialect.American });
 	return resp.dialect;
@@ -173,6 +208,7 @@ function initializeLinter(dialect: Dialect) {
 		dialect,
 	});
 
+	getIgnoredLints().then((i) => linter.importIgnoredLints(i));
 	getUserDictionary().then((u) => linter.importWords(u));
 	getLintConfig().then((c) => linter.setLintConfig(c));
 	linter.setup();

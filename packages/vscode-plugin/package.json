@@ -2,7 +2,7 @@
 	"name": "harper",
 	"displayName": "Harper - Grammar / Spell Checking",
 	"description": "The grammar checker for developers",
-	"version": "0.33.0",
+	"version": "0.37.0",
 	"private": true,
 	"author": "Elijah Potter",
 	"publisher": "elijah-potter",
@@ -37,6 +37,7 @@
 		"onLanguage:java",
 		"onLanguage:javascript",
 		"onLanguage:javascriptreact",
+		"onLanguage:kotlin",
 		"onLanguage:literate haskell",
 		"onLanguage:lua",
 		"onLanguage:markdown",
@@ -133,6 +134,12 @@
 					"type": "boolean",
 					"default": true,
 					"description": "Corrects `a lot worst` to `a lot worse` for proper comparative usage."
+				},
+				"harper.linters.APart": {
+					"scope": "resource",
+					"type": "boolean",
+					"default": true,
+					"description": "Finds and corrects common mistakes between 'a part' and 'apart'"
 				},
 				"harper.linters.AWholeEntire": {
 					"scope": "resource",
@@ -247,6 +254,12 @@
 					"type": "boolean",
 					"default": true,
 					"description": "Corrects `aswell` to `as well`."
+				},
+				"harper.linters.AskNoPreposition": {
+					"scope": "resource",
+					"type": "boolean",
+					"default": true,
+					"description": "Identifies sequences like `ask to us` or `tell to him` and recommends removing the superfluous “to”."
 				},
 				"harper.linters.AtFaceValue": {
 					"scope": "resource",
@@ -524,6 +537,18 @@
 					"default": true,
 					"description": "Ensure proper capitalization of Day One and Day One Premium as brand names."
 				},
+				"harper.linters.DefiniteArticle": {
+					"scope": "resource",
+					"type": "boolean",
+					"default": true,
+					"description": "The name of the word `the` is `definite article`."
+				},
+				"harper.linters.DefiniteArticles": {
+					"scope": "resource",
+					"type": "boolean",
+					"default": true,
+					"description": "The name of the word `the` is `definite article`."
+				},
 				"harper.linters.Desktop": {
 					"scope": "resource",
 					"type": "boolean",
@@ -590,6 +615,12 @@
 					"default": true,
 					"description": "Make sure you have the correct number of dots in your ellipsis."
 				},
+				"harper.linters.ElsePossessive": {
+					"scope": "resource",
+					"type": "boolean",
+					"default": true,
+					"description": "Detects missing apostrophes in phrases like `someone elses book` and suggests the correct possessive form `else’s`."
+				},
 				"harper.linters.EludedTo": {
 					"scope": "resource",
 					"type": "boolean",
@@ -601,6 +632,12 @@
 					"type": "boolean",
 					"default": true,
 					"description": "Detects variants like `on mass` or `in mass` and suggests `en masse`."
+				},
+				"harper.linters.EverPresent": {
+					"scope": "resource",
+					"type": "boolean",
+					"default": true,
+					"description": "Corrects the missing hyphen in `ever present` to the compound adjective `ever-present`."
 				},
 				"harper.linters.Everywhere": {
 					"scope": "resource",
@@ -698,6 +735,12 @@
 					"default": true,
 					"description": "Ensures `face first` is correctly hyphenated as `face-first` when used before `into`."
 				},
+				"harper.linters.FairBit": {
+					"scope": "resource",
+					"type": "boolean",
+					"default": true,
+					"description": "Corrects malapropisms of `a fair bit`."
+				},
 				"harper.linters.FarWorse": {
 					"scope": "resource",
 					"type": "boolean",
@@ -763,6 +806,12 @@
 					"type": "boolean",
 					"default": true,
 					"description": "Encourages vivid writing by suggesting `freezing` instead of weaker expressions like `very cold.`"
+				},
+				"harper.linters.FurtherAdo": {
+					"scope": "resource",
+					"type": "boolean",
+					"default": true,
+					"description": "Corrects `adieu` to `ado`."
 				},
 				"harper.linters.Furthermore": {
 					"scope": "resource",
@@ -1106,6 +1155,12 @@
 					"default": true,
 					"description": "Corrects the misspelling `It cam` to the proper phrase `It can`."
 				},
+				"harper.linters.ItsContraction": {
+					"scope": "resource",
+					"type": "boolean",
+					"default": true,
+					"description": "Detects the possessive `its` before `had`, `been`, or `got` and offers `it's` or `it has`."
+				},
 				"harper.linters.Itself": {
 					"scope": "resource",
 					"type": "boolean",
@@ -1274,6 +1329,18 @@
 					"default": true,
 					"description": "Advises using `momentous` or `monumental` instead of `monumentous` for serious usage."
 				},
+				"harper.linters.MostNumber": {
+					"scope": "resource",
+					"type": "boolean",
+					"default": true,
+					"description": "Corrects `most number` and `most amount`"
+				},
+				"harper.linters.MuchAdo": {
+					"scope": "resource",
+					"type": "boolean",
+					"default": true,
+					"description": "Corrects `adieu` to `ado`."
+				},
 				"harper.linters.MuchWorse": {
 					"scope": "resource",
 					"type": "boolean",
@@ -1322,6 +1389,12 @@
 					"default": true,
 					"description": "Looks for incorrect spacing inside the closed compound `myself`."
 				},
+				"harper.linters.NailOnTheHead": {
+					"scope": "resource",
+					"type": "boolean",
+					"default": true,
+					"description": "Replaces hat/had/hit/hid in the idiom `nail on the head` with `head`."
+				},
 				"harper.linters.NationalCapitals": {
 					"scope": "resource",
 					"type": "boolean",
@@ -1351,6 +1424,12 @@
 					"type": "boolean",
 					"default": true,
 					"description": "Looks for incorrect spacing inside the closed compound `nobody`."
+				},
+				"harper.linters.NominalWants": {
+					"scope": "resource",
+					"type": "boolean",
+					"default": true,
+					"description": "Ensures you use the correct `want` / `wants` after a nominal."
 				},
 				"harper.linters.Nonetheless": {
 					"scope": "resource",
@@ -1435,6 +1514,18 @@
 					"type": "boolean",
 					"default": true,
 					"description": "Corrects two common malapropisms of `once in a while`."
+				},
+				"harper.linters.OneAndTheSame": {
+					"scope": "resource",
+					"type": "boolean",
+					"default": true,
+					"description": "This linter flags instances of the nonstandard phrase `one in the same`. The correct, more accepted form is `one and the same`"
+				},
+				"harper.linters.OpenCompounds": {
+					"scope": "resource",
+					"type": "boolean",
+					"default": true,
+					"description": "Corrects compound words that should be written as two words."
 				},
 				"harper.linters.OperativeSystem": {
 					"scope": "resource",
@@ -1586,12 +1677,6 @@
 					"default": true,
 					"description": "Ensure proper capitalization of proper nouns."
 				},
-				"harper.linters.QuiteAWhile": {
-					"scope": "resource",
-					"type": "boolean",
-					"default": true,
-					"description": "Corrects `quite awhile` => `quite a while` by inserting the missing article."
-				},
 				"harper.linters.RealTrouper": {
 					"scope": "resource",
 					"type": "boolean",
@@ -1627,6 +1712,12 @@
 					"type": "boolean",
 					"default": true,
 					"description": "Corrects the incorrect phrase `same then` to the standard `same as`."
+				},
+				"harper.linters.SaveToSafe": {
+					"scope": "resource",
+					"type": "boolean",
+					"default": true,
+					"description": "Corrects `save to <verb>` to `safe to <verb>` after a form of `be`."
 				},
 				"harper.linters.ScantilyClad": {
 					"scope": "resource",
@@ -1741,6 +1832,12 @@
 					"type": "boolean",
 					"default": true,
 					"description": "Fixes `suppose to` to the correct `supposed to`."
+				},
+				"harper.linters.TakeItPersonally": {
+					"scope": "resource",
+					"type": "boolean",
+					"default": true,
+					"description": "Corrects `take it personal` to `take it personally`."
 				},
 				"harper.linters.TakeItSeriously": {
 					"scope": "resource",
@@ -2005,6 +2102,12 @@
 					"type": "boolean",
 					"default": true,
 					"description": "Incorrect verb form: `will` should be followed by the base form `contain`."
+				},
+				"harper.linters.WinPrize": {
+					"scope": "resource",
+					"type": "boolean",
+					"default": true,
+					"description": "Catches the mix-up between `price`/`prise` and `prize` after the verb `win`."
 				},
 				"harper.linters.WordPressDotcom": {
 					"scope": "resource",
