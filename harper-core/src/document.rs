@@ -178,7 +178,6 @@ impl Document {
         let pattern = Self::ARTICLE_PATTERN.with(|v| v.clone());
 
         for m in pattern.find_all_matches_in_doc(self) {
-            dbg!(m);
             if let TokenKind::Word(Some(metadata)) = &mut self.tokens[m.start + 2].kind {
                 metadata.noun = None;
                 metadata.verb = None;
