@@ -3,20 +3,18 @@ Message: |
        3 | BY F. SCOTT FITZGERALD
          |    ^~ Did you mean to spell `F.` this way?
 Suggest:
+  - Replace with: “Ft”
   - Replace with: “F”
   - Replace with: “Ff”
-  - Replace with: “Fl”
 
 
 
 Lint:    Spelling (63 priority)
 Message: |
        3 | BY F. SCOTT FITZGERALD
-         |       ^~~~~ Did you mean to spell `SCOTT` this way?
+         |       ^~~~~ Did you mean `SCART`?
 Suggest:
-  - Replace with: “Scot”
-  - Replace with: “SCM's”
-  - Replace with: “SEO's”
+  - Replace with: “SCART”
 
 
 
@@ -402,16 +400,6 @@ Message: |
 
 
 
-Lint:    WordChoice (31 priority)
-Message: |
-     136 | powerful ends that ever played football at New Haven—a national figure in a way,
-         |                                            ^~~ Did you mean “knew” (the past tense of “know”)?
-     137 | one of those men who reach such an acute limited excellence at twenty-one that
-Suggest:
-  - Replace with: “Knew”
-
-
-
 Lint:    Readability (127 priority)
 Message: |
      138 | everything afterward savors of anti-climax. His family were enormously
@@ -471,15 +459,6 @@ Message: |
          | ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
      168 | a great pack of muscle shifting when his shoulder moved under his thin coat. It
          | ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ This sentence is 48 words long.
-
-
-
-Lint:    WordChoice (31 priority)
-Message: |
-     173 | toward people he liked—and there were men at New Haven who had hated his guts.
-         |                                              ^~~ Did you mean “knew” (the past tense of “know”)?
-Suggest:
-  - Replace with: “Knew”
 
 
 
@@ -1002,7 +981,7 @@ Message: |
 Suggest:
   - Replace with: “Bu”
   - Replace with: “Be”
-  - Replace with: “Bk”
+  - Replace with: “Bi”
 
 
 
@@ -1307,7 +1286,7 @@ Message: |
 Suggest:
   - Replace with: “Bu”
   - Replace with: “Be”
-  - Replace with: “Bk”
+  - Replace with: “Bi”
 
 
 
@@ -2443,7 +2422,7 @@ Message: |
 Suggest:
   - Replace with: “Sf”
   - Replace with: “Sh”
-  - Replace with: “So”
+  - Replace with: “Sq”
 
 
 
@@ -2454,7 +2433,7 @@ Message: |
 Suggest:
   - Replace with: “Bu”
   - Replace with: “Be”
-  - Replace with: “Bk”
+  - Replace with: “Bi”
 
 
 
@@ -2546,7 +2525,7 @@ Message: |
 Suggest:
   - Replace with: “Sf”
   - Replace with: “Sh”
-  - Replace with: “So”
+  - Replace with: “Sq”
 
 
 
@@ -2625,7 +2604,7 @@ Message: |
 Suggest:
   - Replace with: “D”
   - Replace with: “Dad”
-  - Replace with: “Dam”
+  - Replace with: “Dag”
 
 
 
@@ -2671,7 +2650,7 @@ Message: |
 Suggest:
   - Replace with: “Bu”
   - Replace with: “Be”
-  - Replace with: “Bk”
+  - Replace with: “Bi”
 
 
 
@@ -2835,7 +2814,7 @@ Message: |
 Suggest:
   - Replace with: “Sf”
   - Replace with: “Sh”
-  - Replace with: “So”
+  - Replace with: “Sq”
 
 
 
@@ -6367,9 +6346,9 @@ Message: |
     5122 | ghost of a superior “Hm!”
          |                      ^~ Did you mean to spell `Hm` this way?
 Suggest:
-  - Replace with: “H'm”
-  - Replace with: “Ha”
+  - Replace with: “H”
   - Replace with: “Ham”
+  - Replace with: “He”
 
 
 
@@ -6836,7 +6815,7 @@ Message: |
     5352 | I think it was on the third day that a telegram signed Henry C. Gatz arrived
          |                                                              ^~ Did you mean to spell `C.` this way?
 Suggest:
-  - Replace with: “Cw”
+  - Replace with: “Cu”
   - Replace with: “C”
   - Replace with: “Cc”
 
@@ -6966,7 +6945,7 @@ Message: |
 Suggest:
   - Replace with: “Bu”
   - Replace with: “Be”
-  - Replace with: “Bk”
+  - Replace with: “Bi”
 
 
 
@@ -6975,9 +6954,9 @@ Message: |
     5455 | and I’m sort of helpless without them. My address is care of B. F.———”
          |                                                                 ^~ Did you mean to spell `F.` this way?
 Suggest:
+  - Replace with: “Ft”
   - Replace with: “F”
   - Replace with: “Ff”
-  - Replace with: “Fl”
 
 
 
@@ -7406,9 +7385,9 @@ Message: |
     5692 | figures in my more fantastic dreams. I see it as a night scene by El Greco: a
          |                                                                   ^~ Did you mean to spell `El` this way?
 Suggest:
+  - Replace with: “E”
   - Replace with: “Ea”
-  - Replace with: “Ed”
-  - Replace with: “En”
+  - Replace with: “Em”
 
 
 

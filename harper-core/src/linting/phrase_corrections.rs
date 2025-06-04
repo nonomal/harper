@@ -13,7 +13,7 @@ pub fn lint_group() -> LintGroup {
                 $group.add_pattern_linter(
                     $name,
                     Box::new(
-                        MapPhraseLinter::new_exact_phrases(
+                        MapPhraseLinter::new_fixed_phrases(
                             $input,
                             $corrections,
                             $hint,
@@ -28,7 +28,7 @@ pub fn lint_group() -> LintGroup {
     add_exact_mappings!(group, {
         // The name of the rule
         "ChangeTack" => (
-            // The exact phrase(s) to look for.
+            // The phrase(s) to look for.
             ["change tact", "change tacks", "change tacts"],
             // The corrections to provide.
             ["change tack"],
@@ -744,10 +744,15 @@ pub fn lint_group() -> LintGroup {
             "Corrects `worst and worst` to `worse and worse` for proper comparative usage."
         ),
         "WorseCaseScenario" => (
-            ["worse case scenario", "worse-case scenario", "worse-case-scenario",
-             "worst case scenario",                        "worst-case-scenario"],
+            ["worse case scenario", "worse-case scenario", "worse-case-scenario"],
             ["worst-case scenario"],
             "Use `worst` for referring to the worst possible scenario. (`Worse` is for comparing)",
+            "Corrects `worst-case scenario` when the hyphen is missing or `worse` is used instead of `worst`."
+        ),
+        "WorstCaseScenario" => (
+            ["worst case scenario", "worst-case-scenario"],
+            ["worst-case scenario"],
+            "Hyphenate `worst-case`.",
             "Corrects `worst-case scenario` when the hyphen is missing or `worse` is used instead of `worst`."
         ),
         "WorseThan" => (
@@ -1006,7 +1011,7 @@ pub fn lint_group() -> LintGroup {
         "SufficeItToSay" => (
             ["suffice to say"],
             ["suffice it to say"],
-            "`Suffice it to say` is more standard and more common variant.",
+            "`Suffice it to say` is the more standard and more common variant.",
             "Corrects `suffice to say` to `suffice it to say`."
         ),
         "LikeThePlague" => (
@@ -1242,6 +1247,48 @@ pub fn lint_group() -> LintGroup {
             ["take it personally"],
             "The more standard, less colloquial form is `take it personally`.",
             "Corrects `take it personal` to `take it personally`."
+        ),
+        "AsOfLate" => (
+            ["as of lately"],
+            ["as of late"],
+            "The standard form is `as of late`.",
+            "Corrects `as of lately` to `as of late`."
+        ),
+        "RapidFire" => (
+            ["rapid fire"],
+            ["rapid-fire"],
+            "It is more idiomatic to hypenate `rapid-fire`.",
+            "Checks to ensure writers hyphenate `rapid-fire`."
+        ),
+        "PointsOfView" => (
+            ["point of views"],
+            ["points of view"],
+            "The correct plural is `points of view`.",
+            "Corrects pluralizing the wrong noun in `point of view`."
+        ),
+        "Insurmountable" => (
+            ["unsurmountable"],
+            ["insurmountable"],
+            "This word has a more standard, more common synonym.",
+            "Suggests the more standard and common synonym `insurmountable`."
+        ),
+        "Brutality" => (
+            ["brutalness"],
+            ["brutality"],
+            "This word has a more standard, more common synonym.",
+            "Suggests the more standard and common synonym `brutality`."
+        ),
+        "InNeedOf" => (
+            ["in need for"],
+            ["in need of"],
+            "Use `in need of` for when something is required or necessary.",
+            "Corrects `in need for` to `in need of`."
+        ),
+        "PeaceOfMind" => (
+            ["piece of mind"],
+            ["peace of mind"],
+            "The phrase is `peace of mind`, meaning `calm`. A `piece` is a `part` of something.",
+            "Corrects `piece of mind` to `peace of mind`."
         ),
     });
 
@@ -2708,5 +2755,59 @@ mod tests {
             lint_group(),
             "This is not personal, do not take it personally, we also think Thingsboard is a extraordinary tool (we are using in several scenarios in fact)",
         );
+    }
+
+    #[test]
+    fn corrects_as_of_lately() {
+        assert_suggestion_result(
+            "I haven't noticed any crashing with AMDGPU as of lately, so this looks to not be an issue anymore.",
+            lint_group(),
+            "I haven't noticed any crashing with AMDGPU as of late, so this looks to not be an issue anymore.",
+        )
+    }
+
+    #[test]
+    fn corrects_points_of_view() {
+        assert_suggestion_result(
+            "This will produce a huge amount of raw data, representing the region in multiple point of views.",
+            lint_group(),
+            "This will produce a huge amount of raw data, representing the region in multiple points of view.",
+        )
+    }
+
+    #[test]
+    fn corrects_brutalness() {
+        assert_suggestion_result(
+            "the mildness and brutalness of the story rises.",
+            lint_group(),
+            "the mildness and brutality of the story rises.",
+        )
+    }
+
+    #[test]
+    fn corrects_unsurmountable() {
+        assert_suggestion_result(
+            "That being said, if you find upgrading to newer versions to be unsurmountable, please open an issue.",
+            lint_group(),
+            "That being said, if you find upgrading to newer versions to be insurmountable, please open an issue.",
+        )
+    }
+
+    #[test]
+    fn corrects_in_need_of() {
+        assert_suggestion_result(
+            "In need for a native control for map symbols (map legend) #5203.",
+            lint_group(),
+            "In need of a native control for map symbols (map legend) #5203.",
+        );
+    }
+
+    #[test]
+    fn corrects_piece_of_mind() {
+        assert_suggestion_result(
+            "A Discord bot that gives you piece of mind knowing you are free from obnoxious intrusions in a Discord Voice Channel",
+            lint_group(),
+            "A Discord bot that gives you peace of mind knowing you are free from obnoxious intrusions in a Discord Voice Channel",
+        )
     }
 }
