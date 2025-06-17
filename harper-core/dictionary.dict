@@ -4734,7 +4734,7 @@ Hymen/Og
 Hyperion/Og
 Hyundai/Ng
 Hz/g
-I/I~1
+I/I~f
 I'd/~
 I'd've/
 I'll/~
@@ -13561,8 +13561,8 @@ awning/Ng
 awoke/~V
 awoken/V
 awry/~J
-ax/~NVgdSG
-axe/NVdSgG!@_
+ax/~NVgdSG<
+axe/NVdSgG!
 axial/~JNY
 axiom/~NSg
 axiomatic/JQ
@@ -39784,7 +39784,8 @@ progovernment/J
 program/~NVerS
 programmable/~JNgS
 programmatic/JQ
-programme/NVBzd>SgZG!_
+programme/NVBzd>SgZG
+programme/!_
 programmed/~VJre
 programmer/~NgS
 programming/~NVSg
