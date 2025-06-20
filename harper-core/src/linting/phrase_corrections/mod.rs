@@ -1222,9 +1222,9 @@ pub fn lint_group() -> LintGroup {
         ),
         "Unless" => (
             ["unless if"],
-            ["unless"],
-            "Use `unless` on its own.",
-            "Corrects `unless if` to `unless`."
+            ["unless", "except if", "except when"],
+            "`Unless if` is not idiomatic English. `Unless`, `except if`, and `except when` express a condition that is true in all cases except one.",
+            "Corrects `unless if`."
         ),
         "WantBe" => (
             ["want be"],
@@ -1292,12 +1292,6 @@ pub fn lint_group() -> LintGroup {
             ["will contain"],
             "Did you mean `will contain`?",
             "Incorrect verb form: `will` should be followed by the base form `contain`."
-        ),
-        "WorldWarII" => (
-            ["world war 2", "world war ii", "world war ii", "world war ii", "world war ii"],
-            ["World War II"],
-            "Use the correct capitalization for `World War II`.",
-            "Ensures `World War II` is correctly capitalized."
         ),
         "WorseAndWorse" => (
             ["worst and worst", "worse and worst", "worst and worse"],
