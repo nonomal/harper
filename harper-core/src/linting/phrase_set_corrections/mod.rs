@@ -81,6 +81,19 @@ pub fn lint_group() -> LintGroup {
             "Corrects extraneous apostrophe in `client's side` and `server's side`.",
             LintKind::Punctuation
         ),
+        "ConfirmThat" => (
+            &[
+                ("conform that", "confirm that"),
+                ("conformed that", "confirmed that"),
+                ("conforms that", "confirms that"),
+                // Note: false positives in this inflection:
+                // "is there any example of a case that isn't fully conforming that is supported today?"
+                ("conforming that", "confirming that"),
+            ],
+            "Did you mean `confirm` rather than `conform`?",
+            "Corrects `conform` typos to `confirm`.",
+            LintKind::Typo
+        ),
         "DefiniteArticle" => (
             &[
                 ("definitive article", "definite article"),
@@ -101,6 +114,26 @@ pub fn lint_group() -> LintGroup {
             "Removes unnecessary `about` after `discuss`.",
             // or maybe Redundancy?
             LintKind::Usage
+        ),
+        "DoesOrDose" => (
+            &[
+                // Negatives
+                ("dose not", "does not"),
+                // Pronouns
+                ("he dose", "he does"),
+                ("it dose", "it does"),
+                ("she dose", "she does"),
+                ("someone dose", "someone does"),
+                // Interrogatives
+                ("how dose", "how does"),
+                ("when dose", "when does"),
+                ("where dose", "where does"),
+                ("who dose", "who does"),
+                ("why dose", "why does"),
+            ],
+            "This may be a typo for `does`.",
+            "Tries to correct typos of `dose` to `does`.",
+            LintKind::Typo
         ),
         "ExpandArgument" => (
             &[

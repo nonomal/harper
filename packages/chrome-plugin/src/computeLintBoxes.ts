@@ -1,7 +1,7 @@
 import type { Span } from 'harper.js';
-import { domRectToBox, type IgnorableLintBox, isBottomEdgeInBox, type LintBox } from './Box';
+import { domRectToBox, type IgnorableLintBox, isBottomEdgeInBox, shrinkBoxToFit } from './Box';
 import { getRangeForTextSpan } from './domUtils';
-import { getLexicalRoot, getSlateRoot } from './editorUtils';
+import { getLexicalEditable, getSlateRoot } from './editorUtils';
 import ProtocolClient from './ProtocolClient';
 import TextFieldRange from './TextFieldRange';
 import { applySuggestion, type UnpackedLint, type UnpackedSuggestion } from './unpackLint';
@@ -51,11 +51,13 @@ export default function computeLintBoxes(el: HTMLElement, lint: UnpackedLint): I
 				continue;
 			}
 
+			const shrunkBox = shrinkBoxToFit(targetRect, elBox);
+
 			boxes.push({
-				x: targetRect.x,
-				y: targetRect.y,
-				width: targetRect.width,
-				height: targetRect.height,
+				x: shrunkBox.x,
+				y: shrunkBox.y,
+				width: shrunkBox.width,
+				height: shrunkBox.height,
 				lint,
 				source,
 				applySuggestion: (sug: UnpackedSuggestion) => {
@@ -73,7 +75,7 @@ export default function computeLintBoxes(el: HTMLElement, lint: UnpackedLint): I
 
 function replaceValue(el: HTMLElement, value: string) {
 	const slateRoot = getSlateRoot(el);
-	const lexicalRoot = getLexicalRoot(el);
+	const lexicalRoot = getLexicalEditable(el);
 
 	if (isFormEl(el)) {
 		el.dispatchEvent(new InputEvent('beforeinput', { bubbles: true, data: value }));

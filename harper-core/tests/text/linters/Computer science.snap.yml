@@ -504,9 +504,9 @@ Message: |
      137 | "In the U.S., however, informatics is linked with applied computing, or
          |         ^~~~ Did you mean to spell `U.S.` this way?
 Suggest:
+  - Replace with: “P.S.”
   - Replace with: “UBS”
   - Replace with: “USA”
-  - Replace with: “USB”
 
 
 
@@ -857,17 +857,6 @@ Suggest:
 
 Lint:    Spelling (63 priority)
 Message: |
-     255 | are required to perform those computations. In an effort to answer the first
-     256 | question, computability theory examines which computational problems are
-         |           ^~~~~~~~~~~~~ Did you mean to spell `computability` this way?
-Suggest:
-  - Replace with: “compatibility”
-  - Replace with: “comparability”
-
-
-
-Lint:    Spelling (63 priority)
-Message: |
      262 | The famous P = NP? problem, one of the Millennium Prize Problems, is an open
          |                ^~ Did you mean to spell `NP` this way?
 Suggest:
@@ -1068,19 +1057,6 @@ Suggest:
 
 Lint:    Spelling (63 priority)
 Message: |
-     441 |   deal with in order to represent "anything".[note 4]
-     442 |   > All the information about any computable problem can be represented using
-         |                                   ^~~~~~~~~~ Did you mean to spell `computable` this way?
-     443 |   > only 0 and 1 (or any other bistable pair that can flip-flop between two
-Suggest:
-  - Replace with: “commutable”
-  - Replace with: “comparable”
-  - Replace with: “compatible”
-
-
-
-Lint:    Spelling (63 priority)
-Message: |
      442 |   > All the information about any computable problem can be represented using
      443 |   > only 0 and 1 (or any other bistable pair that can flip-flop between two
          |                                ^~~~~~~~ Did you mean to spell `bistable` this way?
@@ -1194,16 +1170,6 @@ Suggest:
   - Replace with: “got”
   - Replace with: “goo”
   - Replace with: “gore”
-
-
-
-Lint:    Miscellaneous (10 priority)
-Message: |
-     489 |   feature of objects is that an object's procedures can access and often modify
-     490 |   the data fields of the object with which they are associated. Thus
-         |       ^~~~ Use an apostrophe and `s` to form a noun’s possessive.
-Suggest:
-  - Replace with: “data's”
 
 
 

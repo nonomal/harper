@@ -43,11 +43,13 @@ use super::filler_words::FillerWords;
 use super::first_aid_kit::FirstAidKit;
 use super::for_noun::ForNoun;
 use super::have_pronoun::HavePronoun;
+use super::have_take_a_look::HaveTakeALook;
 use super::hedging::Hedging;
 use super::hereby::Hereby;
 use super::hop_hope::HopHope;
 use super::how_to::HowTo;
 use super::hyphenate_number_day::HyphenateNumberDay;
+use super::i_am_agreement::IAmAgreement;
 use super::in_on_the_cards::InOnTheCards;
 use super::inflected_verb_after_to::InflectedVerbAfterTo;
 use super::its_contraction::ItsContraction;
@@ -96,6 +98,7 @@ use super::somewhat_something::SomewhatSomething;
 use super::spaces::Spaces;
 use super::spell_check::SpellCheck;
 use super::spelled_numbers::SpelledNumbers;
+use super::that_than::ThatThan;
 use super::that_which::ThatWhich;
 use super::the_how_why::TheHowWhy;
 use super::the_my::TheMy;
@@ -116,7 +119,9 @@ use super::{CurrencyPlacement, HtmlDescriptionLinter, Linter, NoOxfordComma, Oxf
 use super::{ExprLinter, Lint};
 use crate::linting::dashes::Dashes;
 use crate::linting::open_compounds::OpenCompounds;
-use crate::linting::{closed_compounds, initialisms, phrase_corrections, phrase_set_corrections};
+use crate::linting::{
+    MassPlurals, closed_compounds, initialisms, phrase_corrections, phrase_set_corrections,
+};
 use crate::spell::{Dictionary, MutableDictionary};
 use crate::{CharString, Dialect, Document, TokenStringExt};
 
@@ -387,6 +392,7 @@ impl LintGroup {
         out.merge_from(&mut initialisms::lint_group());
 
         // Add all the more complex rules to the group.
+        // Please maintain alphabetical order.
         // On *nix you can maintain sort order with `sort -t'(' -k2`
         insert_expr_rule!(APart, true);
         insert_expr_rule!(AdjectiveDoubleDegree, true);
@@ -426,6 +432,7 @@ impl LintGroup {
         insert_struct_rule!(HopHope, true);
         insert_struct_rule!(HowTo, true);
         insert_expr_rule!(HyphenateNumberDay, true);
+        insert_expr_rule!(IAmAgreement, true);
         insert_struct_rule!(ItsContraction, true);
         insert_struct_rule!(ItsPossessive, true);
         insert_expr_rule!(LeftRightHand, true);
@@ -470,6 +477,7 @@ impl LintGroup {
         insert_expr_rule!(SomewhatSomething, true);
         insert_struct_rule!(Spaces, true);
         insert_struct_rule!(SpelledNumbers, false);
+        insert_expr_rule!(ThatThan, true);
         insert_expr_rule!(ThatWhich, true);
         insert_expr_rule!(TheHowWhy, true);
         insert_struct_rule!(TheMy, true);
@@ -484,7 +492,6 @@ impl LintGroup {
         insert_expr_rule!(WayTooAdjective, true);
         insert_expr_rule!(Whereas, true);
         insert_expr_rule!(WidelyAccepted, true);
-        insert_struct_rule!(WidelyAccepted, true);
         insert_expr_rule!(WinPrize, true);
         insert_struct_rule!(WordPressDotcom, true);
 
@@ -507,10 +514,16 @@ impl LintGroup {
         out.config.set_rule_enabled("SentenceCapitalization", true);
 
         out.add("PossessiveNoun", PossessiveNoun::new(dictionary.clone()));
-        out.config.set_rule_enabled("PossessiveNoun", true);
+        out.config.set_rule_enabled("PossessiveNoun", false);
 
         out.add("Regionalisms", Regionalisms::new(dialect));
         out.config.set_rule_enabled("Regionalisms", true);
+
+        out.add("HaveTakeALook", HaveTakeALook::new(dialect));
+        out.config.set_rule_enabled("HaveTakeALook", true);
+
+        out.add("MassPlurals", MassPlurals::new(dictionary.clone()));
+        out.config.set_rule_enabled("MassPlurals", true);
 
         out
     }
@@ -594,8 +607,26 @@ mod tests {
     use std::sync::Arc;
 
     use super::LintGroup;
+    use crate::linting::tests::assert_no_lints;
     use crate::spell::{FstDictionary, MutableDictionary};
     use crate::{Dialect, Document, linting::Linter};
+
+    fn test_group() -> LintGroup {
+        LintGroup::new_curated(Arc::new(MutableDictionary::curated()), Dialect::American)
+    }
+
+    #[test]
+    fn clean_interjection() {
+        assert_no_lints(
+            "Although I only saw the need to interject once, I still saw it.",
+            test_group(),
+        );
+    }
+
+    #[test]
+    fn clean_consensus() {
+        assert_no_lints("But there is less consensus on this.", test_group());
+    }
 
     #[test]
     fn can_get_all_descriptions() {

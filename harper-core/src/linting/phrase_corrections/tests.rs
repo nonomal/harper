@@ -409,6 +409,16 @@ fn detect_ever_present_real_world() {
     );
 }
 
+// EveryTime
+#[test]
+fn fix_everytime() {
+    assert_suggestion_result(
+        "Init tool everytime a file in a directory is modified",
+        lint_group(),
+        "Init tool every time a file in a directory is modified",
+    );
+}
+
 // Excellent
 #[test]
 fn excellent_clean() {
@@ -582,16 +592,6 @@ fn hunger_pain() {
 
 // IAm
 // -none-
-
-// IAmAgreement
-#[test]
-fn corrects_i_are() {
-    assert_suggestion_result(
-        "I are really happy about this release.",
-        lint_group(),
-        "I am really happy about this release.",
-    );
-}
 
 // IDo
 #[test]

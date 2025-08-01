@@ -17,9 +17,9 @@ Message: |
          |                                                               ^~~ Did you mean to spell `PoS` this way?
        9 | POST), also called grammatical tagging is the process of marking up a word in a
 Suggest:
-  - Replace with: “Poe”
   - Replace with: “PBS”
   - Replace with: “PMS”
+  - Replace with: “POS”
 
 
 
@@ -162,16 +162,6 @@ Suggest:
   - Replace with: “Freeman”
   - Replace with: “Reembark”
   - Replace with: “Debank”
-
-
-
-Lint:    Miscellaneous (10 priority)
-Message: |
-      65 | the earlier Brown Corpus and LOB Corpus tag sets, though much smaller. In
-      66 | Europe, tag sets from the Eagles Guidelines see wide use and include versions
-         |                           ^~~~~~ Use an apostrophe and `s` to form a noun’s possessive.
-Suggest:
-  - Replace with: “Eagle's”
 
 
 
