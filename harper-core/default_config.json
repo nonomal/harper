@@ -200,6 +200,13 @@
 					"settings": [
 						{
 							"Bool": {
+								"name": "AsFarAsICanTell",
+								"state": true,
+								"label": "As Far As I Can Tell"
+							}
+						},
+						{
+							"Bool": {
 								"name": "AsFarAsIKnow",
 								"state": true,
 								"label": "As Far As I Know"
@@ -322,6 +329,13 @@
 								"name": "OhMyGod",
 								"state": true,
 								"label": "Oh My God"
+							}
+						},
+						{
+							"Bool": {
+								"name": "OnTheOtherHand",
+								"state": true,
+								"label": "On the Other Hand"
 							}
 						},
 						{
@@ -1263,6 +1277,13 @@
 						},
 						{
 							"Bool": {
+								"name": "NotForLackOf",
+								"state": true,
+								"label": "Not for Lack of"
+							}
+						},
+						{
+							"Bool": {
 								"name": "NotOnly",
 								"state": true,
 								"label": "Not Only"
@@ -1308,6 +1329,13 @@
 								"name": "Piggyback",
 								"state": true,
 								"label": "Piggyback"
+							}
+						},
+						{
+							"Bool": {
+								"name": "Provocate",
+								"state": true,
+								"label": "Provocate"
 							}
 						},
 						{
@@ -3296,6 +3324,13 @@
 						},
 						{
 							"Bool": {
+								"name": "AdvantageOf",
+								"state": true,
+								"label": "Advantage Of"
+							}
+						},
+						{
+							"Bool": {
 								"name": "AfterAll",
 								"state": true,
 								"label": "After All"
@@ -3793,6 +3828,12 @@
 						},
 						{
 							"Bool": {
+								"name": "ReverseEngineer",
+								"state": true
+							}
+						},
+						{
+							"Bool": {
 								"name": "RulesOfThumb",
 								"state": true,
 								"label": "Rules Of Thumb"
@@ -4036,7 +4077,7 @@
 							"Bool": {
 								"name": "AheadAnd",
 								"state": true,
-								"label": "Ahead And"
+								"label": "Ahead and"
 							}
 						},
 						{
@@ -4464,6 +4505,13 @@
 								"name": "ChangeTack",
 								"state": true,
 								"label": "Change Tack"
+							}
+						},
+						{
+							"Bool": {
+								"name": "ChickenAndEgg",
+								"state": true,
+								"label": "Chicken and Egg"
 							}
 						},
 						{
@@ -4965,6 +5013,13 @@
 						},
 						{
 							"Bool": {
+								"name": "InTheFirstPlace",
+								"state": true,
+								"label": "In the First Place"
+							}
+						},
+						{
+							"Bool": {
 								"name": "InTheGrandSchemeOfThings",
 								"state": true,
 								"label": "In the Grand Scheme of Things"
@@ -5136,6 +5191,13 @@
 								"name": "LookingForwardTo",
 								"state": true,
 								"label": "Looking Forward To"
+							}
+						},
+						{
+							"Bool": {
+								"name": "Lots",
+								"state": true,
+								"label": "Lots"
 							}
 						},
 						{
@@ -5329,6 +5391,13 @@
 						},
 						{
 							"Bool": {
+								"name": "OnTheFence",
+								"state": true,
+								"label": "On The Fence"
+							}
+						},
+						{
+							"Bool": {
 								"name": "OnTheSpurOfTheMoment",
 								"state": true,
 								"label": "On The Spur Of The Moment"
@@ -5392,9 +5461,23 @@
 						},
 						{
 							"Bool": {
+								"name": "PlayAFactor",
+								"state": true,
+								"label": "Play a Factor"
+							}
+						},
+						{
+							"Bool": {
 								"name": "PrayingMantis",
 								"state": true,
 								"label": "Praying Mantis"
+							}
+						},
+						{
+							"OneOfMany": {
+								"names": ["PreferPleaded", "PreferPled"],
+								"name": "PreferPleaded",
+								"labels": ["Prefer ‘Pleaded’", "Prefer ‘Pled’"]
 							}
 						},
 						{
@@ -5724,6 +5807,13 @@
 								"name": "ViceVersa",
 								"state": true,
 								"label": "Vice Versa"
+							}
+						},
+						{
+							"Bool": {
+								"name": "WaistWaste",
+								"state": true,
+								"label": "Waist / Waste"
 							}
 						},
 						{
