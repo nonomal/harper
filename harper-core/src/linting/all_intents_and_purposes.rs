@@ -34,9 +34,9 @@ impl Default for AllIntentsAndPurposes {
                     ])),
                 ])
                 .t_ws()
-                .t_set(&["purposes", "purpose"])
+                .t_set(["purposes", "purpose"])
                 .but_not(
-                    SequenceExpr::word_set(&["for", "to"])
+                    SequenceExpr::word_set(["for", "to"])
                         .t_ws()
                         .then_word_seq(&["all", "intents", "and", "purposes"]),
                 ),
