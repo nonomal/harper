@@ -3828,6 +3828,12 @@
 						},
 						{
 							"Bool": {
+								"name": "ReverseEngineer",
+								"state": true
+							}
+						},
+						{
+							"Bool": {
 								"name": "RulesOfThumb",
 								"state": true,
 								"label": "Rules Of Thumb"
