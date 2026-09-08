@@ -4950,6 +4950,13 @@
 						},
 						{
 							"Bool": {
+								"name": "InAnIdealWorld",
+								"state": true,
+								"label": "In an Ideal World"
+							}
+						},
+						{
+							"Bool": {
 								"name": "IncidentReport",
 								"state": true,
 								"label": "Incident Report"
