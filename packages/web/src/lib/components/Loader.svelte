@@ -115,7 +115,7 @@ function updateParticles(ctx: CanvasRenderingContext2D) {
 			toRemove.push(i);
 		}
 	}
-	particles = particles.filter((v, i) => !toRemove.includes(i));
+	particles = particles.filter((_v, i) => !toRemove.includes(i));
 
 	// Move according to velocity
 	for (let particle of particles) {
