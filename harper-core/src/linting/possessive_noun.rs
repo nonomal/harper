@@ -1,65 +1,51 @@
 use harper_brill::UPOS;
 
 use super::{ExprLinter, Lint, LintKind, Suggestion};
-use crate::Token;
-use crate::expr::All;
-use crate::expr::Expr;
-use crate::expr::SequenceExpr;
-use crate::patterns::UPOSSet;
-use crate::patterns::WordSet;
+use crate::expr::{All, Expr, SequenceExpr};
+use crate::linting::expr_linter::Chunk;
+use crate::patterns::{UPOSSet, WordSet};
 use crate::spell::Dictionary;
+use crate::{Token, TokenKind};
 
 pub struct PossessiveNoun<D> {
-    expr: Box<dyn Expr>,
+    expr: All,
     dict: D,
 }
 
-impl<D> PossessiveNoun<D>
-where
-    D: Dictionary,
-{
+impl<D: Dictionary> PossessiveNoun<D> {
     pub fn new(dict: D) -> Self {
-        let expr = SequenceExpr::default()
-            .then(UPOSSet::new(&[UPOS::DET, UPOS::PROPN]))
+        let expr = SequenceExpr::with(UPOSSet::new(&[UPOS::DET, UPOS::PROPN]))
             .t_ws()
-            .then(|tok: &Token, _: &[char]| {
-                tok.kind.is_plural_nominal() && !tok.kind.is_singular_nominal()
-            })
+            .then_kind_is_but_is_not(TokenKind::is_plural_nominal, TokenKind::is_singular_nominal)
             .t_ws()
             .then(UPOSSet::new(&[UPOS::NOUN, UPOS::PROPN]))
-            .then_optional(SequenceExpr::default().t_any().t_any());
+            .then_optional(SequenceExpr::anything().t_any());
 
-        let additional_req = SequenceExpr::default()
-            .t_any()
-            .t_any()
-            .t_any()
-            .t_any()
-            .then_noun();
+        let additional_req = SequenceExpr::anything().t_any().t_any().t_any().then_noun();
 
-        let exceptions = SequenceExpr::default()
-            .then_unless(|tok: &Token, _: &[char]| tok.kind.is_demonstrative_determiner())
-            .t_any()
-            .then_unless(WordSet::new(&["flags", "checks", "catches", "you"]))
-            .t_any()
-            .then_unless(WordSet::new(&["form", "go"]));
+        let exceptions =
+            SequenceExpr::unless(|tok: &Token, _: &[char]| tok.kind.is_demonstrative_determiner())
+                .t_any()
+                .then_unless(WordSet::new(["flags", "checks", "catches", "you"]))
+                .t_any()
+                .then_unless(WordSet::new(["form", "go"]));
 
         Self {
-            expr: Box::new(All::new(vec![
+            expr: All::new(vec![
                 Box::new(expr),
                 Box::new(additional_req),
                 Box::new(exceptions),
-            ])),
+            ]),
             dict,
         }
     }
 }
 
-impl<D> ExprLinter for PossessiveNoun<D>
-where
-    D: Dictionary,
-{
+impl<D: Dictionary> ExprLinter for PossessiveNoun<D> {
+    type Unit = Chunk;
+
     fn expr(&self) -> &dyn Expr {
-        self.expr.as_ref()
+        &self.expr
     }
 
     fn match_to_lint(&self, matched_tokens: &[Token], _source: &[char]) -> Option<Lint> {
@@ -89,7 +75,7 @@ where
             span,
             lint_kind: LintKind::Miscellaneous,
             suggestions: vec![Suggestion::ReplaceWith(replacement.chars().collect())],
-            message: self.description().to_string(),
+            message: self.description().to_owned(),
             priority: 10,
         })
     }

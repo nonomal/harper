@@ -4,12 +4,13 @@ use crate::expr::SequenceExpr;
 use crate::{Token, TokenStringExt};
 
 use super::{ExprLinter, Lint, LintKind, Suggestion};
+use crate::linting::expr_linter::Chunk;
 
 const EN_DASH: char = '–';
 const EM_DASH: char = '—';
 
 pub struct Dashes {
-    expr: Box<dyn Expr>,
+    expr: LongestMatchOf,
 }
 
 impl Default for Dashes {
@@ -22,15 +23,15 @@ impl Default for Dashes {
 
         let pattern = LongestMatchOf::new(vec![Box::new(em_dash_or_longer), Box::new(en_dash)]);
 
-        Self {
-            expr: Box::new(pattern),
-        }
+        Self { expr: pattern }
     }
 }
 
 impl ExprLinter for Dashes {
+    type Unit = Chunk;
+
     fn expr(&self) -> &dyn Expr {
-        self.expr.as_ref()
+        &self.expr
     }
 
     fn match_to_lint(&self, matched_tokens: &[Token], _source: &[char]) -> Option<Lint> {
@@ -42,14 +43,14 @@ impl ExprLinter for Dashes {
                 span,
                 lint_kind,
                 suggestions: vec![Suggestion::ReplaceWith(vec![EN_DASH])],
-                message: "A sequence of hyphens is not an en dash.".to_owned(),
+                message: "Replace these two hyphens with an en dash (–).".to_owned(),
                 priority: 63,
             }),
             3 => Some(Lint {
                 span,
                 lint_kind,
                 suggestions: vec![Suggestion::ReplaceWith(vec![EM_DASH])],
-                message: "A sequence of hyphens is not an em dash.".to_owned(),
+                message: "Replace these three hyphens with an em dash (—).".to_owned(),
                 priority: 63,
             }),
             4.. => None, // Ignore longer hyphen sequences.
@@ -58,7 +59,7 @@ impl ExprLinter for Dashes {
     }
 
     fn description(&self) -> &'static str {
-        "Rather than outright using an em dash or en dash, authors often use a sequence of hyphens, expecting them to be condensed. Use two hyphens to denote an en dash and three to denote an em dash."
+        "Writers often type `--` or `---` expecting their editor to convert them into proper dashes. Replace these sequences with the correct characters: use an en dash (–) for ranges or connections and an em dash (—) for a break in thought."
     }
 }
 

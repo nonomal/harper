@@ -3,12 +3,23 @@ use unicode_width::UnicodeWidthChar;
 
 use crate::Punctuation;
 
-pub trait CharExt {
+mod private {
+    pub trait Sealed {}
+
+    impl Sealed for char {}
+}
+
+pub trait CharExt: private::Sealed {
     fn is_cjk(&self) -> bool;
     /// Whether a character can be a component of an English word.
     fn is_english_lingual(&self) -> bool;
     fn is_emoji(&self) -> bool;
     fn is_punctuation(&self) -> bool;
+    /// Whether the character is an (English) vowel.
+    ///
+    /// Checks whether the character is in the set (A, E, I, O, U); case-insensitive.
+    fn is_vowel(&self) -> bool;
+    fn normalized(&self) -> Self;
 }
 
 impl CharExt for char {
@@ -21,6 +32,15 @@ impl CharExt for char {
             && self.is_alphabetic()
             && !self.is_cjk()
             && self.script() == Script::Latin
+    }
+
+    fn normalized(&self) -> Self {
+        match self {
+            '\u{2018}' | '\u{2019}' | '\u{02BC}' | '\u{FF07}' => '\'',
+            '\u{201C}' | '\u{201D}' | '\u{FF02}' => '"',
+            '\u{2013}' | '\u{2014}' | '\u{2212}' | '\u{FF0D}' => '-',
+            _ => *self,
+        }
     }
 
     fn is_emoji(&self) -> bool {
@@ -76,6 +96,10 @@ impl CharExt for char {
 
     fn is_punctuation(&self) -> bool {
         Punctuation::from_char(*self).is_some()
+    }
+
+    fn is_vowel(&self) -> bool {
+        matches!(self.to_ascii_lowercase(), 'a' | 'e' | 'i' | 'o' | 'u')
     }
 }
 

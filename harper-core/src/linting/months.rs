@@ -1,3 +1,4 @@
+use crate::linting::expr_linter::Chunk;
 use crate::{
     Lrc, Token, TokenKind,
     expr::{Expr, FirstMatchOf, SequenceExpr},
@@ -22,13 +23,13 @@ const ALL_MONTHS: &[&str] = &[
 ];
 
 pub struct Months {
-    expr: Box<dyn Expr>,
+    expr: SequenceExpr,
 }
 
 impl Default for Months {
     fn default() -> Self {
         // Define ambiguous months (those that are also common words)
-        let ambiguous_months = Lrc::new(WordSet::new(&["march", "may", "august"]));
+        let ambiguous_months = Lrc::new(WordSet::new(["march", "may", "august"]));
 
         // The unambiguous months
         let only_months: Vec<&str> = ALL_MONTHS
@@ -37,9 +38,9 @@ impl Default for Months {
             .copied()
             .collect();
 
-        let only_months = WordSet::new(&only_months);
+        let only_months = WordSet::new(only_months);
 
-        let before_month_sense_only = WordSet::new(&[
+        let before_month_sense_only = WordSet::new([
             // Determiners.
             // These words won't disambiguate months: "each", "this", "that"
             // "each may do as he likes"
@@ -53,8 +54,8 @@ impl Default for Months {
             "by", "during", "in", "last", "next", "of", "until",
         ]);
 
-        let year_or_day_of_month = SequenceExpr::default().then(|tok: &Token, _src: &[char]| {
-            if let TokenKind::Number(number) = &tok.kind {
+        let year_or_day_of_month = SequenceExpr::default().then_kind_where(|kind| {
+            if let TokenKind::Number(number) = &kind {
                 let v = number.value.into_inner() as u32;
                 (1500..=2500).contains(&v) || (1..=31).contains(&v)
             } else {
@@ -64,42 +65,40 @@ impl Default for Months {
 
         // An Expr that matches either a plain month
         // Or an ambiguous month after a disambiguating word
-        let month_expr = SequenceExpr::default().then(FirstMatchOf::new(vec![
-            Box::new(only_months),
+        let month_expr = SequenceExpr::with(FirstMatchOf::new([
+            Box::new(only_months) as Box<dyn Expr>,
             Box::new(
-                SequenceExpr::default()
-                    .then(before_month_sense_only)
+                SequenceExpr::with(before_month_sense_only)
                     .then_whitespace()
                     .then(ambiguous_months.clone()),
             ),
             Box::new(
-                SequenceExpr::default()
-                    .then(ambiguous_months)
+                SequenceExpr::with(ambiguous_months)
                     .then_whitespace()
                     .then(year_or_day_of_month),
             ),
         ]));
 
-        Self {
-            expr: Box::new(month_expr),
-        }
+        Self { expr: month_expr }
     }
 }
 
 impl ExprLinter for Months {
+    type Unit = Chunk;
+
     fn expr(&self) -> &dyn Expr {
-        self.expr.as_ref()
+        &self.expr
     }
 
     fn match_to_lint(&self, tokens: &[Token], src: &[char]) -> Option<Lint> {
         // `find` which token is the month by seeing which tok's content (lowercased) is in ALL_MONTHS
         let month_tok = tokens.iter().find(|token| {
-            let token_str = token.span.get_content_string(src);
+            let token_str = token.get_str(src);
             ALL_MONTHS.iter().any(|&m| m == token_str.to_lowercase())
         })?; // Return None if no month token found
 
         // let month_tok = tokens.last().unwrap();
-        let month_ch = month_tok.span.get_content(src);
+        let month_ch = month_tok.get_ch(src);
 
         if month_ch[0].is_uppercase() {
             return None;
@@ -112,7 +111,7 @@ impl ExprLinter for Months {
             span: month_tok.span,
             lint_kind: LintKind::Miscellaneous,
             suggestions: vec![Suggestion::ReplaceWith(month_vec)],
-            message: "Months should be written with a capital letter.".to_string(),
+            message: "Months should be written with a capital letter.".to_owned(),
             priority: 126,
         })
     }

@@ -8,6 +8,8 @@ use crate::Currency;
 )]
 #[serde(tag = "kind")]
 pub enum Punctuation {
+    /// `°`
+    Degree,
     /// `…`
     Ellipsis,
     /// `–`
@@ -76,46 +78,63 @@ pub enum Punctuation {
     Pipe,
     /// `_`
     Underscore,
+    /// `´`
+    Acute,
+    /// `‘`
+    OpenSingle,
+    /// `′`
+    SinglePrime,
+    /// `″`
+    DoublePrime,
+    /// `\``,
+    Backtick,
 }
 
 impl Punctuation {
     pub fn from_char(c: char) -> Option<Punctuation> {
         let punct = match c {
-            '@' => Punctuation::At,
-            '~' => Punctuation::Tilde,
-            '=' => Punctuation::Equal,
-            '<' => Punctuation::LessThan,
-            '>' => Punctuation::GreaterThan,
-            '/' => Punctuation::ForwardSlash,
-            '\\' => Punctuation::Backslash,
-            '%' => Punctuation::Percent,
+            '´' => Punctuation::Acute,
+            '&' => Punctuation::Ampersand,
             '’' => Punctuation::Apostrophe,
             '\'' => Punctuation::Apostrophe,
-            '.' => Punctuation::Period,
+            '@' => Punctuation::At,
+            '\\' => Punctuation::Backslash,
             '!' => Punctuation::Bang,
-            '?' => Punctuation::Question,
+            '^' => Punctuation::Caret,
             ':' => Punctuation::Colon,
-            ';' => Punctuation::Semicolon,
             ',' => Punctuation::Comma,
             '、' => Punctuation::Comma,
             '，' => Punctuation::Comma,
+            '°' => Punctuation::Degree,
+            '″' => Punctuation::DoublePrime,
+            '–' => Punctuation::EnDash,
+            '—' => Punctuation::EmDash,
+            '…' => Punctuation::Ellipsis,
+            '=' => Punctuation::Equal,
+            '/' => Punctuation::ForwardSlash,
+            '>' => Punctuation::GreaterThan,
+            '#' => Punctuation::Hash,
             '-' => Punctuation::Hyphen,
+            '<' => Punctuation::LessThan,
+            '‘' => Punctuation::OpenSingle,
+            '%' => Punctuation::Percent,
+            '|' => Punctuation::Pipe,
+            '+' => Punctuation::Plus,
+            '?' => Punctuation::Question,
+            '.' => Punctuation::Period,
+            ';' => Punctuation::Semicolon,
+            '′' => Punctuation::SinglePrime,
+            '*' => Punctuation::Star,
+            '~' => Punctuation::Tilde,
+            '_' => Punctuation::Underscore,
+
             '[' => Punctuation::OpenSquare,
             ']' => Punctuation::CloseSquare,
             '{' => Punctuation::OpenCurly,
             '}' => Punctuation::CloseCurly,
             '(' => Punctuation::OpenRound,
             ')' => Punctuation::CloseRound,
-            '#' => Punctuation::Hash,
-            '*' => Punctuation::Star,
-            '&' => Punctuation::Ampersand,
-            '–' => Punctuation::EnDash,
-            '—' => Punctuation::EmDash,
-            '…' => Punctuation::Ellipsis,
-            '^' => Punctuation::Caret,
-            '+' => Punctuation::Plus,
-            '|' => Punctuation::Pipe,
-            '_' => Punctuation::Underscore,
+            '`' => Punctuation::Backtick,
             _ => Punctuation::Currency(Currency::from_char(c)?),
         };
 

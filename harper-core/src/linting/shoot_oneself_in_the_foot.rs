@@ -6,19 +6,19 @@ use crate::{
 };
 
 use super::{ExprLinter, Lint, LintKind};
+use crate::linting::expr_linter::Chunk;
 
 pub struct ShootOneselfInTheFoot {
-    pattern: Box<dyn Expr>,
+    pattern: SequenceExpr,
 }
 
 impl Default for ShootOneselfInTheFoot {
     fn default() -> Self {
-        let verb_forms = WordSet::new(&["shoot", "shooting", "shoots", "shot", "shooted"]);
+        let verb_forms = WordSet::new(["shoot", "shooting", "shoots", "shot", "shooted"]);
 
-        let body_parts = WordSet::new(&["foot", "feet", "leg", "legs"]);
+        let body_parts = WordSet::new(["foot", "feet", "leg", "legs"]);
 
-        let pattern = SequenceExpr::default()
-            .then(verb_forms)
+        let pattern = SequenceExpr::with(verb_forms)
             .t_ws()
             .then(ReflexivePronoun::default())
             .t_ws()
@@ -27,29 +27,29 @@ impl Default for ShootOneselfInTheFoot {
             .then_determiner()
             .t_ws()
             .then(body_parts);
-        Self {
-            pattern: Box::new(pattern),
-        }
+        Self { pattern }
     }
 }
 
 impl ExprLinter for ShootOneselfInTheFoot {
+    type Unit = Chunk;
+
     fn expr(&self) -> &dyn Expr {
-        self.pattern.as_ref()
+        &self.pattern
     }
 
     fn match_to_lint(&self, toks: &[Token], src: &[char]) -> Option<Lint> {
-        let pron = &toks.get(2)?.span.get_content(src);
-        let prep = &toks.get(4)?.span.get_content(src);
-        let det = &toks.get(6)?.span.get_content(src);
-        let body_part = &toks.get(8)?.span.get_content(src);
+        let pron = &toks.get(2)?.get_ch(src);
+        let prep = &toks.get(4)?.get_ch(src);
+        let det = &toks.get(6)?.get_ch(src);
+        let body_part = &toks.get(8)?.get_ch(src);
 
         let plural_pron = pron.ends_with_ignore_ascii_case_str("elves");
         let plural_foot = toks.get(8)?.kind.is_plural_noun();
 
-        let is_in = prep.eq_ignore_ascii_case_str("in");
-        let is_the = det.eq_ignore_ascii_case_str("the");
-        let is_foot = body_part.eq_ignore_ascii_case_str("foot");
+        let is_in = prep.eq_str("in");
+        let is_the = det.eq_str("the");
+        let is_foot = body_part.eq_str("foot");
 
         let foot_ok = is_foot || (plural_pron && plural_foot);
 
@@ -75,13 +75,13 @@ impl ExprLinter for ShootOneselfInTheFoot {
             span: in_the_foot,
             lint_kind: LintKind::Miscellaneous,
             suggestions,
-            message: "The standard idiom is 'shoot oneself in the foot'.".to_string(),
+            message: "The standard idiom is 'shoot oneself in the foot'.".to_owned(),
             priority: 50,
         })
     }
 
     fn description(&self) -> &str {
-        "Corrects non-standard variants of 'shoot oneself in the foot'."
+        "Corrects nonstandard variants of 'shoot oneself in the foot'."
     }
 }
 

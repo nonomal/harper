@@ -3,9 +3,9 @@ Message: |
        3 | BY F. SCOTT FITZGERALD
          |    ^~ Did you mean to spell `F.` this way?
 Suggest:
+  - Replace with: “Fa”
+  - Replace with: “Fe”
   - Replace with: “Ft”
-  - Replace with: “F”
-  - Replace with: “Ff”
 
 
 
@@ -14,16 +14,18 @@ Message: |
        3 | BY F. SCOTT FITZGERALD
          |       ^~~~~ Did you mean to spell `SCOTT` this way?
 Suggest:
+  - Replace with: “Scout”
   - Replace with: “Scott”
-  - Replace with: “Scot”
-  - Replace with: “Scots”
+  - Replace with: “Scoot”
 
 
 
 Lint:    Spelling (63 priority)
 Message: |
        3 | BY F. SCOTT FITZGERALD
-         |             ^~~~~~~~~~ Did you mean to spell `FITZGERALD` this way?
+         |             ^~~~~~~~~~ Did you mean `Fitzgerald`?
+Suggest:
+  - Replace with: “Fitzgerald”
 
 
 
@@ -71,29 +73,6 @@ Message: |
          | ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
       24 | express them, are usually plagiaristic and marred by obvious suppressions.
          | ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ This sentence is 57 words long.
-
-
-
-Lint:    Spelling (63 priority)
-Message: |
-      23 | the intimate revelations of young men, or at least the terms in which they
-      24 | express them, are usually plagiaristic and marred by obvious suppressions.
-         |                           ^~~~~~~~~~~~ Did you mean to spell `plagiaristic` this way?
-Suggest:
-  - Replace with: “plagiarist's”
-  - Replace with: “plagiarist”
-  - Replace with: “plagiarists”
-
-
-
-Lint:    Spelling (63 priority)
-Message: |
-      24 | express them, are usually plagiaristic and marred by obvious suppressions.
-         |                                                              ^~~~~~~~~~~~ Did you mean to spell `suppressions` this way?
-Suggest:
-  - Replace with: “suppression's”
-  - Replace with: “suppression”
-  - Replace with: “suppressors”
 
 
 
@@ -161,18 +140,6 @@ Message: |
 
 
 
-Lint:    Spelling (63 priority)
-Message: |
-      46 | wake of his dreams that temporarily closed out my interest in the abortive
-      47 | sorrows and short-winded elations of men.
-         |                          ^~~~~~~~ Did you mean to spell `elations` this way?
-Suggest:
-  - Replace with: “elation's”
-  - Replace with: “elation”
-  - Replace with: “relations”
-
-
-
 Lint:    Readability (127 priority)
 Message: |
       50 | three generations. The Carraways are something of a clan, and we have a
@@ -191,9 +158,11 @@ Message: |
 Lint:    Spelling (63 priority)
 Message: |
       50 | three generations. The Carraways are something of a clan, and we have a
-         |                        ^~~~~~~~~ Did you mean `Caraways`?
+         |                        ^~~~~~~~~ Did you mean to spell `Carraways` this way?
 Suggest:
   - Replace with: “Caraways”
+  - Replace with: “Caraway's”
+  - Replace with: “Castaways”
 
 
 
@@ -204,8 +173,8 @@ Message: |
       52 | founder of my line was my grandfather’s brother, who came here in fifty-one,
 Suggest:
   - Replace with: “Buckley's”
-  - Replace with: “Buckley”
-  - Replace with: “Nucleic”
+  - Replace with: “Buckle's”
+  - Replace with: “Buckler's”
 
 
 
@@ -216,8 +185,8 @@ Message: |
       62 | seemed like the ragged edge of the universe—so I decided to go East and learn
 Suggest:
   - Replace with: “center”
+  - Replace with: “cent's”
   - Replace with: “censure”
-  - Replace with: “cent”
 
 
 
@@ -237,12 +206,10 @@ Message: |
 Lint:    Spelling (63 priority)
 Message: |
       72 | sounded like a great idea. He found the house, a weatherbeaten cardboard
-         |                                                  ^~~~~~~~~~~~~ Did you mean to spell `weatherbeaten` this way?
+         |                                                  ^~~~~~~~~~~~~ Did you mean `weather-beaten`?
       73 | bungalow at eighty a month, but at the last minute the firm ordered him to
 Suggest:
-  - Replace with: “weatherboard”
-  - Replace with: “weatherboards”
-  - Replace with: “weatherization”
+  - Replace with: “weather-beaten”
 
 
 
@@ -276,11 +243,9 @@ Lint:    Spelling (63 priority)
 Message: |
       95 | like new money from the mint, promising to unfold the shining secrets that only
       96 | Midas and Morgan and Mæcenas knew. And I had the high intention of reading many
-         |                      ^~~~~~~ Did you mean to spell `Mæcenas` this way?
+         |                      ^~~~~~~ Did you mean `Mycenae`?
 Suggest:
   - Replace with: “Mycenae”
-  - Replace with: “Macon's”
-  - Replace with: “Mycenae's”
 
 
 
@@ -330,20 +295,8 @@ Message: |
          |                                 ^~~~~ Did you mean to spell `Hôtel` this way?
 Suggest:
   - Replace with: “Hotel”
-  - Replace with: “Havel”
-  - Replace with: “Hegel”
-
-
-
-Lint:    Spelling (63 priority)
-Message: |
-     119 | thousand a season. The one on my right was a colossal affair by any standard—it
-     120 | was a factual imitation of some Hôtel de Ville in Normandy, with a tower on one
-         |                                       ^~ Did you mean to spell `de` this way?
-Suggest:
-  - Replace with: “d”
-  - Replace with: “db”
-  - Replace with: “dc”
+  - Replace with: “Hate”
+  - Replace with: “Hazel”
 
 
 
@@ -355,7 +308,7 @@ Message: |
 Suggest:
   - Replace with: “Vile”
   - Replace with: “Villa”
-  - Replace with: “Lille”
+  - Replace with: “Villi”
 
 
 
@@ -405,6 +358,16 @@ Message: |
 
 
 
+Lint:    Spelling (127 priority)
+Message: |
+     137 | one of those men who reach such an acute limited excellence at twenty-one that
+     138 | everything afterward savors of anti-climax. His family were enormously
+         |                                ^~~~~~~~~~~ This looks like a prefix that can be joined with the rest of the word.
+Suggest:
+  - Replace with: “anticlimax”
+
+
+
 Lint:    Readability (127 priority)
 Message: |
      138 | everything afterward savors of anti-climax. His family were enormously
@@ -415,16 +378,6 @@ Message: |
          | ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
      141 | for instance, he’d brought down a string of polo ponies from Lake Forest. It was
          | ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ This sentence is 47 words long.
-
-
-
-Lint:    Spelling (63 priority)
-Message: |
-     145 | particular reason, and then drifted here and there unrestfully wherever people
-         |                                                    ^~~~~~~~~~~ Did you mean `restfully`?
-     146 | played polo and were rich together. This was a permanent move, said Daisy over
-Suggest:
-  - Replace with: “restfully”
 
 
 
@@ -483,9 +436,9 @@ Message: |
      189 | “It belonged to Demaine, the oil man.” He turned me around again, politely and
          |                 ^~~~~~~ Did you mean to spell `Demaine` this way?
 Suggest:
-  - Replace with: “Deanne”
-  - Replace with: “Deming”
-  - Replace with: “Dewayne”
+  - Replace with: “Decline”
+  - Replace with: “Demand”
+  - Replace with: “Demise”
 
 
 
@@ -495,18 +448,6 @@ Message: |
          |                              ^~~~~~~ Did you mean the closed compound noun “oilman”?
 Suggest:
   - Replace with: “oilman”
-
-
-
-Lint:    Spelling (63 priority)
-Message: |
-     192 | We walked through a high hallway into a bright rosy-colored space, fragilely
-         |                                                                    ^~~~~~~~~ Did you mean to spell `fragilely` this way?
-     193 | bound into the house by French windows at either end. The windows were ajar and
-Suggest:
-  - Replace with: “fragile”
-  - Replace with: “facilely”
-  - Replace with: “fragiler”
 
 
 
@@ -549,53 +490,24 @@ Suggest:
 
 
 
-Lint:    Spelling (63 priority)
-Message: |
-     322 | Slenderly, languidly, their hands set lightly on their hips, the two young women
-         | ^~~~~~~~~ Did you mean `Tenderly`?
-Suggest:
-  - Replace with: “Tenderly”
-
-
-
-Lint:    Spelling (63 priority)
+Lint:    Formatting (255 priority)
 Message: |
      334 | “All right,” said Daisy. ‘‘What’ll we plan?” She turned to me helplessly: ‘‘What
-         |                            ^~~~~~~ Did you mean `That'll`?
-Suggest:
-  - Replace with: “That'll”
+         |                                            ^ This quote has no termination.
 
 
 
-Lint:    Spelling (63 priority)
+Lint:    Formatting (255 priority)
 Message: |
-     352 | Sometimes she and Miss Baker talked at once, unobtrusively and with a bantering
-     353 | inconsequence that was never quite chatter, that was as cool as their white
-         | ^~~~~~~~~~~~~ Did you mean `consequence`?
-Suggest:
-  - Replace with: “consequence”
+     335 | do people plan?”
+         |                ^ This quote has no termination.
 
 
 
-Lint:    Spelling (63 priority)
+Lint:    Formatting (255 priority)
 Message: |
-     362 | “You make me feel uncivilized, Daisy,” I confessed on my second glass of corky
-         |                                                                          ^~~~~ Did you mean to spell `corky` this way?
-     363 | but rather impressive claret. “Can’t you talk about crops or something?”
-Suggest:
-  - Replace with: “cork”
-  - Replace with: “cocky”
-  - Replace with: “corks”
-
-
-
-Lint:    Spelling (63 priority)
-Message: |
-     378 | “Tom’s getting very profound,” said Daisy, with an expression of unthoughtful
-         |                                                                  ^~~~~~~~~~~~ Did you mean `thoughtful`?
-     379 | sadness. “He reads deep books with long words in them. What was that word we———”
-Suggest:
-  - Replace with: “thoughtful”
+     392 | “This idea is that we’re Nordics. I am, and you are, and you are, and—” After an
+         | ^ This quote has no termination.
 
 
 
@@ -632,6 +544,13 @@ Suggest:
 
 
 
+Lint:    Formatting (255 priority)
+Message: |
+     452 | “Why—” she said hesitantly, ‘‘Tom’s got some woman in New York.”
+         | ^ This quote has no termination.
+
+
+
 Lint:    Spelling (63 priority)
 Message: |
      464 | “It couldn’t be helped!” cried Daisy with tense gayety.
@@ -640,17 +559,6 @@ Suggest:
   - Replace with: “gaiety”
   - Replace with: “gamely”
   - Replace with: “gamete”
-
-
-
-Lint:    Spelling (63 priority)
-Message: |
-     474 | The telephone rang inside, startingly, and as Daisy shook her head decisively at
-         |                            ^~~~~~~~~~ Did you mean to spell `startingly` this way?
-Suggest:
-  - Replace with: “startlingly”
-  - Replace with: “searingly”
-  - Replace with: “slantingly”
 
 
 
@@ -690,6 +598,13 @@ Message: |
 
 
 
+Lint:    Formatting (255 priority)
+Message: |
+     514 | “I’ll show you how I’ve gotten to feel about—things. Well, she was less than an
+         | ^ This quote has no termination.
+
+
+
 Lint:    Spelling (63 priority)
 Message: |
      529 | the whole evening had been a trick of some sort to exact a contributary emotion
@@ -704,25 +619,12 @@ Suggest:
 
 Lint:    Spelling (63 priority)
 Message: |
-     535 | end of the long couch and she read aloud to him from the Saturday Evening
-     536 | Post—the words, murmurous and uninflected, running together in a soothing tune.
-         |                               ^~~~~~~~~~~ Did you mean to spell `uninflected` this way?
-Suggest:
-  - Replace with: “uninfected”
-  - Replace with: “inflected”
-  - Replace with: “noninflected”
-
-
-
-Lint:    Spelling (63 priority)
-Message: |
      551 | “Jordan’s going to play in the tournament tomorrow,” explained Daisy, “over at
      552 | Westchester.”
          | ^~~~~~~~~~~ Did you mean to spell `Westchester` this way?
 Suggest:
   - Replace with: “Westminster”
   - Replace with: “Winchester”
-  - Replace with: “Winchesters”
 
 
 
@@ -732,7 +634,8 @@ Message: |
          |                          ^~~~~~~~ Did you mean to spell `Carraway` this way?
 Suggest:
   - Replace with: “Caraway”
-  - Replace with: “Faraway”
+  - Replace with: “Caraways”
+  - Replace with: “Castaway”
 
 
 
@@ -742,6 +645,13 @@ Message: |
          |                                                      ^~~~~~~~~ Vocabulary enhancement: use `excellent` instead of `very good`
 Suggest:
   - Replace with: “excellent”
+
+
+
+Lint:    Formatting (255 priority)
+Message: |
+     603 | square of light. As I started my motor Daisy peremptorily called: “Wait!
+         |                                                                   ^ This quote has no termination.
 
 
 
@@ -765,6 +675,16 @@ Message: |
          |               ^~~~~~~~ Did you mean `gazumps`?
 Suggest:
   - Replace with: “gazumps”
+
+
+
+Lint:    Typo (31 priority)
+Message: |
+     628 | Already it was deep summer on roadhouse roofs and in front of wayside garages,
+     629 | where new red gaspumps sat out in pools of light, and when I reached my estate
+         |               ^~~~~~~~ `gaspumps` should probably be written as `gas pumps`.
+Suggest:
+  - Replace with: “gas pumps”
 
 
 
@@ -839,9 +759,9 @@ Message: |
      664 | it, you perceive, after a moment, the eyes of Doctor T. J. Eckleburg. The eyes
          |                                                      ^~ Did you mean to spell `T.` this way?
 Suggest:
-  - Replace with: “Tr”
-  - Replace with: “T”
-  - Replace with: “Tb”
+  - Replace with: “Ti”
+  - Replace with: “To”
+  - Replace with: “Th”
 
 
 
@@ -850,9 +770,9 @@ Message: |
      664 | it, you perceive, after a moment, the eyes of Doctor T. J. Eckleburg. The eyes
          |                                                         ^~ Did you mean to spell `J.` this way?
 Suggest:
-  - Replace with: “Jr”
-  - Replace with: “J”
+  - Replace with: “Jo”
   - Replace with: “Jg”
+  - Replace with: “Jr”
 
 
 
@@ -863,7 +783,7 @@ Message: |
 Suggest:
   - Replace with: “Excalibur”
   - Replace with: “Vicksburg”
-  - Replace with: “Iceberg”
+  - Replace with: “Heckler”
 
 
 
@@ -873,9 +793,9 @@ Message: |
      665 | of Doctor T. J. Eckleburg are blue and gigantic—their retinas are one yard high.
          |           ^~ Did you mean to spell `T.` this way?
 Suggest:
-  - Replace with: “Tr”
-  - Replace with: “T”
-  - Replace with: “Tb”
+  - Replace with: “Ti”
+  - Replace with: “To”
+  - Replace with: “Th”
 
 
 
@@ -884,9 +804,9 @@ Message: |
      665 | of Doctor T. J. Eckleburg are blue and gigantic—their retinas are one yard high.
          |              ^~ Did you mean to spell `J.` this way?
 Suggest:
-  - Replace with: “Jr”
-  - Replace with: “J”
+  - Replace with: “Jo”
   - Replace with: “Jg”
+  - Replace with: “Jr”
 
 
 
@@ -897,19 +817,7 @@ Message: |
 Suggest:
   - Replace with: “Excalibur”
   - Replace with: “Vicksburg”
-  - Replace with: “Iceberg”
-
-
-
-Lint:    Spelling (63 priority)
-Message: |
-     669 | sank down himself into eternal blindness, or forgot them and moved away. But his
-     670 | eyes, dimmed a little by many paintless days, under sun and rain, brood on over
-         |                               ^~~~~~~~~ Did you mean to spell `paintless` this way?
-Suggest:
-  - Replace with: “pointless”
-  - Replace with: “painless”
-  - Replace with: “painters”
+  - Replace with: “Heckler”
 
 
 
@@ -926,18 +834,6 @@ Message: |
 
 Lint:    Spelling (63 priority)
 Message: |
-     680 | acquaintances resented the fact that he turned up in popular cafés with her and,
-         |                                                              ^~~~~ Did you mean to spell `cafés` this way?
-     681 | leaving her at a table, sauntered about, chatting with whomsoever he knew.
-Suggest:
-  - Replace with: “caffs”
-  - Replace with: “cafes”
-  - Replace with: “cafe's”
-
-
-
-Lint:    Spelling (63 priority)
-Message: |
      683 | up to New York with Tom on the train one afternoon, and when we stopped by the
      684 | ashheaps he jumped to his feet and, taking hold of my elbow, literally forced me
          | ^~~~~~~~ Did you mean to spell `ashheaps` this way?
@@ -948,6 +844,16 @@ Suggest:
 
 
 
+Lint:    Typo (31 priority)
+Message: |
+     683 | up to New York with Tom on the train one afternoon, and when we stopped by the
+     684 | ashheaps he jumped to his feet and, taking hold of my elbow, literally forced me
+         | ^~~~~~~~ `ashheaps` should probably be written as `ash heaps`.
+Suggest:
+  - Replace with: “ash heaps”
+
+
+
 Lint:    Spelling (63 priority)
 Message: |
      694 | hundred yards along the road under Doctor Eckleburg’s persistent stare. The only
@@ -955,7 +861,7 @@ Message: |
 Suggest:
   - Replace with: “Excalibur's”
   - Replace with: “Vicksburg's”
-  - Replace with: “Iceberg's”
+  - Replace with: “Heckler's”
 
 
 
@@ -974,18 +880,9 @@ Message: |
      699 | garage—Repairs. George B. Wilson. Cars bought and sold.—and I followed Tom
          |                        ^~ Did you mean to spell `B.` this way?
 Suggest:
-  - Replace with: “Bu”
   - Replace with: “Be”
-  - Replace with: “Bk”
-
-
-
-Lint:    Spelling (63 priority)
-Message: |
-     702 | The interior was unprosperous and bare; the only car visible was the
-         |                  ^~~~~~~~~~~~ Did you mean `prosperous`?
-Suggest:
-  - Replace with: “prosperous”
+  - Replace with: “Bi”
+  - Replace with: “BO”
 
 
 
@@ -1012,51 +909,10 @@ Suggest:
 
 
 
-Lint:    Spelling (63 priority)
+Lint:    Formatting (255 priority)
 Message: |
-     706 | door of an office, wiping his hands on a piece of waste. He was a blond,
-     707 | spiritless man, anæmic, and faintly handsome. When he saw us a damp gleam of
-         |                 ^~~~~~ Did you mean to spell `anæmic` this way?
-Suggest:
-  - Replace with: “anemic”
-  - Replace with: “anemia”
-  - Replace with: “atomic”
-
-
-
-Lint:    Spelling (63 priority)
-Message: |
-     726 | footsteps on a stairs, and in a moment the thickish figure of a woman blocked
-         |                                            ^~~~~~~~ Did you mean to spell `thickish` this way?
-     727 | out the light from the office door. She was in the middle thirties, and faintly
-Suggest:
-  - Replace with: “thick's”
-  - Replace with: “thickest”
-  - Replace with: “thickos”
-
-
-
-Lint:    Spelling (63 priority)
-Message: |
-     728 | stout, but she carried her flesh sensuously as some women can. Her face, above a
-     729 | spotted dress of dark blue crêpe-de-chine, contained no facet or gleam of
-         |                            ^~~~~ Did you mean to spell `crêpe` this way?
-Suggest:
-  - Replace with: “crepe”
-  - Replace with: “crape”
-  - Replace with: “cope”
-
-
-
-Lint:    Spelling (63 priority)
-Message: |
-     728 | stout, but she carried her flesh sensuously as some women can. Her face, above a
-     729 | spotted dress of dark blue crêpe-de-chine, contained no facet or gleam of
-         |                                  ^~ Did you mean to spell `de` this way?
-Suggest:
-  - Replace with: “d”
-  - Replace with: “db”
-  - Replace with: “dc”
+     711 | ‘‘How’s business?”
+         |                  ^ This quote has no termination.
 
 
 
@@ -1072,17 +928,6 @@ Suggest:
 
 
 
-Lint:    WordChoice (31 priority)
-Message: |
-     731 | nerves of her body were continually smouldering. She smiled slowly and, walking
-     732 | through her husband as if he were a ghost, shook hands with Tom, looking him
-         |                              ^~~~ Use the contraction or separate the words instead.
-Suggest:
-  - Replace with: “we're”
-  - Replace with: “we are”
-
-
-
 Lint:    Spelling (63 priority)
 Message: |
      756 | “Terrible place, isn’t it,” said Tom, exchanging a frown with Doctor Eckleburg.
@@ -1090,7 +935,7 @@ Message: |
 Suggest:
   - Replace with: “Excalibur”
   - Replace with: “Vicksburg”
-  - Replace with: “Iceberg”
+  - Replace with: “Heckler”
 
 
 
@@ -1100,9 +945,18 @@ Message: |
      769 | to the sensibilities of those East Eggers who might be on the train.
          |                                    ^~~~~~ Did you mean to spell `Eggers` this way?
 Suggest:
-  - Replace with: “Eggo's”
-  - Replace with: “Engels”
   - Replace with: “Edgers”
+  - Replace with: “Eggo's”
+  - Replace with: “Edge's”
+
+
+
+Lint:    Spelling (127 priority)
+Message: |
+     775 | Up-stairs, in the solemn echoing drive she let four taxicabs drive away before
+         | ^~~~~~~~~ This looks like a prefix that can be joined with the rest of the word.
+Suggest:
+  - Replace with: “Upstairs”
 
 
 
@@ -1111,20 +965,9 @@ Message: |
      784 | We backed up to a gray old man who bore an absurd resemblance to John D.
          |                                                                       ^~ Did you mean to spell `D.` this way?
 Suggest:
-  - Replace with: “D”
-  - Replace with: “Db”
-  - Replace with: “Dc”
-
-
-
-Lint:    WordChoice (127 priority)
-Message: |
-     806 | “That dog?” He looked at it admiringly. “That dog will cost you ten dollars.”
-         |                                                             ^~~ The possessive version of this word is more common in this context.
-Suggest:
-  - Replace with: “your”
-  - Replace with: “you're a”
-  - Replace with: “you're an”
+  - Replace with: “Do”
+  - Replace with: “DA”
+  - Replace with: “Di”
 
 
 
@@ -1155,16 +998,6 @@ Suggest:
   - Replace with: “McKee's”
   - Replace with: “McKee”
   - Replace with: “McGee's”
-
-
-
-Lint:    Spelling (63 priority)
-Message: |
-     842 | small bedroom, and a bath. The living-room was crowded to the doors with a set
-     843 | of tapestried furniture entirely too large for it, so that to move about was to
-         |    ^~~~~~~~~~ Did you mean `tapestries`?
-Suggest:
-  - Replace with: “tapestries”
 
 
 
@@ -1237,9 +1070,11 @@ Suggest:
 Lint:    Spelling (63 priority)
 Message: |
      905 | “Mrs. Eberhardt. She goes around looking at people’s feet in their own homes.”
-         |       ^~~~~~~~~ Did you mean `Bernhardt`?
+         |       ^~~~~~~~~ Did you mean to spell `Eberhardt` this way?
 Suggest:
-  - Replace with: “Bernhardt”
+  - Replace with: “Earhart”
+  - Replace with: “Earnhardt”
+  - Replace with: “Erhard”
 
 
 
@@ -1266,23 +1101,15 @@ Suggest:
 
 
 
-Lint:    Repetition (63 priority)
-Message: |
-     950 | “Two studies. One of them I call ‘Montauk Point—The Gulls,’ and the other I call
-         |                      ^~~~~~ There are too many personal pronouns in sequence here.
-Suggest:
-  - Replace with: “them”
-  - Replace with: “I”
-
-
-
 Lint:    Spelling (63 priority)
 Message: |
      950 | “Two studies. One of them I call ‘Montauk Point—The Gulls,’ and the other I call
-         |                                   ^~~~~~~ Did you mean `Montague`?
+         |                                   ^~~~~~~ Did you mean to spell `Montauk` this way?
      951 | ‘Montauk Point—The Sea.’”
 Suggest:
+  - Replace with: “Montage”
   - Replace with: “Montague”
+  - Replace with: “Montana”
 
 
 
@@ -1290,9 +1117,11 @@ Lint:    Spelling (63 priority)
 Message: |
      950 | “Two studies. One of them I call ‘Montauk Point—The Gulls,’ and the other I call
      951 | ‘Montauk Point—The Sea.’”
-         |  ^~~~~~~ Did you mean `Montague`?
+         |  ^~~~~~~ Did you mean to spell `Montauk` this way?
 Suggest:
+  - Replace with: “Montage”
   - Replace with: “Montague”
+  - Replace with: “Montana”
 
 
 
@@ -1302,9 +1131,9 @@ Message: |
      990 | B. Wilson at the Gasoline Pump,’ or something like that.”
          | ^~ Did you mean to spell `B.` this way?
 Suggest:
-  - Replace with: “Bu”
   - Replace with: “Be”
-  - Replace with: “Bk”
+  - Replace with: “Bi”
+  - Replace with: “BO”
 
 
 
@@ -1327,8 +1156,8 @@ Message: |
          |        ^~~~ Did you mean to spell `kyke` this way?
 Suggest:
   - Replace with: “kike”
-  - Replace with: “tyke”
   - Replace with: “dyke”
+  - Replace with: “tyke”
 
 
 
@@ -1341,23 +1170,12 @@ Suggest:
 
 
 
-Lint:    Repetition (127 priority)
+Lint:    Repetition (128 priority)
 Message: |
     1065 | “The only crazy I was was when I married him. I knew right away I made a
          |                   ^~~~~~~ Did you mean to repeat this word?
 Suggest:
   - Replace with: “was”
-
-
-
-Lint:    WordChoice (31 priority)
-Message: |
-    1077 | janitor and sent him for some celebrated sandwiches, which were a complete
-         |                                                            ^~~~ Use the contraction or separate the words instead.
-    1078 | supper in themselves. I wanted to get out and walk eastward toward the park
-Suggest:
-  - Replace with: “we're”
-  - Replace with: “we are”
 
 
 
@@ -1374,36 +1192,14 @@ Message: |
 
 
 
-Lint:    Repetition (63 priority)
-Message: |
-    1092 | eyes off him, but every time he looked at me I had to pretend to be looking at
-         |                                           ^~~~ There are too many personal pronouns in sequence here.
-    1093 | the advertisement over his head. When we came into the station he was next to
-Suggest:
-  - Replace with: “me”
-  - Replace with: “I”
-
-
-
-Lint:    Repetition (63 priority)
-Message: |
-    1095 | to call a policeman, but he knew I lied. I was so excited that when I got into a
-    1096 | taxi with him I didn’t hardly know I wasn’t getting into a subway train. All I
-         |           ^~~~~ There are too many personal pronouns in sequence here.
-Suggest:
-  - Replace with: “him”
-  - Replace with: “I”
-
-
-
 Lint:    Spelling (63 priority)
 Message: |
     1122 | Daisy! Dai———”
          |        ^~~ Did you mean to spell `Dai` this way?
 Suggest:
-  - Replace with: “Day”
+  - Replace with: “Dab”
   - Replace with: “Dad”
-  - Replace with: “Dais”
+  - Replace with: “Dag”
 
 
 
@@ -1471,17 +1267,6 @@ Suggest:
 
 
 
-Lint:    Spelling (63 priority)
-Message: |
-    1160 | gardens men and girls came and went like moths among the whisperings and the
-         |                                                          ^~~~~~~~~~~ Did you mean to spell `whisperings` this way?
-    1161 | champagne and the stars. At high tide in the afternoon I watched his guests
-Suggest:
-  - Replace with: “whispering”
-  - Replace with: “whimpering”
-
-
-
 Lint:    Readability (127 priority)
 Message: |
     1161 | champagne and the stars. At high tide in the afternoon I watched his guests
@@ -1506,16 +1291,6 @@ Suggest:
 
 
 
-Lint:    WordChoice (63 priority)
-Message: |
-    1172 | York—every Monday these same oranges and lemons left his back door in a pyramid
-         |                                                          ^~~~~~~~~ Did you mean the closed compound noun “backdoor”?
-    1173 | of pulpless halves. There was a machine in the kitchen which could extract the
-Suggest:
-  - Replace with: “backdoor”
-
-
-
 Lint:    Spelling (63 priority)
 Message: |
     1172 | York—every Monday these same oranges and lemons left his back door in a pyramid
@@ -1528,6 +1303,16 @@ Suggest:
 
 
 
+Lint:    Typo (31 priority)
+Message: |
+    1172 | York—every Monday these same oranges and lemons left his back door in a pyramid
+    1173 | of pulpless halves. There was a machine in the kitchen which could extract the
+         |    ^~~~~~~~ `pulpless` should probably be written as `pulp less`.
+Suggest:
+  - Replace with: “pulp less”
+
+
+
 Lint:    Spelling (63 priority)
 Message: |
     1179 | enormous garden. On buffet tables, garnished with glistening hors-d’œuvre,
@@ -1535,8 +1320,8 @@ Message: |
     1180 | spiced baked hams crowded against salads of harlequin designs and pastry pigs
 Suggest:
   - Replace with: “hours”
-  - Replace with: “hers”
   - Replace with: “ho's”
+  - Replace with: “hers”
 
 
 
@@ -1578,6 +1363,16 @@ Message: |
 
 
 
+Lint:    Spelling (127 priority)
+Message: |
+    1188 | piccolos, and low and high drums. The last swimmers have come in from the beach
+    1189 | now and are dressing up-stairs; the cars from New York are parked five deep in
+         |                      ^~~~~~~~~ This looks like a prefix that can be joined with the rest of the word.
+Suggest:
+  - Replace with: “upstairs”
+
+
+
 Lint:    Spelling (63 priority)
 Message: |
     1191 | colors, and hair bobbed in strange new ways, and shawls beyond the dreams of
@@ -1585,8 +1380,8 @@ Message: |
          | ^~~~~~~ Did you mean to spell `Castile` this way?
 Suggest:
   - Replace with: “Castle”
-  - Replace with: “Cassie”
-  - Replace with: “Castillo”
+  - Replace with: “Captive”
+  - Replace with: “Caste”
 
 
 
@@ -1638,8 +1433,8 @@ Message: |
     1204 | triumph, glide on through the sea-change of faces and voices and color under the
 Suggest:
   - Replace with: “center”
+  - Replace with: “cent's”
   - Replace with: “censure”
-  - Replace with: “cent”
 
 
 
@@ -1709,9 +1504,9 @@ Message: |
          |                                                   ^~~~~~~~~~ Did you mean to spell `Croirier’s` this way?
     1288 | gown in it.”
 Suggest:
-  - Replace with: “Currier's”
   - Replace with: “Courier's”
   - Replace with: “Crosier's”
+  - Replace with: “Croupier's”
 
 
 
@@ -1774,6 +1569,7 @@ Message: |
     1374 | Volume One of the “Stoddard Lectures.”
          |                    ^~~~~~~~ Did you mean to spell `Stoddard` this way?
 Suggest:
+  - Replace with: “Standard”
   - Replace with: “Stoppard”
   - Replace with: “Goddard”
 
@@ -1806,8 +1602,8 @@ Message: |
     1377 | fooled me. This fella’s a regular Belasco. It’s a triumph. What thoroughness!
          |                 ^~~~~~~ Did you mean to spell `fella’s` this way?
 Suggest:
-  - Replace with: “fell's”
   - Replace with: “fellas”
+  - Replace with: “fell's”
   - Replace with: “Bella's”
 
 
@@ -1819,7 +1615,7 @@ Message: |
 Suggest:
   - Replace with: “Bela's”
   - Replace with: “Belau's”
-  - Replace with: “Basho”
+  - Replace with: “Balance”
 
 
 
@@ -1829,8 +1625,8 @@ Message: |
          |                                                                 ^~~~~ Did you mean to spell `Claud` this way?
 Suggest:
   - Replace with: “Clad”
+  - Replace with: “Cloud”
   - Replace with: “Claude”
-  - Replace with: “Claus”
 
 
 
@@ -1849,13 +1645,11 @@ Message: |
 
 
 
-Lint:    Miscellaneous (10 priority)
+Lint:    Formatting (255 priority)
 Message: |
-    1407 | celebrated tenor had sung in Italian, and a notorious contralto had sung in
     1408 | jazz, and between the numbers people were doing ‘‘stunts” all over the garden,
-         |                       ^~~~~~~ Use an apostrophe and `s` to form a noun’s possessive.
-Suggest:
-  - Replace with: “number's”
+         |                                                         ^ This quote has no termination.
+    1409 | while happy, vacuous bursts of laughter rose toward the summer sky. A pair of
 
 
 
@@ -1867,18 +1661,6 @@ Suggest:
   - Replace with: “banjo's”
   - Replace with: “banjos”
   - Replace with: “bandies”
-
-
-
-Lint:    WordChoice (127 priority)
-Message: |
-    1428 | “I was in the Sixteenth until June nineteen-eighteen. I knew I’d seen you
-         |                                                                       ^~~ The possessive version of this word is more common in this context.
-    1429 | somewhere before.”
-Suggest:
-  - Replace with: “your”
-  - Replace with: “you're a”
-  - Replace with: “you're an”
 
 
 
@@ -2050,9 +1832,9 @@ Message: |
     1615 | Sigourney Howard. . . . My aunt. . . .” She was hurrying off as she talked—her
          | ^~~~~~~~~ Did you mean to spell `Sigourney` this way?
 Suggest:
+  - Replace with: “Sojourned”
+  - Replace with: “Sojourner”
   - Replace with: “Gurney”
-  - Replace with: “Journey”
-  - Replace with: “Tourney”
 
 
 
@@ -2097,9 +1879,9 @@ Message: |
     1693 | “Wha’s matter?” he inquired calmly. “Did we run outa gas?”
          |  ^~~~~ Did you mean to spell `Wha’s` this way?
 Suggest:
-  - Replace with: “W12's”
-  - Replace with: “WAL's”
-  - Replace with: “WIP's”
+  - Replace with: “Wham's”
+  - Replace with: “What's”
+  - Replace with: “Who's”
 
 
 
@@ -2108,9 +1890,18 @@ Message: |
     1693 | “Wha’s matter?” he inquired calmly. “Did we run outa gas?”
          |                                                 ^~~~ Did you mean to spell `outa` this way?
 Suggest:
-  - Replace with: “outta”
   - Replace with: “out”
+  - Replace with: “outta”
   - Replace with: “outs”
+
+
+
+Lint:    Typo (31 priority)
+Message: |
+    1693 | “Wha’s matter?” he inquired calmly. “Did we run outa gas?”
+         |                                                 ^~~~ `outa` should possibly be written as `out a`.
+Suggest:
+  - Replace with: “out a”
 
 
 
@@ -2126,10 +1917,9 @@ Suggest:
 Lint:    Spelling (63 priority)
 Message: |
     1710 | “Wonder’ff tell me where there’s a gas’line station?”
-         |  ^~~~~~~~~ Did you mean to spell `Wonder’ff` this way?
+         |  ^~~~~~~~~ Did you mean `Wonder's`?
 Suggest:
   - Replace with: “Wonder's”
-  - Replace with: “Wonderbra”
 
 
 
@@ -2157,6 +1947,17 @@ Message: |
 
 
 
+Lint:    Spelling (127 priority)
+Message: |
+    1745 | I took dinner usually at the Yale Club—for some reason it was the gloomiest
+    1746 | event of my day—and then I went up-stairs to the library and studied investments
+         |                                 ^~~~~~~~~ This looks like a prefix that can be joined with the rest of the word.
+    1747 | and securities for a conscientious hour. There were generally a few rioters
+Suggest:
+  - Replace with: “upstairs”
+
+
+
 Lint:    Readability (127 priority)
 Message: |
     1759 | darkness. At the enchanted metropolitan twilight I felt a haunting loneliness
@@ -2178,8 +1979,8 @@ Message: |
     1766 | heart. Forms leaned together in the taxis as they waited, and voices sang, and
 Suggest:
   - Replace with: “theater”
-  - Replace with: “there”
   - Replace with: “they're”
+  - Replace with: “there”
 
 
 
@@ -2215,6 +2016,16 @@ Message: |
          | ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     1780 | at Daisy’s. At her first big golf tournament there was a row that nearly reached
          | ~~~~~~~~~~~ This sentence is 45 words long.
+
+
+
+Lint:    Spelling (127 priority)
+Message: |
+    1781 | the newspapers—a suggestion that she had moved her ball from a bad lie in the
+    1782 | semi-final round. The thing approached the proportions of a scandal—then died
+         | ^~~~~~~~~~ This looks like a prefix that can be joined with the rest of the word.
+Suggest:
+  - Replace with: “semifinal”
 
 
 
@@ -2256,9 +2067,18 @@ Message: |
     1838 | was nephew to Von Hindenburg and second cousin to the devil. Reach me a rose,
          |               ^~~ Did you mean to spell `Von` this way?
 Suggest:
+  - Replace with: “Van”
   - Replace with: “Vol”
-  - Replace with: “Yon”
-  - Replace with: “Con”
+  - Replace with: “Vow”
+
+
+
+Lint:    Grammar (31 priority)
+Message: |
+    1839 | honey, and pour me a last drop into that there crystal glass.”
+         |                                          ^~~~~ Did you mean `their`?
+Suggest:
+  - Replace with: “their”
 
 
 
@@ -2270,7 +2090,7 @@ Message: |
 Suggest:
   - Replace with: “Becker's”
   - Replace with: “Backers”
-  - Replace with: “Bickers”
+  - Replace with: “Beakers”
 
 
 
@@ -2292,7 +2112,7 @@ Message: |
 Suggest:
   - Replace with: “Voltaire's”
   - Replace with: “Voltaire”
-  - Replace with: “Solitaires”
+  - Replace with: “Voltages”
 
 
 
@@ -2300,8 +2120,9 @@ Lint:    Spelling (63 priority)
 Message: |
     1850 | summer up in Maine. And the Hornbeams and the Willie Voltaires, and a whole clan
     1851 | named Blackbuck, who always gathered in a corner and flipped up their noses like
-         |       ^~~~~~~~~ Did you mean `Blackburn`?
+         |       ^~~~~~~~~ Did you mean to spell `Blackbuck` this way?
 Suggest:
+  - Replace with: “Blackjack”
   - Replace with: “Blackburn”
 
 
@@ -2313,8 +2134,8 @@ Message: |
     1853 | Auerbach and Mr. Chrystie’s wife), and Edgar Beaver, whose hair, they say,
 Suggest:
   - Replace with: “Irma's”
+  - Replace with: “Ism's”
   - Replace with: “Dismays”
-  - Replace with: “Islams”
 
 
 
@@ -2336,17 +2157,20 @@ Message: |
     1853 | Auerbach and Mr. Chrystie’s wife), and Edgar Beaver, whose hair, they say,
          | ^~~~~~~~ Did you mean to spell `Auerbach` this way?
 Suggest:
-  - Replace with: “Outreach”
-  - Replace with: “Bernbach”
+  - Replace with: “Approach”
+  - Replace with: “Acerbate”
+  - Replace with: “Acerbic”
 
 
 
 Lint:    Spelling (63 priority)
 Message: |
     1853 | Auerbach and Mr. Chrystie’s wife), and Edgar Beaver, whose hair, they say,
-         |                  ^~~~~~~~~~ Did you mean `Christi's`?
+         |                  ^~~~~~~~~~ Did you mean to spell `Chrystie’s` this way?
 Suggest:
+  - Replace with: “Christie's”
   - Replace with: “Christi's”
+  - Replace with: “Christine's”
 
 
 
@@ -2356,8 +2180,8 @@ Message: |
          |                                                  ^~~~ Did you mean to spell `Etty` this way?
 Suggest:
   - Replace with: “Etta”
-  - Replace with: “Betty”
-  - Replace with: “Getty”
+  - Replace with: “Ethyl”
+  - Replace with: “Jetty”
 
 
 
@@ -2368,8 +2192,8 @@ Message: |
          |                                    ^~~~~~~~ Did you mean to spell `Cheadles` this way?
 Suggest:
   - Replace with: “Charles”
+  - Replace with: “Cradles”
   - Replace with: “Headless”
-  - Replace with: “Beadles”
 
 
 
@@ -2378,9 +2202,9 @@ Message: |
     1858 | farther out on the Island came the Cheadles and the O. R. P. Schraeders, and the
          |                                                     ^~ Did you mean to spell `O.` this way?
 Suggest:
-  - Replace with: “Os”
-  - Replace with: “O”
-  - Replace with: “OD”
+  - Replace with: “Of”
+  - Replace with: “Oh”
+  - Replace with: “Oi”
 
 
 
@@ -2389,9 +2213,9 @@ Message: |
     1858 | farther out on the Island came the Cheadles and the O. R. P. Schraeders, and the
          |                                                        ^~ Did you mean to spell `R.` this way?
 Suggest:
-  - Replace with: “Rd”
-  - Replace with: “R”
-  - Replace with: “RC”
+  - Replace with: “RI”
+  - Replace with: “Ra”
+  - Replace with: “Ru”
 
 
 
@@ -2400,9 +2224,9 @@ Message: |
     1858 | farther out on the Island came the Cheadles and the O. R. P. Schraeders, and the
          |                                                           ^~ Did you mean to spell `P.` this way?
 Suggest:
-  - Replace with: “Pt”
-  - Replace with: “P”
   - Replace with: “Pa”
+  - Replace with: “Pi”
+  - Replace with: “PE”
 
 
 
@@ -2420,10 +2244,9 @@ Suggest:
 Lint:    Spelling (63 priority)
 Message: |
     1859 | Stonewall Jackson Abrams of Georgia, and the Fishguards and the Ripley Snells.
-         |                                              ^~~~~~~~~~ Did you mean to spell `Fishguards` this way?
+         |                                              ^~~~~~~~~~ Did you mean `Fireguards`?
 Suggest:
   - Replace with: “Fireguards”
-  - Replace with: “Wireguards”
 
 
 
@@ -2433,8 +2256,8 @@ Message: |
          |                                                                        ^~~~~~ Did you mean to spell `Snells` this way?
 Suggest:
   - Replace with: “Snell's”
-  - Replace with: “Snell”
-  - Replace with: “Knells”
+  - Replace with: “Sells”
+  - Replace with: “Shells”
 
 
 
@@ -2443,8 +2266,8 @@ Message: |
     1861 | the gravel drive that Mrs. Ulysses Swett’s automobile ran over his right hand.
          |                                    ^~~~~~~ Did you mean to spell `Swett’s` this way?
 Suggest:
-  - Replace with: “Scott's”
-  - Replace with: “Sept's”
+  - Replace with: “Sweat's”
+  - Replace with: “Sweet's”
   - Replace with: “Seth's”
 
 
@@ -2454,9 +2277,9 @@ Message: |
     1862 | The Dancies came, too, and S. B. Whitebait, who was well over sixty, and Maurice
          |     ^~~~~~~ Did you mean to spell `Dancies` this way?
 Suggest:
+  - Replace with: “Dances”
+  - Replace with: “Dandies”
   - Replace with: “Dannie's”
-  - Replace with: “Fancies”
-  - Replace with: “Danes”
 
 
 
@@ -2465,9 +2288,9 @@ Message: |
     1862 | The Dancies came, too, and S. B. Whitebait, who was well over sixty, and Maurice
          |                            ^~ Did you mean to spell `S.` this way?
 Suggest:
-  - Replace with: “Sf”
-  - Replace with: “Sh”
   - Replace with: “So”
+  - Replace with: “SA”
+  - Replace with: “Se”
 
 
 
@@ -2476,9 +2299,9 @@ Message: |
     1862 | The Dancies came, too, and S. B. Whitebait, who was well over sixty, and Maurice
          |                               ^~ Did you mean to spell `B.` this way?
 Suggest:
-  - Replace with: “Bu”
   - Replace with: “Be”
-  - Replace with: “Bk”
+  - Replace with: “Bi”
+  - Replace with: “BO”
 
 
 
@@ -2488,9 +2311,9 @@ Message: |
     1863 | A. Flink, and the Hammerheads, and Beluga the tobacco importer, and Beluga’s
          | ^~ Did you mean to spell `A.` this way?
 Suggest:
-  - Replace with: “Av”
   - Replace with: “A”
   - Replace with: “Ab”
+  - Replace with: “Ac”
 
 
 
@@ -2499,9 +2322,9 @@ Message: |
     1863 | A. Flink, and the Hammerheads, and Beluga the tobacco importer, and Beluga’s
          |    ^~~~~ Did you mean to spell `Flink` this way?
 Suggest:
-  - Replace with: “Flunk”
-  - Replace with: “Blink”
-  - Replace with: “Link”
+  - Replace with: “Fink”
+  - Replace with: “Flank”
+  - Replace with: “Flick”
 
 
 
@@ -2524,6 +2347,7 @@ Message: |
          |                                      ^~~~~~~~~ Did you mean to spell `Mulreadys` this way?
     1867 | Schoen and Gulick the State senator and Newton Orchid, who controlled Films Par
 Suggest:
+  - Replace with: “Misreads”
   - Replace with: “Already”
   - Replace with: “Unready”
 
@@ -2535,9 +2359,9 @@ Message: |
     1867 | Schoen and Gulick the State senator and Newton Orchid, who controlled Films Par
          | ^~~~~~ Did you mean to spell `Schoen` this way?
 Suggest:
-  - Replace with: “Chosen”
-  - Replace with: “Echoes”
-  - Replace with: “Echoed”
+  - Replace with: “School”
+  - Replace with: “Scion”
+  - Replace with: “Scone”
 
 
 
@@ -2547,9 +2371,9 @@ Message: |
     1867 | Schoen and Gulick the State senator and Newton Orchid, who controlled Films Par
          |            ^~~~~~ Did you mean to spell `Gulick` this way?
 Suggest:
+  - Replace with: “Gulch”
   - Replace with: “Click”
   - Replace with: “Flick”
-  - Replace with: “Lick”
 
 
 
@@ -2568,19 +2392,20 @@ Message: |
     1868 | Excellence, and Eckhaust and Clyde Cohen and Don S. Schwartze (the son) and
          |                                                  ^~ Did you mean to spell `S.` this way?
 Suggest:
-  - Replace with: “Sf”
-  - Replace with: “Sh”
   - Replace with: “So”
+  - Replace with: “SA”
+  - Replace with: “Se”
 
 
 
 Lint:    Spelling (63 priority)
 Message: |
     1868 | Excellence, and Eckhaust and Clyde Cohen and Don S. Schwartze (the son) and
-         |                                                     ^~~~~~~~~ Did you mean `Schwartz`?
+         |                                                     ^~~~~~~~~ Did you mean to spell `Schwartze` this way?
     1869 | Arthur McCarty, all connected with the movies in one way or another. And the
 Suggest:
   - Replace with: “Schwartz”
+  - Replace with: “Schwartz's”
 
 
 
@@ -2588,9 +2413,11 @@ Lint:    Spelling (63 priority)
 Message: |
     1869 | Arthur McCarty, all connected with the movies in one way or another. And the
     1870 | Catlips and the Bembergs and G. Earl Muldoon, brother to that Muldoon who
-         | ^~~~~~~ Did you mean `Cali's`?
+         | ^~~~~~~ Did you mean to spell `Catlips` this way?
 Suggest:
   - Replace with: “Cali's”
+  - Replace with: “Catnip's”
+  - Replace with: “Caliphs”
 
 
 
@@ -2601,8 +2428,8 @@ Message: |
          |                 ^~~~~~~~ Did you mean to spell `Bembergs` this way?
 Suggest:
   - Replace with: “Berber's”
+  - Replace with: “Bomber's”
   - Replace with: “Berbers”
-  - Replace with: “Ember's”
 
 
 
@@ -2612,33 +2439,38 @@ Message: |
     1870 | Catlips and the Bembergs and G. Earl Muldoon, brother to that Muldoon who
          |                              ^~ Did you mean to spell `G.` this way?
 Suggest:
-  - Replace with: “Gt”
-  - Replace with: “Gm”
-  - Replace with: “GB”
+  - Replace with: “Go”
+  - Replace with: “GI”
+  - Replace with: “GU”
 
 
 
 Lint:    Spelling (63 priority)
 Message: |
     1870 | Catlips and the Bembergs and G. Earl Muldoon, brother to that Muldoon who
-         |                                      ^~~~~~~ Did you mean to spell `Muldoon` this way?
+         |                                      ^~~~~~~ Did you mean `Mullion`?
     1871 | afterward strangled his wife. Da Fontano the promoter came there, and Ed Legros
 Suggest:
   - Replace with: “Mullion”
-  - Replace with: “Mauldin”
-  - Replace with: “Mellon”
 
 
 
 Lint:    Spelling (63 priority)
 Message: |
     1870 | Catlips and the Bembergs and G. Earl Muldoon, brother to that Muldoon who
-         |                                                               ^~~~~~~ Did you mean to spell `Muldoon` this way?
+         |                                                               ^~~~~~~ Did you mean `Mullion`?
     1871 | afterward strangled his wife. Da Fontano the promoter came there, and Ed Legros
 Suggest:
   - Replace with: “Mullion”
-  - Replace with: “Mauldin”
-  - Replace with: “Mellon”
+
+
+
+Lint:    Capitalization (127 priority)
+Message: |
+    1871 | afterward strangled his wife. Da Fontano the promoter came there, and Ed Legros
+         |                               ^~ This word's canonical spelling is all-caps.
+Suggest:
+  - Replace with: “DA”
 
 
 
@@ -2647,9 +2479,9 @@ Message: |
     1871 | afterward strangled his wife. Da Fontano the promoter came there, and Ed Legros
          |                               ^~ Did you mean to spell `Da` this way?
 Suggest:
-  - Replace with: “D”
+  - Replace with: “Dab”
   - Replace with: “Dad”
-  - Replace with: “Day”
+  - Replace with: “Dag”
 
 
 
@@ -2669,8 +2501,10 @@ Message: |
 Lint:    Spelling (63 priority)
 Message: |
     1871 | afterward strangled his wife. Da Fontano the promoter came there, and Ed Legros
-         |                                  ^~~~~~~ Did you mean `Montana`?
+         |                                  ^~~~~~~ Did you mean to spell `Fontano` this way?
 Suggest:
+  - Replace with: “Fondant”
+  - Replace with: “Fontanel”
   - Replace with: “Montana”
 
 
@@ -2682,8 +2516,8 @@ Message: |
     1872 | and James B. (“Rot-Gut”) Ferret and the De Jongs and Ernest Lilly—they came to
 Suggest:
   - Replace with: “Lear's”
-  - Replace with: “Negros”
-  - Replace with: “Lagos”
+  - Replace with: “Leger's”
+  - Replace with: “Leer's”
 
 
 
@@ -2693,21 +2527,9 @@ Message: |
     1872 | and James B. (“Rot-Gut”) Ferret and the De Jongs and Ernest Lilly—they came to
          |           ^~ Did you mean to spell `B.` this way?
 Suggest:
-  - Replace with: “Bu”
   - Replace with: “Be”
-  - Replace with: “Bk”
-
-
-
-Lint:    Spelling (63 priority)
-Message: |
-    1872 | and James B. (“Rot-Gut”) Ferret and the De Jongs and Ernest Lilly—they came to
-         |                                         ^~ Did you mean to spell `De` this way?
-    1873 | gamble, and when Ferret wandered into the garden it meant he was cleaned out and
-Suggest:
-  - Replace with: “D”
-  - Replace with: “Db”
-  - Replace with: “Dd”
+  - Replace with: “Bi”
+  - Replace with: “BO”
 
 
 
@@ -2726,7 +2548,20 @@ Suggest:
 Lint:    Spelling (63 priority)
 Message: |
     1876 | A man named Klipspringer was there so often and so long that he became known as
-         |             ^~~~~~~~~~~~ Did you mean to spell `Klipspringer` this way?
+         |             ^~~~~~~~~~~~ Did you mean `Kissinger`?
+Suggest:
+  - Replace with: “Kissinger”
+
+
+
+Lint:    Agreement (127 priority)
+Message: |
+    1877 | “the boarder”—I doubt if he had any other home. Of theatrical people there were
+         |                                                                            ^~~~~
+    1878 | Gus Waize and Horace O’Donavan and Lester Myer and George Duckweed and Francis
+         | ~~~ There is disagreement in number between the verb and the noun.
+Suggest:
+  - Replace with: “was a Gus”
 
 
 
@@ -2736,9 +2571,9 @@ Message: |
     1878 | Gus Waize and Horace O’Donavan and Lester Myer and George Duckweed and Francis
          |     ^~~~~ Did you mean to spell `Waize` this way?
 Suggest:
+  - Replace with: “Waive”
   - Replace with: “Waite”
   - Replace with: “Maize”
-  - Replace with: “Waive”
 
 
 
@@ -2746,11 +2581,9 @@ Lint:    Spelling (63 priority)
 Message: |
     1877 | “the boarder”—I doubt if he had any other home. Of theatrical people there were
     1878 | Gus Waize and Horace O’Donavan and Lester Myer and George Duckweed and Francis
-         |                      ^~~~~~~~~ Did you mean to spell `O’Donavan` this way?
+         |                      ^~~~~~~~~ Did you mean `Donovan`?
 Suggest:
-  - Replace with: “O'Donnell”
   - Replace with: “Donovan”
-  - Replace with: “Okinawan”
 
 
 
@@ -2784,9 +2617,11 @@ Message: |
 Lint:    Spelling (63 priority)
 Message: |
     1879 | Bull. Also from New York were the Chromes and the Backhyssons and the Dennickers
-         |                                                   ^~~~~~~~~~~ Did you mean `Jacksons`?
+         |                                                   ^~~~~~~~~~~ Did you mean to spell `Backhyssons` this way?
     1880 | and Russel Betty and the Corrigans and the Kellehers and the Dewars and the
 Suggest:
+  - Replace with: “Backhoes”
+  - Replace with: “Backstops”
   - Replace with: “Jacksons”
 
 
@@ -2797,9 +2632,9 @@ Message: |
          |                                                                       ^~~~~~~~~~ Did you mean to spell `Dennickers` this way?
     1880 | and Russel Betty and the Corrigans and the Kellehers and the Dewars and the
 Suggest:
-  - Replace with: “Knickers”
-  - Replace with: “Nickers”
-  - Replace with: “Picnickers”
+  - Replace with: “Deicers”
+  - Replace with: “Deniers”
+  - Replace with: “Dickers”
 
 
 
@@ -2807,11 +2642,9 @@ Lint:    Spelling (63 priority)
 Message: |
     1879 | Bull. Also from New York were the Chromes and the Backhyssons and the Dennickers
     1880 | and Russel Betty and the Corrigans and the Kellehers and the Dewars and the
-         |                          ^~~~~~~~~ Did you mean to spell `Corrigans` this way?
+         |                          ^~~~~~~~~ Did you mean `Cardigans`?
 Suggest:
   - Replace with: “Cardigans”
-  - Replace with: “Corina's”
-  - Replace with: “Corrine's”
 
 
 
@@ -2834,8 +2667,8 @@ Message: |
     1881 | Scullys and S. W. Belcher and the Smirkes and the young Quinns, divorced now,
 Suggest:
   - Replace with: “Dewar's”
-  - Replace with: “Dewar”
-  - Replace with: “Dena's”
+  - Replace with: “Dears”
+  - Replace with: “Debars”
 
 
 
@@ -2846,8 +2679,8 @@ Message: |
          | ^~~~~~~ Did you mean to spell `Scullys` this way?
 Suggest:
   - Replace with: “Scull's”
-  - Replace with: “Sculley's”
   - Replace with: “Sculls”
+  - Replace with: “Sculley's”
 
 
 
@@ -2857,9 +2690,9 @@ Message: |
     1881 | Scullys and S. W. Belcher and the Smirkes and the young Quinns, divorced now,
          |             ^~ Did you mean to spell `S.` this way?
 Suggest:
-  - Replace with: “Sf”
-  - Replace with: “Sh”
   - Replace with: “So”
+  - Replace with: “SA”
+  - Replace with: “Se”
 
 
 
@@ -2870,7 +2703,7 @@ Message: |
 Suggest:
   - Replace with: “We”
   - Replace with: “WA”
-  - Replace with: “WC”
+  - Replace with: “WI”
 
 
 
@@ -2880,8 +2713,8 @@ Message: |
          |                   ^~~~~~~ Did you mean to spell `Belcher` this way?
 Suggest:
   - Replace with: “Beecher”
-  - Replace with: “Becker”
-  - Replace with: “Blucher”
+  - Replace with: “Belched”
+  - Replace with: “Belches”
 
 
 
@@ -2904,8 +2737,8 @@ Message: |
     1882 | and Henry L. Palmetto, who killed himself by jumping in front of a subway train
 Suggest:
   - Replace with: “Quinn's”
-  - Replace with: “Quinn”
-  - Replace with: “Qin's”
+  - Replace with: “Quines”
+  - Replace with: “Quins”
 
 
 
@@ -2915,18 +2748,18 @@ Message: |
     1882 | and Henry L. Palmetto, who killed himself by jumping in front of a subway train
          |           ^~ Did you mean to spell `L.` this way?
 Suggest:
-  - Replace with: “Lo”
-  - Replace with: “L”
-  - Replace with: “La”
+  - Replace with: “Le”
+  - Replace with: “Li”
+  - Replace with: “Lu”
 
 
 
 Lint:    Spelling (63 priority)
 Message: |
     1885 | Benny McClenahan arrived always with four girls. They were never quite the same
-         |       ^~~~~~~~~~ Did you mean `McClain`?
+         |       ^~~~~~~~~~ Did you mean `McClellan`?
 Suggest:
-  - Replace with: “McClain”
+  - Replace with: “McClellan”
 
 
 
@@ -2960,10 +2793,12 @@ Lint:    Spelling (63 priority)
 Message: |
     1887 | inevitably seemed they had been there before. I have forgotten their
     1888 | names—Jaqueline, I think, or else Consuela, or Gloria or Judy or June, and their
-         |                                   ^~~~~~~~ Did you mean `Consuelo`?
+         |                                   ^~~~~~~~ Did you mean to spell `Consuela` this way?
     1889 | last names were either the melodious names of flowers and months or the sterner
 Suggest:
   - Replace with: “Consuelo”
+  - Replace with: “Consul”
+  - Replace with: “Consular”
 
 
 
@@ -2973,8 +2808,9 @@ Message: |
          |                                              ^~~~~~~~ Did you mean to spell `Faustina` this way?
     1894 | least once and the Baedeker girls and young Brewer, who had his nose shot off in
 Suggest:
-  - Replace with: “Faustino”
   - Replace with: “Faustian”
+  - Replace with: “Faustino”
+  - Replace with: “Fasting”
 
 
 
@@ -2991,9 +2827,9 @@ Message: |
          |                                          ^~~~ Did you mean to spell `Haag` this way?
     1896 | Fitz-Peters and Mr. P. Jewett, once head of the American Legion, and Miss
 Suggest:
-  - Replace with: “Hag”
+  - Replace with: “Hang”
   - Replace with: “Haas”
-  - Replace with: “Ha's”
+  - Replace with: “Hag”
 
 
 
@@ -3015,8 +2851,9 @@ Message: |
          |                                                                 ^~~~~~ Did you mean to spell `Ardita` this way?
     1896 | Fitz-Peters and Mr. P. Jewett, once head of the American Legion, and Miss
 Suggest:
+  - Replace with: “Aria”
+  - Replace with: “Audit”
   - Replace with: “Akita”
-  - Replace with: “Anita”
 
 
 
@@ -3026,9 +2863,9 @@ Message: |
     1896 | Fitz-Peters and Mr. P. Jewett, once head of the American Legion, and Miss
          | ^~~~ Did you mean to spell `Fitz` this way?
 Suggest:
+  - Replace with: “Fits”
   - Replace with: “Fit”
   - Replace with: “Fritz”
-  - Replace with: “Ditz”
 
 
 
@@ -3037,9 +2874,9 @@ Message: |
     1896 | Fitz-Peters and Mr. P. Jewett, once head of the American Legion, and Miss
          |                     ^~ Did you mean to spell `P.` this way?
 Suggest:
-  - Replace with: “Pt”
-  - Replace with: “P”
   - Replace with: “Pa”
+  - Replace with: “Pi”
+  - Replace with: “PE”
 
 
 
@@ -3048,9 +2885,9 @@ Message: |
     1896 | Fitz-Peters and Mr. P. Jewett, once head of the American Legion, and Miss
          |                        ^~~~~~ Did you mean to spell `Jewett` this way?
 Suggest:
+  - Replace with: “Jewel”
   - Replace with: “Jewell”
   - Replace with: “Jewess”
-  - Replace with: “Dewitt”
 
 
 
@@ -3064,17 +2901,6 @@ Message: |
          | ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     1914 | nervous, sporadic games. This quality was continually breaking through his
          | ~~~~~~~~~~~~~~~~~~~~~~~~ This sentence is 44 words long.
-
-
-
-Lint:    WordChoice (127 priority)
-Message: |
-    1951 | “I’ll tell you God’s truth.” His right hand suddenly ordered divine retribution
-         |            ^~~ The possessive version of this word is more common in this context.
-Suggest:
-  - Replace with: “your”
-  - Replace with: “you're a”
-  - Replace with: “you're an”
 
 
 
@@ -3097,9 +2923,9 @@ Message: |
          |                                                                             ^~~~ Did you mean to spell `Bois` this way?
     1982 | de Boulogne.
 Suggest:
-  - Replace with: “Bogs”
+  - Replace with: “Boss”
   - Replace with: “Boris”
-  - Replace with: “Bis”
+  - Replace with: “Bios”
 
 
 
@@ -3107,20 +2933,9 @@ Lint:    Spelling (63 priority)
 Message: |
     1981 | “character” leaking sawdust at every pore as he pursued a tiger through the Bois
     1982 | de Boulogne.
-         | ^~ Did you mean to spell `de` this way?
+         |    ^~~~~~~~ Did you mean to spell `Boulogne` this way?
 Suggest:
-  - Replace with: “d”
-  - Replace with: “db”
-  - Replace with: “dc”
-
-
-
-Lint:    Spelling (63 priority)
-Message: |
-    1981 | “character” leaking sawdust at every pore as he pursued a tiger through the Bois
-    1982 | de Boulogne.
-         |    ^~~~~~~~ Did you mean `Cologne`?
-Suggest:
+  - Replace with: “Bologna”
   - Replace with: “Cologne”
 
 
@@ -3142,8 +2957,18 @@ Message: |
     2007 | circular legend, “Montenegro, Nicolas Rex.”
 Suggest:
   - Replace with: “Order”
-  - Replace with: “Oder”
   - Replace with: “Orders”
+  - Replace with: “Order's”
+
+
+
+Lint:    Capitalization (127 priority)
+Message: |
+    2006 | To my astonishment, the thing had an authentic look. “Orderi di Danilo,” ran the
+         |                                                              ^~ This word's canonical spelling is all-caps.
+    2007 | circular legend, “Montenegro, Nicolas Rex.”
+Suggest:
+  - Replace with: “DI”
 
 
 
@@ -3153,9 +2978,9 @@ Message: |
          |                                                              ^~ Did you mean to spell `di` this way?
     2007 | circular legend, “Montenegro, Nicolas Rex.”
 Suggest:
-  - Replace with: “d”
   - Replace with: “db”
   - Replace with: “dc”
+  - Replace with: “dd”
 
 
 
@@ -3165,9 +2990,9 @@ Message: |
          |                                                                 ^~~~~~ Did you mean to spell `Danilo` this way?
     2007 | circular legend, “Montenegro, Nicolas Rex.”
 Suggest:
+  - Replace with: “Daily”
+  - Replace with: “Danish”
   - Replace with: “Danial”
-  - Replace with: “Daniel”
-  - Replace with: “Daniels”
 
 
 
@@ -3177,8 +3002,8 @@ Message: |
          |                                  ^~~~~~ Did you mean to spell `Valour` this way?
 Suggest:
   - Replace with: “Valor”
-  - Replace with: “Valium”
-  - Replace with: “Valois”
+  - Replace with: “Velour”
+  - Replace with: “Value”
 
 
 
@@ -3212,7 +3037,7 @@ Message: |
 Suggest:
   - Replace with: “undeserved”
   - Replace with: “undefeated”
-  - Replace with: “undesired”
+  - Replace with: “underserved”
 
 
 
@@ -3245,7 +3070,17 @@ Message: |
 Suggest:
   - Replace with: “somber”
   - Replace with: “hombre”
-  - Replace with: “some”
+  - Replace with: “sober”
+
+
+
+Lint:    Capitalization (127 priority)
+Message: |
+    2078 | driven by a white chauffeur, in which sat three modish negroes, two bucks and a
+         |                                                        ^~~~~~~ The canonical dictionary spelling is title case: `Negroes`.
+    2079 | girl. I laughed aloud as the yolks of their eyeballs rolled toward us in haughty
+Suggest:
+  - Replace with: “Negroes”
 
 
 
@@ -3267,7 +3102,8 @@ Message: |
          |      ^~~~~~~~ Did you mean to spell `Carraway` this way?
 Suggest:
   - Replace with: “Caraway”
-  - Replace with: “Faraway”
+  - Replace with: “Caraways”
+  - Replace with: “Castaway”
 
 
 
@@ -3293,7 +3129,18 @@ Suggest:
 Lint:    Spelling (63 priority)
 Message: |
     2105 | “I handed the money to Katspaugh and I sid: ‘All right, Katspaugh, don’t pay him
-         |                        ^~~~~~~~~ Did you mean to spell `Katspaugh` this way?
+         |                        ^~~~~~~~~ Did you mean `Kasparov`?
+Suggest:
+  - Replace with: “Kasparov”
+
+
+
+Lint:    Capitalization (127 priority)
+Message: |
+    2105 | “I handed the money to Katspaugh and I sid: ‘All right, Katspaugh, don’t pay him
+         |                                        ^~~ The canonical dictionary spelling is title case: `Sid`.
+Suggest:
+  - Replace with: “Sid”
 
 
 
@@ -3311,8 +3158,10 @@ Suggest:
 Lint:    Spelling (63 priority)
 Message: |
     2105 | “I handed the money to Katspaugh and I sid: ‘All right, Katspaugh, don’t pay him
-         |                                                         ^~~~~~~~~ Did you mean to spell `Katspaugh` this way?
+         |                                                         ^~~~~~~~~ Did you mean `Kasparov`?
     2106 | a penny till he shuts his mouth.’ He shut it then and there.”
+Suggest:
+  - Replace with: “Kasparov”
 
 
 
@@ -3377,8 +3226,8 @@ Message: |
     2124 | “The old Metropole.”
          |          ^~~~~~~~~ Did you mean to spell `Metropole` this way?
 Suggest:
-  - Replace with: “Metronome”
   - Replace with: “Metropolis”
+  - Replace with: “Metronome”
 
 
 
@@ -3387,8 +3236,8 @@ Message: |
     2126 | “The old Metropole,” brooded Mr. Wolfshiem gloomily. “Filled with faces dead and
          |          ^~~~~~~~~ Did you mean to spell `Metropole` this way?
 Suggest:
-  - Replace with: “Metronome”
   - Replace with: “Metropolis”
+  - Replace with: “Metronome”
 
 
 
@@ -3401,14 +3250,29 @@ Suggest:
 
 
 
+Lint:    Formatting (255 priority)
+Message: |
+    2126 | “The old Metropole,” brooded Mr. Wolfshiem gloomily. “Filled with faces dead and
+         |                                                      ^ This quote has no termination.
+    2127 | gone. Filled with friends gone now forever. I can’t forget so long as I live the
+
+
+
+Lint:    Formatting (255 priority)
+Message: |
+    2134 | “‘Let the bastards come in here if they want you, Rosy, but don’t you, so help
+         | ^ This quote has no termination.
+
+
+
 Lint:    Spelling (63 priority)
 Message: |
     2142 | “Sure he went.” Mr. Wolfshiem’s nose flashed at me indignantly. “He turned
          |                     ^~~~~~~~~~~ Did you mean to spell `Wolfshiem’s` this way?
 Suggest:
+  - Replace with: “Waldheim's”
   - Replace with: “Welshmen's”
   - Replace with: “Wolfe's”
-  - Replace with: “Wolsey's”
 
 
 
@@ -3418,6 +3282,13 @@ Message: |
          |                                          ^~~~~~~~~~ Did you mean `connection`?
 Suggest:
   - Replace with: “connection”
+
+
+
+Lint:    Formatting (255 priority)
+Message: |
+    2154 | “Oh, no,” he exclaimed, ‘‘this isn’t the man.”
+         |                                              ^ This quote has no termination.
 
 
 
@@ -3455,8 +3326,8 @@ Message: |
     2163 | atmosphere of the old Metropole, began to eat with ferocious delicacy. His eyes,
          |                       ^~~~~~~~~ Did you mean to spell `Metropole` this way?
 Suggest:
-  - Replace with: “Metronome”
   - Replace with: “Metropolis”
+  - Replace with: “Metronome”
 
 
 
@@ -3484,8 +3355,7 @@ Message: |
          |          ^~~~~~~~ Did you mean to spell `Oggsford` this way?
 Suggest:
   - Replace with: “Oxford”
-  - Replace with: “Osborn”
-  - Replace with: “Osgood”
+  - Replace with: “Longsword”
 
 
 
@@ -3495,8 +3365,7 @@ Message: |
          |             ^~~~~~~~ Did you mean to spell `Oggsford` this way?
 Suggest:
   - Replace with: “Oxford”
-  - Replace with: “Osborn”
-  - Replace with: “Osgood”
+  - Replace with: “Longsword”
 
 
 
@@ -3506,8 +3375,7 @@ Message: |
          |                                                   ^~~~~~~~ Did you mean to spell `Oggsford` this way?
 Suggest:
   - Replace with: “Oxford”
-  - Replace with: “Osborn”
-  - Replace with: “Osgood”
+  - Replace with: “Longsword”
 
 
 
@@ -3577,7 +3445,8 @@ Message: |
          |  ^~~~~~ Did you mean to spell `How’ve` this way?
 Suggest:
   - Replace with: “How're”
-  - Replace with: “Howe”
+  - Replace with: “How'd”
+  - Replace with: “How's”
 
 
 
@@ -3594,17 +3463,6 @@ Message: |
 
 
 
-Lint:    Repetition (63 priority)
-Message: |
-    2314 | girl wants to be looked at sometime, and because it seemed romantic to me I have
-         |                                                                        ^~~~ There are too many personal pronouns in sequence here.
-    2315 | remembered the incident ever since. His name was Jay Gatsby, and I didn’t lay
-Suggest:
-  - Replace with: “me”
-  - Replace with: “I”
-
-
-
 Lint:    Spelling (63 priority)
 Message: |
     2319 | That was nineteen-seventeen. By the next year I had a few beaux myself, and I
@@ -3617,6 +3475,16 @@ Suggest:
 
 
 
+Lint:    Typo (31 priority)
+Message: |
+    2319 | That was nineteen-seventeen. By the next year I had a few beaux myself, and I
+         |                                                           ^~~~~ `beaux` should probably be written as `be aux`.
+    2320 | began to play in tournaments, so I didn’t see Daisy very often. She went with a
+Suggest:
+  - Replace with: “be aux”
+
+
+
 Lint:    Spelling (63 priority)
 Message: |
     2329 | By the next autumn she was gay again, gay as ever. She had a début after the
@@ -3624,8 +3492,8 @@ Message: |
     2330 | armistice, and in February she was presumably engaged to a man from New Orleans.
 Suggest:
   - Replace with: “debut”
-  - Replace with: “debit”
   - Replace with: “debt”
+  - Replace with: “doubt”
 
 
 
@@ -3648,8 +3516,9 @@ Message: |
          |                                              ^~~~~~~~ Did you mean to spell `Muhlbach` this way?
     2334 | the wedding he gave her a string of pearls valued at three hundred and fifty
 Suggest:
+  - Replace with: “Mulch”
+  - Replace with: “Mullah”
   - Replace with: “Fullback”
-  - Replace with: “Pullback”
 
 
 
@@ -3661,15 +3530,18 @@ Message: |
 Suggest:
   - Replace with: “Sauternes”
   - Replace with: “Sterne”
+  - Replace with: “Sauteing”
 
 
 
 Lint:    Spelling (63 priority)
 Message: |
     2342 | “’Gratulate me,” she muttered. “Never had a drink before, but oh how I do enjoy
-         |   ^~~~~~~~~ Did you mean `Granulate`?
+         |   ^~~~~~~~~ Did you mean to spell `Gratulate` this way?
 Suggest:
   - Replace with: “Granulate”
+  - Replace with: “Graduate”
+  - Replace with: “Granulated”
 
 
 
@@ -3679,29 +3551,15 @@ Message: |
          |        ^~~~~~ Did you mean to spell `deares` this way?
 Suggest:
   - Replace with: “dear's”
-  - Replace with: “deaves”
   - Replace with: “dares”
+  - Replace with: “dearies”
 
 
 
-Lint:    Repetition (63 priority)
+Lint:    Formatting (255 priority)
 Message: |
-    2351 | whoever they belong to. Tell ’em all Daisy’s change’ her mine. Say: ‘Daisy’s
-         |                                                      ^~~~~~~~ There are too many personal pronouns in sequence here.
-Suggest:
-  - Replace with: “her”
-  - Replace with: “mine”
-
-
-
-Lint:    Repetition (63 priority)
-Message: |
-    2351 | whoever they belong to. Tell ’em all Daisy’s change’ her mine. Say: ‘Daisy’s
     2352 | change’ her mine!’”
-         |         ^~~~~~~~ There are too many personal pronouns in sequence here.
-Suggest:
-  - Replace with: “her”
-  - Replace with: “mine”
+         |                   ^ This quote has no termination.
 
 
 
@@ -3718,6 +3576,14 @@ Message: |
 
 
 
+Lint:    Formatting (255 priority)
+Message: |
+    2368 | around uneasily, and say: ‘‘Where’s Tom gone?” and wear the most abstracted
+         |                                              ^ This quote has no termination.
+    2369 | expression until she saw him coming in the door. She used to sit on the sand
+
+
+
 Lint:    Spelling (63 priority)
 Message: |
     2373 | week after I left Santa Barbara Tom ran into a wagon on the Ventura road one
@@ -3725,20 +3591,28 @@ Message: |
     2374 | night, and ripped a front wheel off his car. The girl who was with him got into
 Suggest:
   - Replace with: “Venture”
-  - Replace with: “Century”
-  - Replace with: “Denture”
+  - Replace with: “Ventral”
+  - Replace with: “Ventured”
 
 
 
 Lint:    Spelling (63 priority)
 Message: |
     2379 | saw them one spring in Cannes, and later in Deauville, and then they came back
-         |                                             ^~~~~~~~~ Did you mean to spell `Deauville` this way?
+         |                                             ^~~~~~~~~ Did you mean `Danville`?
     2380 | to Chicago to settle down. Daisy was popular in Chicago, as you know. They moved
 Suggest:
   - Replace with: “Danville”
-  - Replace with: “Melville”
-  - Replace with: “Neville”
+
+
+
+Lint:    Capitalization (127 priority)
+Message: |
+    2395 | When Jordan Baker had finished telling all this we had left the Plaza for half
+    2396 | an hour and were driving in a victoria through Central Park. The sun had gone
+         |                               ^~~~~~~~ The canonical dictionary spelling is title case: `Victoria`.
+Suggest:
+  - Replace with: “Victoria”
 
 
 
@@ -3749,8 +3623,8 @@ Message: |
          |                               ^~~~~~~~ Did you mean to spell `victoria` this way?
 Suggest:
   - Replace with: “Victoria”
-  - Replace with: “victor”
   - Replace with: “victor's”
+  - Replace with: “victor”
 
 
 
@@ -3760,18 +3634,23 @@ Message: |
          |            ^~~~~ Did you mean to spell `Sheik` this way?
 Suggest:
   - Replace with: “Sheikh”
-  - Replace with: “Sabik”
-  - Replace with: “Seiko”
+  - Replace with: “She'd”
+  - Replace with: “She's”
 
 
 
-Lint:    WordChoice (31 priority)
+Lint:    Formatting (255 priority)
 Message: |
-    2447 | “When I said you were a particular friend of Tom’s, he started to abandon the
-         |                  ^~~~ Use the contraction or separate the words instead.
-Suggest:
-  - Replace with: “we're”
-  - Replace with: “we are”
+    2437 | “I think he half expected her to wander into one of his parties, some night,”
+    2438 | went on Jordan, “but she never did. Then he began asking people casually if they
+         |                 ^ This quote has no termination.
+
+
+
+Lint:    Formatting (255 priority)
+Message: |
+    2444 | “‘I don’t want to do anything out of the way!’ he kept saying. ‘I want to see
+         | ^ This quote has no termination.
 
 
 
@@ -3786,6 +3665,13 @@ Suggest:
 
 
 
+Lint:    Formatting (255 priority)
+Message: |
+    2458 | busy and the tired.”
+         |                    ^ This quote has no termination.
+
+
+
 Lint:    Miscellaneous (55 priority)
 Message: |
     2462 | “Does she want to see Gatsby?”
@@ -3797,24 +3683,30 @@ Suggest:
 
 Lint:    Spelling (63 priority)
 Message: |
-    2467 | We passed a barrier of dark trees, and then the façade of Fifty-ninth Street, a
-         |                                                 ^~~~~~ Did you mean to spell `façade` this way?
-    2468 | block of delicate pale light, beamed down into the park. Unlike Gatsby and Tom
+    2492 | some of the rooms. Let’s go to Coney Island, old sport. In my car.”
+         |                                ^~~~~ Did you mean to spell `Coney` this way?
 Suggest:
-  - Replace with: “facade”
-  - Replace with: “fade”
-  - Replace with: “facades”
+  - Replace with: “Convey”
+  - Replace with: “Conley”
+  - Replace with: “Corey”
 
 
 
 Lint:    Spelling (63 priority)
 Message: |
-    2492 | some of the rooms. Let’s go to Coney Island, old sport. In my car.”
-         |                                ^~~~~ Did you mean to spell `Coney` this way?
+    2526 | “There’s another little thing,” he said uncertainly, and hesitated.
+         |                                         ^~~~~~~~~~~ Did you mean to spell `uncertainly` this way?
 Suggest:
-  - Replace with: “Cone”
-  - Replace with: “Conley”
-  - Replace with: “Corey”
+  - Replace with: “uncertainty”
+  - Replace with: “uncertain”
+  - Replace with: “certainly”
+
+
+
+Lint:    Formatting (255 priority)
+Message: |
+    2530 | “Oh, it isn’t about that. At least—’’ He fumbled with a series of beginnings.
+         | ^ This quote has no termination.
 
 
 
@@ -3843,7 +3735,7 @@ Message: |
     2562 | Coney Island, or for how many hours he “glanced into rooms” while his house
          | ^~~~~ Did you mean to spell `Coney` this way?
 Suggest:
-  - Replace with: “Cone”
+  - Replace with: “Convey”
   - Replace with: “Conley”
   - Replace with: “Corey”
 
@@ -3892,6 +3784,16 @@ Suggest:
 
 
 
+Lint:    Typo (31 priority)
+Message: |
+    2607 | Clay’s “Economics,” starting at the Finnish tread that shook the kitchen floor,
+    2608 | and peering toward the bleared windows from time to time as if a series of
+         |                        ^~~~~~~ `bleared` should probably be written as `bl eared`.
+Suggest:
+  - Replace with: “bl eared”
+
+
+
 Lint:    Style (31 priority)
 Message: |
     2629 | The exhilarating ripple of her voice was a wild tonic in the rain. I had to
@@ -3905,8 +3807,9 @@ Suggest:
 Lint:    Spelling (63 priority)
 Message: |
     2638 | “That’s the secret of Castle Rackrent. Tell your chauffeur to go far away and
-         |                              ^~~~~~~~ Did you mean `Backrest`?
+         |                              ^~~~~~~~ Did you mean to spell `Rackrent` this way?
 Suggest:
+  - Replace with: “Racket”
   - Replace with: “Backrest”
 
 
@@ -3916,9 +3819,9 @@ Message: |
     2641 | “Come back in an hour, Ferdie.” Then in a grave murmur: “His name is Ferdie.”
          |                        ^~~~~~ Did you mean to spell `Ferdie` this way?
 Suggest:
+  - Replace with: “Faerie”
+  - Replace with: “Fertile”
   - Replace with: “Fermi”
-  - Replace with: “Ferris”
-  - Replace with: “Freddie”
 
 
 
@@ -3927,9 +3830,9 @@ Message: |
     2641 | “Come back in an hour, Ferdie.” Then in a grave murmur: “His name is Ferdie.”
          |                                                                      ^~~~~~ Did you mean to spell `Ferdie` this way?
 Suggest:
+  - Replace with: “Faerie”
+  - Replace with: “Fertile”
   - Replace with: “Fermi”
-  - Replace with: “Ferris”
-  - Replace with: “Freddie”
 
 
 
@@ -3943,6 +3846,13 @@ Message: |
          | ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     2676 | frightened but graceful, on the edge of a stiff chair.
          | ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ This sentence is 41 words long.
+
+
+
+Lint:    Formatting (255 priority)
+Message: |
+    2720 | terrible, terrible mistake.”
+         |                            ^ This quote has no termination.
 
 
 
@@ -3989,6 +3899,22 @@ Suggest:
 
 
 
+Lint:    Spelling (127 priority)
+Message: |
+    2789 | Daisy went up-stairs to wash her face—too late I thought with humiliation of my
+         |            ^~~~~~~~~ This looks like a prefix that can be joined with the rest of the word.
+Suggest:
+  - Replace with: “upstairs”
+
+
+
+Lint:    Formatting (255 priority)
+Message: |
+    2806 | was in he answered: ‘‘That’s my affair,” before he realized that it wasn’t an
+         |                                        ^ This quote has no termination.
+
+
+
 Lint:    Style (31 priority)
 Message: |
     2823 | “I keep it always full of interesting people, night and day. People who do
@@ -4004,9 +3930,9 @@ Message: |
     2827 | entered by the big postern. With enchanting murmurs Daisy admired this aspect or
          |                    ^~~~~~~ Did you mean to spell `postern` this way?
 Suggest:
+  - Replace with: “pastern”
   - Replace with: “poster”
   - Replace with: “posters”
-  - Replace with: “pastern”
 
 
 
@@ -4023,6 +3949,14 @@ Message: |
 
 
 
+Lint:    Formatting (255 priority)
+Message: |
+    2837 | closed the door of ‘‘the Merton College Library” I could have sworn I heard the
+         |                                                ^ This quote has no termination.
+    2838 | owl-eyed man break into ghostly laughter.
+
+
+
 Lint:    Readability (127 priority)
 Message: |
     2840 | We went up-stairs, through period bedrooms swathed in rose and lavender silk and
@@ -4033,6 +3967,15 @@ Message: |
          | ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     2843 | doing liver exercises on the floor. It was Mr. Klipspringer, the ‘‘boarder.” I
          | ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ This sentence is 45 words long.
+
+
+
+Lint:    Spelling (127 priority)
+Message: |
+    2840 | We went up-stairs, through period bedrooms swathed in rose and lavender silk and
+         |         ^~~~~~~~~ This looks like a prefix that can be joined with the rest of the word.
+Suggest:
+  - Replace with: “upstairs”
 
 
 
@@ -4049,7 +3992,17 @@ Suggest:
 Lint:    Spelling (63 priority)
 Message: |
     2843 | doing liver exercises on the floor. It was Mr. Klipspringer, the ‘‘boarder.” I
-         |                                                ^~~~~~~~~~~~ Did you mean to spell `Klipspringer` this way?
+         |                                                ^~~~~~~~~~~~ Did you mean `Kissinger`?
+Suggest:
+  - Replace with: “Kissinger”
+
+
+
+Lint:    Formatting (255 priority)
+Message: |
+    2843 | doing liver exercises on the floor. It was Mr. Klipspringer, the ‘‘boarder.” I
+         |                                                                            ^ This quote has no termination.
+    2844 | had seen him wandering hungrily about the beach that morning. Finally we came to
 
 
 
@@ -4060,17 +4013,6 @@ Message: |
          |                           ^~~~~~~ An Oxford comma is necessary here.
 Suggest:
   - Insert “,”
-
-
-
-Lint:    Spelling (63 priority)
-Message: |
-    2866 | intensity. Now, in the reaction, he was running down like an overwound clock.
-         |                                                              ^~~~~~~~~ Did you mean to spell `overwound` this way?
-Suggest:
-  - Replace with: “overground”
-  - Replace with: “overfond”
-  - Replace with: “overfund”
 
 
 
@@ -4108,6 +4050,17 @@ Suggest:
 
 
 
+Lint:    Typo (31 priority)
+Message: |
+    2878 | brought more and the soft rich heap mounted higher—shirts with stripes and
+    2879 | scrolls and plaids in coral and applegreen and lavender and faint orange, with
+         |                                 ^~~~~~~~~~ `applegreen` should probably be written as `apple green`.
+    2880 | monograms of Indian blue. Suddenly, with a strained sound, Daisy bent her head
+Suggest:
+  - Replace with: “apple green”
+
+
+
 Lint:    Readability (127 priority)
 Message: |
     2887 | After the house, we were to see the grounds and the swimming-pool, and the
@@ -4119,17 +4072,30 @@ Message: |
 
 
 
+Lint:    Capitalization (31 priority)
+Message: |
+    2905 | “Who’s this?”
+         |  ^~~~~ The canonical dictionary spelling is `who's`.
+Suggest:
+  - Replace with: “who's”
+
+
+
 Lint:    Spelling (63 priority)
 Message: |
     2940 | “I know what we'll do,” said Gatsby, “we'll have Klipspringer play the piano.”
-         |                                                  ^~~~~~~~~~~~ Did you mean to spell `Klipspringer` this way?
+         |                                                  ^~~~~~~~~~~~ Did you mean `Kissinger`?
+Suggest:
+  - Replace with: “Kissinger”
 
 
 
 Lint:    Spelling (63 priority)
 Message: |
     2949 | “I was asleep,” cried Mr. Klipspringer, in a spasm of embarrassment. “That is,
-         |                           ^~~~~~~~~~~~ Did you mean to spell `Klipspringer` this way?
+         |                           ^~~~~~~~~~~~ Did you mean `Kissinger`?
+Suggest:
+  - Replace with: “Kissinger”
 
 
 
@@ -4145,7 +4111,9 @@ Suggest:
 Lint:    Spelling (63 priority)
 Message: |
     2952 | “Klipspringer plays the piano,” said Gatsby, cutting him off. “Don’t you, Ewing,
-         |  ^~~~~~~~~~~~ Did you mean to spell `Klipspringer` this way?
+         |  ^~~~~~~~~~~~ Did you mean `Kissinger`?
+Suggest:
+  - Replace with: “Kissinger”
 
 
 
@@ -4154,8 +4122,8 @@ Message: |
     2955 | “I don’t play well. I don’t—I hardly play at all. I’m all out of prac———”
          |                                                                  ^~~~ Did you mean to spell `prac` this way?
 Suggest:
-  - Replace with: “pray”
   - Replace with: “prat”
+  - Replace with: “pray”
   - Replace with: “pram”
 
 
@@ -4163,28 +4131,9 @@ Suggest:
 Lint:    Spelling (63 priority)
 Message: |
     2965 | When Klipspringer had played “The Love Nest” he turned around on the bench and
-         |      ^~~~~~~~~~~~ Did you mean to spell `Klipspringer` this way?
-
-
-
-Lint:    WordChoice (127 priority)
-Message: |
-    2968 | “I’m all out of practice, you see. I told you I couldn’t play. I’m all out of
-         |                                           ^~~ The possessive version of this word is more common in this context.
+         |      ^~~~~~~~~~~~ Did you mean `Kissinger`?
 Suggest:
-  - Replace with: “your”
-  - Replace with: “you're a”
-  - Replace with: “you're an”
-
-
-
-Lint:    Repetition (63 priority)
-Message: |
-    2968 | “I’m all out of practice, you see. I told you I couldn’t play. I’m all out of
-         |                                           ^~~~~ There are too many personal pronouns in sequence here.
-Suggest:
-  - Replace with: “you”
-  - Replace with: “I”
+  - Replace with: “Kissinger”
 
 
 
@@ -4194,20 +4143,18 @@ Message: |
     2969 | prac—”
          | ^~~~ Did you mean to spell `prac` this way?
 Suggest:
-  - Replace with: “pray”
   - Replace with: “prat”
+  - Replace with: “pray”
   - Replace with: “pram”
 
 
 
-Lint:    WordChoice (54 priority)
+Lint:    Capitalization (127 priority)
 Message: |
-    2995 | of emotion. I think that voice held him most, with its fluctuating, feverish
-         |                                                    ^~~ Use `it's` (short for `it has` or `it is`) here, not the possessive `its`.
-    2996 | warmth, because it couldn’t be over-dreamed—that voice was a deathless song.
+    3003 | ## CHAPTER VI
+         | ^~~~~~~~~~~~~ Try to use title case in headings.
 Suggest:
-  - Replace with: “it's”
-  - Replace with: “it has”
+  - Replace with: “## CHAPTER Vi”
 
 
 
@@ -4230,9 +4177,9 @@ Message: |
     3024 | a source of satisfaction to James Gatz of North Dakota, isn’t easy to say.
          |                                   ^~~~ Did you mean to spell `Gatz` this way?
 Suggest:
-  - Replace with: “Ga's”
   - Replace with: “Gate”
-  - Replace with: “GHz”
+  - Replace with: “Garth”
+  - Replace with: “Goth”
 
 
 
@@ -4241,9 +4188,9 @@ Message: |
     3026 | James Gatz—that was really, or at least legally, his name. He had changed it at
          |       ^~~~ Did you mean to spell `Gatz` this way?
 Suggest:
-  - Replace with: “Ga's”
   - Replace with: “Gate”
-  - Replace with: “GHz”
+  - Replace with: “Garth”
+  - Replace with: “Goth”
 
 
 
@@ -4265,9 +4212,9 @@ Message: |
     3029 | on Lake Superior. It was James Gatz who had been loafing along the beach that
          |                                ^~~~ Did you mean to spell `Gatz` this way?
 Suggest:
-  - Replace with: “Ga's”
   - Replace with: “Gate”
-  - Replace with: “GHz”
+  - Replace with: “Garth”
+  - Replace with: “Goth”
 
 
 
@@ -4277,9 +4224,9 @@ Message: |
          |                                                      ^~~~~~~~ Did you mean to spell `Tuolomee` this way?
     3032 | that a wind might catch him and break him up in half an hour.
 Suggest:
-  - Replace with: “Togolese”
-  - Replace with: “Tolkien”
-  - Replace with: “Toltec”
+  - Replace with: “Toulouse”
+  - Replace with: “Twosome”
+  - Replace with: “Twosomes”
 
 
 
@@ -4292,16 +4239,6 @@ Suggest:
   - Replace with: “absorption”
   - Replace with: “abortion”
   - Replace with: “adsorption”
-
-
-
-Lint:    WordChoice (31 priority)
-Message: |
-    3057 | an outlet for his imagination; they were a satisfactory hint of the unreality of
-         |                                     ^~~~ Use the contraction or separate the words instead.
-Suggest:
-  - Replace with: “we're”
-  - Replace with: “we are”
 
 
 
@@ -4318,24 +4255,12 @@ Suggest:
 Lint:    Spelling (63 priority)
 Message: |
     3074 | Ella Kaye, the newspaper woman, played Madame de Maintenon to his weakness and
-         |                                               ^~ Did you mean to spell `de` this way?
-    3075 | sent him to sea in a yacht, were common property of the turgid journalism
-Suggest:
-  - Replace with: “d”
-  - Replace with: “db”
-  - Replace with: “dc”
-
-
-
-Lint:    Spelling (63 priority)
-Message: |
-    3074 | Ella Kaye, the newspaper woman, played Madame de Maintenon to his weakness and
          |                                                  ^~~~~~~~~ Did you mean to spell `Maintenon` this way?
     3075 | sent him to sea in a yacht, were common property of the turgid journalism
 Suggest:
+  - Replace with: “Maintain”
+  - Replace with: “Maintenance”
   - Replace with: “Maintop”
-  - Replace with: “Maine's”
-  - Replace with: “Mainer's”
 
 
 
@@ -4345,9 +4270,9 @@ Message: |
     3077 | when he turned up as James Gatz’s destiny in Little Girl Bay.
          |                            ^~~~~~ Did you mean to spell `Gatz’s` this way?
 Suggest:
-  - Replace with: “Ga's”
-  - Replace with: “Gaea's”
-  - Replace with: “Gael's”
+  - Replace with: “Gate's”
+  - Replace with: “Garth's”
+  - Replace with: “Goth's”
 
 
 
@@ -4356,9 +4281,9 @@ Message: |
     3079 | To young Gatz, resting on his oars and looking up at the railed deck, that yacht
          |          ^~~~ Did you mean to spell `Gatz` this way?
 Suggest:
-  - Replace with: “Ga's”
   - Replace with: “Gate”
-  - Replace with: “GHz”
+  - Replace with: “Garth”
+  - Replace with: “Goth”
 
 
 
@@ -4368,9 +4293,9 @@ Message: |
          |                                  ^~~~~~~~ Did you mean to spell `Tuolomee` this way?
     3086 | Barbary Coast Gatsby left too.
 Suggest:
-  - Replace with: “Togolese”
-  - Replace with: “Tolkien”
-  - Replace with: “Toltec”
+  - Replace with: “Toulouse”
+  - Replace with: “Twosome”
+  - Replace with: “Twosomes”
 
 
 
@@ -4394,8 +4319,18 @@ Message: |
     3090 | knew what lavish doings Dan Cody drunk might soon be about, and he provided for
 Suggest:
   - Replace with: “jailer”
+  - Replace with: “jail's”
   - Replace with: “sailor”
-  - Replace with: “tailor”
+
+
+
+Lint:    Typo (31 priority)
+Message: |
+    3089 | in turn steward, mate, skipper, secretary, and even jailor, for Dan Cody sober
+         |                                                     ^~~~~~ `jailor` should probably be written as `jail or`.
+    3090 | knew what lavish doings Dan Cody drunk might soon be about, and he provided for
+Suggest:
+  - Replace with: “jail or”
 
 
 
@@ -4444,17 +4379,18 @@ Message: |
 
 
 
-Lint:    WordChoice (31 priority)
+Lint:    Repetition (31 priority)
 Message: |
-    3123 | They were a party of three on horseback—Tom and a man named Sloane and a pretty
-         |      ^~~~ Use the contraction or separate the words instead.
+    3135 | uneasy anyhow until he had given them something, realizing in a vague way that
+         |                                                                           ^~~~~
+    3136 | that was all they came for. Mr. Sloane wanted nothing. A lemonade? No, thanks. A
+         | ~~~~ Consider whether the second `that` adds meaning in this context.
 Suggest:
-  - Replace with: “we're”
-  - Replace with: “we are”
+  - Replace with: “that”
 
 
 
-Lint:    Repetition (127 priority)
+Lint:    Repetition (128 priority)
 Message: |
     3135 | uneasy anyhow until he had given them something, realizing in a vague way that
          |                                                                           ^~~~~
@@ -4509,17 +4445,6 @@ Message: |
 
 
 
-Lint:    WordChoice (31 priority)
-Message: |
-    3235 | in my memory from Gatsby’s other parties that summer. There were the same
-         |                                                             ^~~~ Use the contraction or separate the words instead.
-    3236 | people, or at least the same sort of people, the same profusion of champagne,
-Suggest:
-  - Replace with: “we're”
-  - Replace with: “we are”
-
-
-
 Lint:    Readability (127 priority)
 Message: |
     3238 | air, a pervading harshness that hadn’t been there before. Or perhaps I had
@@ -4562,14 +4487,21 @@ Suggest:
 
 
 
+Lint:    Formatting (255 priority)
+Message: |
+    3296 | explained, ‘‘or any act of God.”
+         |                                ^ This quote has no termination.
+
+
+
 Lint:    Spelling (63 priority)
 Message: |
     3316 | “Wha’?”
          |  ^~~ Did you mean to spell `Wha` this way?
 Suggest:
-  - Replace with: “What”
   - Replace with: “Wham”
-  - Replace with: “Aha”
+  - Replace with: “What”
+  - Replace with: “Who”
 
 
 
@@ -4580,7 +4512,7 @@ Message: |
 Suggest:
   - Replace with: “defense”
   - Replace with: “decency”
-  - Replace with: “deface”
+  - Replace with: “defect”
 
 
 
@@ -4590,17 +4522,6 @@ Message: |
          |                                                            ^~~~~~~~~~~ Did you mean the closed compound noun “handshakes”?
 Suggest:
   - Replace with: “handshakes”
-
-
-
-Lint:    Spelling (63 priority)
-Message: |
-    3349 | But the rest offended her—and inarguably, because it wasn’t a gesture but an
-         |                               ^~~~~~~~~~ Did you mean to spell `inarguably` this way?
-Suggest:
-  - Replace with: “inarguable”
-  - Replace with: “unarguably”
-  - Replace with: “arguably”
 
 
 
@@ -4625,6 +4546,16 @@ Message: |
 Suggest:
   - Replace with: “rhythmic”
   - Replace with: “mythic”
+
+
+
+Lint:    Capitalization (31 priority)
+Message: |
+    3409 | Her glance left me and sought the lighted top of the steps, where “Three o’Clock
+         |                                                                          ^~~~~~~ The canonical dictionary spelling is `o'clock`.
+    3410 | in the Morning,” a neat, sad little waltz of that year, was drifting out the
+Suggest:
+  - Replace with: “o'clock”
 
 
 
@@ -4688,21 +4619,16 @@ Suggest:
 
 Lint:    Spelling (63 priority)
 Message: |
-    3490 | them than a wisp of startled air. But they made no sound, and what I had almost
-    3491 | remembered was uncommunicable forever.
-         |                ^~~~~~~~~~~~~~ Did you mean to spell `uncommunicable` this way?
-Suggest:
-  - Replace with: “incommunicable”
-  - Replace with: “communicable”
-  - Replace with: “noncommunicable”
-
-
-
-Lint:    Spelling (63 priority)
-Message: |
     3496 | house failed to go on one Saturday night—and, as obscurely as it had begun, his
     3497 | career as Trimalchio was over. Only gradually did I become aware that the
          |           ^~~~~~~~~~ Did you mean to spell `Trimalchio` this way?
+
+
+
+Lint:    Formatting (255 priority)
+Message: |
+    3505 | “Nope.” After a pause he added “sir’’ in a dilatory, grudging way.
+         |                                ^ This quote has no termination.
 
 
 
@@ -4713,7 +4639,8 @@ Message: |
     3508 | over.”
 Suggest:
   - Replace with: “Caraway”
-  - Replace with: “Faraway”
+  - Replace with: “Caraways”
+  - Replace with: “Castaway”
 
 
 
@@ -4723,7 +4650,8 @@ Message: |
          |  ^~~~~~~~ Did you mean to spell `Carraway` this way?
 Suggest:
   - Replace with: “Caraway”
-  - Replace with: “Faraway”
+  - Replace with: “Caraways”
+  - Replace with: “Castaway”
 
 
 
@@ -4733,7 +4661,8 @@ Message: |
          |  ^~~~~~~~ Did you mean to spell `Carraway` this way?
 Suggest:
   - Replace with: “Caraway”
-  - Replace with: “Faraway”
+  - Replace with: “Caraways”
+  - Replace with: “Castaway”
 
 
 
@@ -4838,8 +4767,8 @@ Message: |
          |                     ^~~~~~ Did you mean to spell `centre` this way?
 Suggest:
   - Replace with: “center”
+  - Replace with: “cent's”
   - Replace with: “censure”
-  - Replace with: “cent”
 
 
 
@@ -4889,20 +4818,9 @@ Message: |
     3640 | “Bles-sed pre-cious,” she crooned, holding out her arms. “Come to your own
          |  ^~~~ Did you mean to spell `Bles` this way?
 Suggest:
-  - Replace with: “B's”
-  - Replace with: “BB's”
-  - Replace with: “BC's”
-
-
-
-Lint:    Spelling (63 priority)
-Message: |
-    3640 | “Bles-sed pre-cious,” she crooned, holding out her arms. “Come to your own
-         |       ^~~ Did you mean to spell `sed` this way?
-Suggest:
-  - Replace with: “sad”
-  - Replace with: “sea”
-  - Replace with: “sec”
+  - Replace with: “Bless”
+  - Replace with: “Bales”
+  - Replace with: “Bees”
 
 
 
@@ -4911,9 +4829,9 @@ Message: |
     3640 | “Bles-sed pre-cious,” she crooned, holding out her arms. “Come to your own
          |               ^~~~~ Did you mean to spell `cious` this way?
 Suggest:
+  - Replace with: “coo's”
   - Replace with: “pious”
   - Replace with: “chorus”
-  - Replace with: “circus”
 
 
 
@@ -4931,34 +4849,11 @@ Suggest:
 Lint:    Spelling (63 priority)
 Message: |
     3646 | “The bles-sed pre-cious! Did mother get powder on your old yellowy hair? Stand
-         |           ^~~ Did you mean to spell `sed` this way?
-Suggest:
-  - Replace with: “sad”
-  - Replace with: “sea”
-  - Replace with: “sec”
-
-
-
-Lint:    Spelling (63 priority)
-Message: |
-    3646 | “The bles-sed pre-cious! Did mother get powder on your old yellowy hair? Stand
          |                   ^~~~~ Did you mean to spell `cious` this way?
 Suggest:
+  - Replace with: “coo's”
   - Replace with: “pious”
   - Replace with: “chorus”
-  - Replace with: “circus”
-
-
-
-Lint:    Spelling (63 priority)
-Message: |
-    3646 | “The bles-sed pre-cious! Did mother get powder on your old yellowy hair? Stand
-    3647 | up now, and say—How-de-do.”
-         |                     ^~ Did you mean to spell `de` this way?
-Suggest:
-  - Replace with: “d”
-  - Replace with: “db”
-  - Replace with: “dc”
 
 
 
@@ -4967,9 +4862,9 @@ Message: |
     3672 | “Come, Pammy.”
          |        ^~~~~ Did you mean to spell `Pammy` this way?
 Suggest:
-  - Replace with: “Mammy”
-  - Replace with: “Sammy”
-  - Replace with: “Tammy”
+  - Replace with: “Palmy”
+  - Replace with: “Pommy”
+  - Replace with: “Pam's”
 
 
 
@@ -4985,6 +4880,23 @@ Suggest:
 
 
 
+Lint:    Formatting (255 priority)
+Message: |
+    3687 | “It seems that pretty soon the earth’s going to fall into the sun—or wait a
+         | ^ This quote has no termination.
+
+
+
+Lint:    Regionalism (63 priority)
+Message: |
+    3690 | “Come outside,” he suggested to Gatsby, “I’d like you to have a look at the
+         |                                                          ^~~~ American English prefers `take a look` over `have a look`.
+    3691 | place.”
+Suggest:
+  - Replace with: “take”
+
+
+
 Lint:    Spelling (63 priority)
 Message: |
     3709 | We had luncheon in the dining-room, darkened too against the heat, and drank
@@ -4997,15 +4909,6 @@ Suggest:
 
 
 
-Lint:    Spelling (63 priority)
-Message: |
-    3712 | “What’ll we do with ourselves this afternoon?” cried Daisy, “and the day after
-         |  ^~~~~~~ Did you mean `That'll`?
-Suggest:
-  - Replace with: “That'll”
-
-
-
 Lint:    Miscellaneous (31 priority)
 Message: |
     3736 | mouth opened a little, and he looked at Gatsby, and then back at Daisy as if he
@@ -5013,6 +4916,23 @@ Message: |
          |                            ^~~~~~~~ Did you mean the closed compound `someone`?
 Suggest:
   - Replace with: “someone”
+
+
+
+Lint:    Formatting (255 priority)
+Message: |
+    3739 | “You resemble the advertisement of the man,” she went on innocently. ‘You know
+    3740 | the advertisement of the man—”
+         |                              ^ This quote has no termination.
+
+
+
+Lint:    Spelling (127 priority)
+Message: |
+    3765 | They went up-stairs to get ready while we three men stood there shuffling the
+         |           ^~~~~~~~~ This looks like a prefix that can be joined with the rest of the word.
+Suggest:
+  - Replace with: “upstairs”
 
 
 
@@ -5062,9 +4982,9 @@ Message: |
     3874 | while in silence. Then as Doctor T. J. Eckleburg’s faded eyes came into sight
          |                                  ^~ Did you mean to spell `T.` this way?
 Suggest:
-  - Replace with: “Tr”
-  - Replace with: “T”
-  - Replace with: “Tb”
+  - Replace with: “Ti”
+  - Replace with: “To”
+  - Replace with: “Th”
 
 
 
@@ -5073,9 +4993,9 @@ Message: |
     3874 | while in silence. Then as Doctor T. J. Eckleburg’s faded eyes came into sight
          |                                     ^~ Did you mean to spell `J.` this way?
 Suggest:
-  - Replace with: “Jr”
-  - Replace with: “J”
+  - Replace with: “Jo”
   - Replace with: “Jg”
+  - Replace with: “Jr”
 
 
 
@@ -5087,7 +5007,7 @@ Message: |
 Suggest:
   - Replace with: “Excalibur's”
   - Replace with: “Vicksburg's”
-  - Replace with: “Iceberg's”
+  - Replace with: “Heckler's”
 
 
 
@@ -5126,14 +5046,23 @@ Suggest:
 
 
 
+Lint:    Typo (31 priority)
+Message: |
+    3948 | behind. Over the ashheaps the giant eyes of Doctor T. J. Eckleburg kept their
+         |                  ^~~~~~~~ `ashheaps` should probably be written as `ash heaps`.
+Suggest:
+  - Replace with: “ash heaps”
+
+
+
 Lint:    Spelling (63 priority)
 Message: |
     3948 | behind. Over the ashheaps the giant eyes of Doctor T. J. Eckleburg kept their
          |                                                    ^~ Did you mean to spell `T.` this way?
 Suggest:
-  - Replace with: “Tr”
-  - Replace with: “T”
-  - Replace with: “Tb”
+  - Replace with: “Ti”
+  - Replace with: “To”
+  - Replace with: “Th”
 
 
 
@@ -5142,9 +5071,9 @@ Message: |
     3948 | behind. Over the ashheaps the giant eyes of Doctor T. J. Eckleburg kept their
          |                                                       ^~ Did you mean to spell `J.` this way?
 Suggest:
-  - Replace with: “Jr”
-  - Replace with: “J”
+  - Replace with: “Jo”
   - Replace with: “Jg”
+  - Replace with: “Jr”
 
 
 
@@ -5156,7 +5085,7 @@ Message: |
 Suggest:
   - Replace with: “Excalibur”
   - Replace with: “Vicksburg”
-  - Replace with: “Iceberg”
+  - Replace with: “Heckler”
 
 
 
@@ -5262,9 +5191,9 @@ Message: |
     4016 | “Well, we’d better telephone for an axe———”
          |                                     ^~~ Did you mean to spell `axe` this way?
 Suggest:
-  - Replace with: “aye”
   - Replace with: “ace”
   - Replace with: “age”
+  - Replace with: “ale”
 
 
 
@@ -5313,6 +5242,13 @@ Suggest:
 
 
 
+Lint:    Formatting (255 priority)
+Message: |
+    4062 | wasn’t any connection.”
+         |                       ^ This quote has no termination.
+
+
+
 Lint:    Spelling (63 priority)
 Message: |
     4064 | “I used to know a Bill Biloxi from Memphis,” I remarked.
@@ -5324,14 +5260,45 @@ Suggest:
 
 
 
+Lint:    Spelling (31 priority)
+Message: |
+    4070 | the window, followed by intermittent cries of “Yea—ea—ea!” and finally by a
+         |                                                ^~~ If you mean the informal word for `yes` and not the biblical or legalistic `yea`, the standard spelling is `yeah`.
+Suggest:
+  - Replace with: “Yeah”
+
+
+
+Lint:    Spelling (63 priority)
+Message: |
+    4070 | the window, followed by intermittent cries of “Yea—ea—ea!” and finally by a
+         |                                                    ^~ Did you mean to spell `ea` this way?
+Suggest:
+  - Replace with: “ear”
+  - Replace with: “eat”
+  - Replace with: “eh”
+
+
+
+Lint:    Spelling (63 priority)
+Message: |
+    4070 | the window, followed by intermittent cries of “Yea—ea—ea!” and finally by a
+         |                                                       ^~ Did you mean to spell `ea` this way?
+Suggest:
+  - Replace with: “ear”
+  - Replace with: “eat”
+  - Replace with: “eh”
+
+
+
 Lint:    Spelling (63 priority)
 Message: |
     4073 | “We're getting old,” said Daisy. “lf we were young we’d rise and dance.”
          |                                   ^~ Did you mean to spell `lf` this way?
 Suggest:
-  - Replace with: “l”
   - Replace with: “la”
-  - Replace with: “lb”
+  - Replace with: “lo”
+  - Replace with: “elf”
 
 
 
@@ -5343,6 +5310,13 @@ Suggest:
   - Replace with: “Biko's”
   - Replace with: “Bilbo's”
   - Replace with: “Biro's”
+
+
+
+Lint:    Formatting (255 priority)
+Message: |
+    4075 | “Remember Biloxi,” Jordan warned her. ‘‘Where’d you know him, Tom?”
+         |                                                                   ^ This quote has no termination.
 
 
 
@@ -5363,9 +5337,9 @@ Message: |
          |                                                                  ^~~ Did you mean to spell `Asa` this way?
     4084 | brought him around at the last minute and asked if we had room for him.”
 Suggest:
-  - Replace with: “Ass”
-  - Replace with: “Ada”
-  - Replace with: “Ala”
+  - Replace with: “Aha”
+  - Replace with: “Aka”
+  - Replace with: “As”
 
 
 
@@ -5391,24 +5365,27 @@ Suggest:
 
 
 
-Lint:    WordChoice (127 priority)
+Lint:    Formatting (255 priority)
 Message: |
-    4115 | “I told you I went there,” said Gatsby.
-         |         ^~~ The possessive version of this word is more common in this context.
-Suggest:
-  - Replace with: “your”
-  - Replace with: “you're a”
-  - Replace with: “you're an”
+    4134 | won’t seem so stupid to yourself. . . . Look at the mint!”
+         |                                                          ^ This quote has no termination.
 
 
 
-Lint:    Repetition (63 priority)
+Lint:    Punctuation (31 priority)
 Message: |
-    4115 | “I told you I went there,” said Gatsby.
-         |         ^~~~~ There are too many personal pronouns in sequence here.
+    4149 | the idea you can count me out. . . . Nowadays people begin by sneering at family
+         |                                      ^~~~~~~~ Discourse markers at the beginning of a sentence should be followed by a comma.
+    4150 | life and family institutions, and next they’ll throw everything overboard and
 Suggest:
-  - Replace with: “you”
-  - Replace with: “I”
+  - Insert “,”
+
+
+
+Lint:    Formatting (255 priority)
+Message: |
+    4175 | me.”
+         |    ^ This quote has no termination.
 
 
 
@@ -5423,26 +5400,6 @@ Message: |
 
 
 
-Lint:    WordChoice (127 priority)
-Message: |
-    4192 | “I told you what’s been going on,” said Gatsby. “Going on for five years—and you
-         |         ^~~ The possessive version of this word is more common in this context.
-Suggest:
-  - Replace with: “your”
-  - Replace with: “you're a”
-  - Replace with: “you're an”
-
-
-
-Lint:    WordChoice (63 priority)
-Message: |
-    4209 | a mile of her unless you brought the groceries to the back door. But all the
-         |                                                       ^~~~~~~~~ Did you mean the closed compound noun “backdoor”?
-Suggest:
-  - Replace with: “backdoor”
-
-
-
 Lint:    Spelling (63 priority)
 Message: |
     4241 | “Not at Kapiolani?” demanded Tom suddenly.
@@ -5450,7 +5407,7 @@ Message: |
 Suggest:
   - Replace with: “Kaitlin”
   - Replace with: “Kaposi”
-  - Replace with: “Capillary”
+  - Replace with: “Kaolin”
 
 
 
@@ -5519,7 +5476,7 @@ Suggest:
 
 
 
-Lint:    Repetition (127 priority)
+Lint:    Repetition (128 priority)
 Message: |
     4347 | Her frightened eyes told that whatever intentions, whatever courage she had had,
          |                                                                         ^~~~~~~ Did you mean to repeat this word?
@@ -5564,9 +5521,11 @@ Suggest:
 Lint:    Spelling (63 priority)
 Message: |
     4391 | The young Greek, Michaelis, who ran the coffee joint beside the ashheaps was the
-         |                  ^~~~~~~~~ Did you mean `Michael`?
+         |                  ^~~~~~~~~ Did you mean to spell `Michaelis` this way?
 Suggest:
-  - Replace with: “Michael”
+  - Replace with: “Michael's”
+  - Replace with: “Michaela's”
+  - Replace with: “Micheal's”
 
 
 
@@ -5582,31 +5541,47 @@ Suggest:
 
 
 
+Lint:    Typo (31 priority)
+Message: |
+    4391 | The young Greek, Michaelis, who ran the coffee joint beside the ashheaps was the
+         |                                                                 ^~~~~~~~ `ashheaps` should probably be written as `ash heaps`.
+    4392 | principal witness at the inquest. He had slept through the heat until after
+Suggest:
+  - Replace with: “ash heaps”
+
+
+
 Lint:    Spelling (63 priority)
 Message: |
     4394 | office—really sick, pale as his own pale hair and shaking all over. Michaelis
-         |                                                                     ^~~~~~~~~ Did you mean `Michael`?
+         |                                                                     ^~~~~~~~~ Did you mean to spell `Michaelis` this way?
     4395 | advised him to go to bed, but Wilson refused, saying that he’d miss a lot of
 Suggest:
-  - Replace with: “Michael”
+  - Replace with: “Michael's”
+  - Replace with: “Michaela's”
+  - Replace with: “Micheal's”
 
 
 
 Lint:    Spelling (63 priority)
 Message: |
     4402 | Michaelis was astonished; they had been neighbors for four years, and Wilson had
-         | ^~~~~~~~~ Did you mean `Michael`?
+         | ^~~~~~~~~ Did you mean to spell `Michaelis` this way?
 Suggest:
-  - Replace with: “Michael”
+  - Replace with: “Michael's”
+  - Replace with: “Michaela's”
+  - Replace with: “Micheal's”
 
 
 
 Lint:    Spelling (63 priority)
 Message: |
     4409 | So naturally Michaelis tried to find out what had happened, but Wilson wouldn’t
-         |              ^~~~~~~~~ Did you mean `Michael`?
+         |              ^~~~~~~~~ Did you mean to spell `Michaelis` this way?
 Suggest:
-  - Replace with: “Michael”
+  - Replace with: “Michael's”
+  - Replace with: “Michaela's”
+  - Replace with: “Micheal's”
 
 
 
@@ -5614,9 +5589,11 @@ Lint:    Spelling (63 priority)
 Message: |
     4412 | latter was getting uneasy, some workmen came past the door bound for his
     4413 | restaurant, and Michaelis took the opportunity to get away, intending to come
-         |                 ^~~~~~~~~ Did you mean `Michael`?
+         |                 ^~~~~~~~~ Did you mean to spell `Michaelis` this way?
 Suggest:
-  - Replace with: “Michael”
+  - Replace with: “Michael's”
+  - Replace with: “Michaela's”
+  - Replace with: “Micheal's”
 
 
 
@@ -5651,12 +5628,24 @@ Message: |
 
 
 
+Lint:    Agreement (31 priority)
+Message: |
+    4427 | policeman that it was light green. The other car, the one going toward New York,
+         |                                                       ^~~~~~~~~ `going` is a mass noun.
+    4428 | came to rest a hundred yards beyond, and it’s driver hurried back to where
+Suggest:
+  - Replace with: “one piece of going”
+
+
+
 Lint:    Spelling (63 priority)
 Message: |
     4432 | Michaelis and this man reached her first, but when they had torn open her
-         | ^~~~~~~~~ Did you mean `Michael`?
+         | ^~~~~~~~~ Did you mean to spell `Michaelis` this way?
 Suggest:
-  - Replace with: “Michael”
+  - Replace with: “Michael's”
+  - Replace with: “Michaela's”
+  - Replace with: “Micheal's”
 
 
 
@@ -5676,9 +5665,9 @@ Message: |
 Lint:    Spelling (63 priority)
 Message: |
     4442 | “Wreck!” said Tom. “That’s good. Wilson’ll have a little business at last.”
-         |                                  ^~~~~~~~~ Did you mean `Wilson`?
+         |                                  ^~~~~~~~~ Did you mean `Wilson's`?
 Suggest:
-  - Replace with: “Wilson”
+  - Replace with: “Wilson's”
 
 
 
@@ -5730,6 +5719,16 @@ Suggest:
 
 
 
+Lint:    Typo (31 priority)
+Message: |
+    4470 | a little book. At first I couldn’t find the source of the high, groaning words
+    4471 | that echoed clamorously through the bare garage—then I saw Wilson standing on
+         |             ^~~~~~~~~~~ `clamorously` should probably be written as `cl amorously`.
+Suggest:
+  - Replace with: “cl amorously”
+
+
+
 Lint:    Spelling (63 priority)
 Message: |
     4479 | “Oh, my Ga-od! Oh, my Ga-od! Oh, Ga-od! Oh, my Ga-od!”
@@ -5774,14 +5773,54 @@ Suggest:
 
 
 
+Lint:    Capitalization (127 priority)
+Message: |
+    4484 | “M-a-v—” the policeman was saying, “—o———”
+         |                                      ^ This word's canonical spelling is all-caps.
+Suggest:
+  - Replace with: “O”
+
+
+
 Lint:    Spelling (63 priority)
 Message: |
     4484 | “M-a-v—” the policeman was saying, “—o———”
          |                                      ^ Did you mean to spell `o` this way?
 Suggest:
-  - Replace with: “ob”
   - Replace with: “of”
   - Replace with: “oh”
+  - Replace with: “oi”
+
+
+
+Lint:    Capitalization (127 priority)
+Message: |
+    4486 | “No, r—” corrected the man, “M-a-v-r-o———”
+         |      ^ This word's canonical spelling is all-caps.
+Suggest:
+  - Replace with: “R”
+
+
+
+Lint:    Spelling (63 priority)
+Message: |
+    4486 | “No, r—” corrected the man, “M-a-v-r-o———”
+         |      ^ Did you mean to spell `r` this way?
+Suggest:
+  - Replace with: “re”
+  - Replace with: “a”
+  - Replace with: “i”
+
+
+
+Lint:    Spelling (63 priority)
+Message: |
+    4486 | “No, r—” corrected the man, “M-a-v-r-o———”
+         |                                    ^ Did you mean to spell `r` this way?
+Suggest:
+  - Replace with: “re”
+  - Replace with: “a”
+  - Replace with: “i”
 
 
 
@@ -5790,9 +5829,38 @@ Message: |
     4486 | “No, r—” corrected the man, “M-a-v-r-o———”
          |                                      ^ Did you mean to spell `o` this way?
 Suggest:
-  - Replace with: “ob”
   - Replace with: “of”
   - Replace with: “oh”
+  - Replace with: “oi”
+
+
+
+Lint:    Capitalization (127 priority)
+Message: |
+    4490 | “r—” said the policeman, “o———”
+         |  ^ This word's canonical spelling is all-caps.
+Suggest:
+  - Replace with: “R”
+
+
+
+Lint:    Spelling (63 priority)
+Message: |
+    4490 | “r—” said the policeman, “o———”
+         |  ^ Did you mean to spell `r` this way?
+Suggest:
+  - Replace with: “re”
+  - Replace with: “a”
+  - Replace with: “i”
+
+
+
+Lint:    Capitalization (127 priority)
+Message: |
+    4490 | “r—” said the policeman, “o———”
+         |                           ^ This word's canonical spelling is all-caps.
+Suggest:
+  - Replace with: “O”
 
 
 
@@ -5801,18 +5869,28 @@ Message: |
     4490 | “r—” said the policeman, “o———”
          |                           ^ Did you mean to spell `o` this way?
 Suggest:
-  - Replace with: “ob”
   - Replace with: “of”
   - Replace with: “oh”
+  - Replace with: “oi”
 
 
 
 Lint:    Spelling (63 priority)
 Message: |
     4499 | “Auto hit her. Ins’antly killed.”
-         |                ^~~~~~~~~ Did you mean `Instantly`?
+         |                ^~~~~~~~~ Did you mean to spell `Ins’antly` this way?
 Suggest:
   - Replace with: “Instantly”
+  - Replace with: “Insanely”
+
+
+
+Lint:    Capitalization (127 priority)
+Message: |
+    4503 | “She ran out ina road. Son-of-a-bitch didn’t even stopus car.”
+         |              ^~~ The canonical dictionary spelling is title case: `Ina`.
+Suggest:
+  - Replace with: “Ina”
 
 
 
@@ -5821,9 +5899,9 @@ Message: |
     4503 | “She ran out ina road. Son-of-a-bitch didn’t even stopus car.”
          |              ^~~ Did you mean to spell `ina` this way?
 Suggest:
-  - Replace with: “int”
   - Replace with: “in”
-  - Replace with: “inc”
+  - Replace with: “ind”
+  - Replace with: “inf”
 
 
 
@@ -5834,16 +5912,27 @@ Message: |
 Suggest:
   - Replace with: “stop's”
   - Replace with: “stops”
-  - Replace with: “stomp's”
+  - Replace with: “stoups”
+
+
+
+Lint:    Typo (31 priority)
+Message: |
+    4503 | “She ran out ina road. Son-of-a-bitch didn’t even stopus car.”
+         |                                                   ^~~~~~ `stopus` should probably be written as `stop us`.
+Suggest:
+  - Replace with: “stop us”
 
 
 
 Lint:    Spelling (63 priority)
 Message: |
     4505 | “There was two cars,” said Michaelis, “one comin’, one goin’, see?”
-         |                            ^~~~~~~~~ Did you mean `Michael`?
+         |                            ^~~~~~~~~ Did you mean to spell `Michaelis` this way?
 Suggest:
-  - Replace with: “Michael”
+  - Replace with: “Michael's”
+  - Replace with: “Michaela's”
+  - Replace with: “Micheal's”
 
 
 
@@ -5858,6 +5947,16 @@ Suggest:
 
 
 
+Lint:    Typo (31 priority)
+Message: |
+    4505 | “There was two cars,” said Michaelis, “one comin’, one goin’, see?”
+         |                                            ^~~~~ `comin` has a missing space between words.
+Suggest:
+  - Replace with: “co min”
+  - Replace with: “com in”
+
+
+
 Lint:    Spelling (63 priority)
 Message: |
     4505 | “There was two cars,” said Michaelis, “one comin’, one goin’, see?”
@@ -5865,7 +5964,16 @@ Message: |
 Suggest:
   - Replace with: “gain”
   - Replace with: “gin”
-  - Replace with: “going”
+  - Replace with: “goon”
+
+
+
+Lint:    Typo (31 priority)
+Message: |
+    4505 | “There was two cars,” said Michaelis, “one comin’, one goin’, see?”
+         |                                                        ^~~~ `goin` should probably be written as `go in`.
+Suggest:
+  - Replace with: “go in”
 
 
 
@@ -5876,7 +5984,16 @@ Message: |
 Suggest:
   - Replace with: “gain”
   - Replace with: “gin”
-  - Replace with: “going”
+  - Replace with: “goon”
+
+
+
+Lint:    Typo (31 priority)
+Message: |
+    4509 | “One goin’ each way. Well, she”—his hand rose toward the blankets but stopped
+         |      ^~~~ `goin` should probably be written as `go in`.
+Suggest:
+  - Replace with: “go in”
 
 
 
@@ -5902,15 +6019,24 @@ Suggest:
 
 
 
+Lint:    Typo (31 priority)
+Message: |
+    4510 | half way and fell to his side—“she ran out there an’ the one comin’ from N’York
+         |                                                              ^~~~~ `comin` has a missing space between words.
+    4511 | knock right into her, goin’ thirty or forty miles an hour.”
+Suggest:
+  - Replace with: “co min”
+  - Replace with: “com in”
+
+
+
 Lint:    Spelling (63 priority)
 Message: |
     4510 | half way and fell to his side—“she ran out there an’ the one comin’ from N’York
-         |                                                                          ^~~~~~ Did you mean to spell `N’York` this way?
+         |                                                                          ^~~~~~ Did you mean `York`?
     4511 | knock right into her, goin’ thirty or forty miles an hour.”
 Suggest:
   - Replace with: “York”
-  - Replace with: “Nanook”
-  - Replace with: “Newark”
 
 
 
@@ -5922,7 +6048,17 @@ Message: |
 Suggest:
   - Replace with: “gain”
   - Replace with: “gin”
-  - Replace with: “going”
+  - Replace with: “goon”
+
+
+
+Lint:    Typo (31 priority)
+Message: |
+    4510 | half way and fell to his side—“she ran out there an’ the one comin’ from N’York
+    4511 | knock right into her, goin’ thirty or forty miles an hour.”
+         |                       ^~~~ `goin` should probably be written as `go in`.
+Suggest:
+  - Replace with: “go in”
 
 
 
@@ -6005,9 +6141,16 @@ Message: |
     4636 | faces of “Wolfshiem’s people,” behind him in the dark shrubbery.
          |           ^~~~~~~~~~~ Did you mean to spell `Wolfshiem’s` this way?
 Suggest:
+  - Replace with: “Waldheim's”
   - Replace with: “Welshmen's”
   - Replace with: “Wolfe's”
-  - Replace with: “Wolsey's”
+
+
+
+Lint:    Formatting (255 priority)
+Message: |
+    4679 | “Don’t tell me, old sport.” He winced. “Anyhow—Daisy stepped on it. I tried to
+         |                                        ^ This quote has no termination.
 
 
 
@@ -6050,6 +6193,16 @@ Message: |
 
 
 
+Lint:    Spelling (127 priority)
+Message: |
+    4780 | her as his tent out at camp was to him. There was a ripe mystery about it, a
+    4781 | hint of bedrooms up-stairs more beautiful and cool than other bedrooms, of gay
+         |                  ^~~~~~~~~ This looks like a prefix that can be joined with the rest of the word.
+Suggest:
+  - Replace with: “upstairs”
+
+
+
 Lint:    Readability (127 priority)
 Message: |
     4797 | pretenses. I don’t mean that he had traded on his phantom millions, but he had
@@ -6075,6 +6228,15 @@ Message: |
          | ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     4818 | hot struggles of the poor.
          | ~~~~~~~~~~~~~~~~~~~~~~~~~~ This sentence is 53 words long.
+
+
+
+Lint:    WordChoice (31 priority)
+Message: |
+    4820 | “I can’t describe to you how surprised I was to find out I loved her, old sport.
+         |                                                 ^~~~~~~~ Use `find` instead of `find out` when you mean to discover something directly.
+Suggest:
+  - Replace with: “find”
 
 
 
@@ -6108,8 +6270,8 @@ Message: |
     4851 | hundred pairs of golden and silver slippers shuffled the shining dust. At the
 Suggest:
   - Replace with: “Bale”
-  - Replace with: “Beadle”
-  - Replace with: “Berle”
+  - Replace with: “Beagle”
+  - Replace with: “Belle”
 
 
 
@@ -6142,9 +6304,9 @@ Message: |
          |                                                  ^~~~~~~~~ Did you mean to spell `Leaves’ll` this way?
     4922 | soon, and then there’s always trouble with the pipes.”
 Suggest:
-  - Replace with: “Leakey's”
   - Replace with: “Leave's”
   - Replace with: “Leaven's”
+  - Replace with: “Leaver's”
 
 
 
@@ -6160,12 +6322,10 @@ Suggest:
 Lint:    Spelling (63 priority)
 Message: |
     4980 | “I’ve left Daisy’s house,” she said. “I’m at Hempstead, and I’m going down to
-         |                                              ^~~~~~~~~ Did you mean to spell `Hempstead` this way?
+         |                                              ^~~~~~~~~ Did you mean `Homestead`?
     4981 | Southampton this afternoon.”
 Suggest:
   - Replace with: “Homestead”
-  - Replace with: “Bedstead”
-  - Replace with: “Demisted”
 
 
 
@@ -6177,6 +6337,15 @@ Suggest:
   - Replace with: “asthma's”
   - Replace with: “airheads”
   - Replace with: “ashcans”
+
+
+
+Lint:    Typo (31 priority)
+Message: |
+    5015 | When I passed the ashheaps on the train that morning I had crossed deliberately
+         |                   ^~~~~~~~ `ashheaps` should probably be written as `ash heaps`.
+Suggest:
+  - Replace with: “ash heaps”
 
 
 
@@ -6227,9 +6396,11 @@ Suggest:
 Lint:    Spelling (63 priority)
 Message: |
     5034 | and closed the door. Michaelis and several other men were with him; first, four
-         |                      ^~~~~~~~~ Did you mean `Michael`?
+         |                      ^~~~~~~~~ Did you mean to spell `Michaelis` this way?
 Suggest:
-  - Replace with: “Michael”
+  - Replace with: “Michael's”
+  - Replace with: “Michaela's”
+  - Replace with: “Micheal's”
 
 
 
@@ -6246,10 +6417,12 @@ Suggest:
 Lint:    Spelling (63 priority)
 Message: |
     5035 | or five men, later two or three men. Still later Michaelis had to ask the last
-         |                                                  ^~~~~~~~~ Did you mean `Michael`?
+         |                                                  ^~~~~~~~~ Did you mean to spell `Michaelis` this way?
     5036 | stranger to wait there fifteen minutes longer, while he went back to his own
 Suggest:
-  - Replace with: “Michael”
+  - Replace with: “Michael's”
+  - Replace with: “Michaela's”
+  - Replace with: “Micheal's”
 
 
 
@@ -6269,9 +6442,11 @@ Message: |
 Lint:    Spelling (63 priority)
 Message: |
     5047 | again in his groaning voice. Michaelis made a clumsy attempt to distract him.
-         |                              ^~~~~~~~~ Did you mean `Michael`?
+         |                              ^~~~~~~~~ Did you mean to spell `Michaelis` this way?
 Suggest:
-  - Replace with: “Michael”
+  - Replace with: “Michael's”
+  - Replace with: “Michaela's”
+  - Replace with: “Micheal's”
 
 
 
@@ -6279,9 +6454,11 @@ Lint:    Spelling (63 priority)
 Message: |
     5057 | The hard brown beetles kept thudding against the dull light, and whenever
     5058 | Michaelis heard a car go tearing along the road outside it sounded to him like
-         | ^~~~~~~~~ Did you mean `Michael`?
+         | ^~~~~~~~~ Did you mean to spell `Michaelis` this way?
 Suggest:
-  - Replace with: “Michael”
+  - Replace with: “Michael's”
+  - Replace with: “Michaela's”
+  - Replace with: “Micheal's”
 
 
 
@@ -6320,21 +6497,44 @@ Suggest:
 
 
 
+Lint:    WordChoice (127 priority)
+Message: |
+    5065 | “Have you got a church you go to sometimes, George? Maybe even if you haven’t
+         |                               ^~ Use `too` here to mean ‘also’ or an excessive degree.
+Suggest:
+  - Replace with: “too”
+
+
+
 Lint:    Spelling (63 priority)
 Message: |
     5087 | Michaelis opened the drawer nearest his hand. There was nothing in it but a
-         | ^~~~~~~~~ Did you mean `Michael`?
+         | ^~~~~~~~~ Did you mean to spell `Michaelis` this way?
 Suggest:
-  - Replace with: “Michael”
+  - Replace with: “Michael's”
+  - Replace with: “Michaela's”
+  - Replace with: “Micheal's”
 
 
 
 Lint:    Spelling (63 priority)
 Message: |
     5102 | Michaelis didn’t see anything odd in that, and he gave Wilson a dozen reasons
-         | ^~~~~~~~~ Did you mean `Michael`?
+         | ^~~~~~~~~ Did you mean to spell `Michaelis` this way?
 Suggest:
-  - Replace with: “Michael”
+  - Replace with: “Michael's”
+  - Replace with: “Michaela's”
+  - Replace with: “Micheal's”
+
+
+
+Lint:    Capitalization (127 priority)
+Message: |
+    5121 | Wilson shook his head. His eyes narrowed and his mouth widened slightly with the
+    5122 | ghost of a superior “Hm!”
+         |                      ^~ This word's canonical spelling is all-caps.
+Suggest:
+  - Replace with: “HM”
 
 
 
@@ -6344,7 +6544,7 @@ Message: |
     5122 | ghost of a superior “Hm!”
          |                      ^~ Did you mean to spell `Hm` this way?
 Suggest:
-  - Replace with: “H”
+  - Replace with: “Ha”
   - Replace with: “Ham”
   - Replace with: “He”
 
@@ -6353,18 +6553,22 @@ Suggest:
 Lint:    Spelling (63 priority)
 Message: |
     5128 | Michaelis had seen this too, but it hadn’t occurred to him that there was any
-         | ^~~~~~~~~ Did you mean `Michael`?
+         | ^~~~~~~~~ Did you mean to spell `Michaelis` this way?
 Suggest:
-  - Replace with: “Michael”
+  - Replace with: “Michael's”
+  - Replace with: “Michaela's”
+  - Replace with: “Micheal's”
 
 
 
 Lint:    Spelling (63 priority)
 Message: |
     5136 | He began to rock again, and Michaelis stood twisting the leash in his hand.
-         |                             ^~~~~~~~~ Did you mean `Michael`?
+         |                             ^~~~~~~~~ Did you mean to spell `Michaelis` this way?
 Suggest:
-  - Replace with: “Michael”
+  - Replace with: “Michael's”
+  - Replace with: “Michaela's”
+  - Replace with: “Micheal's”
 
 
 
@@ -6380,12 +6584,24 @@ Suggest:
 
 
 
+Lint:    Typo (31 priority)
+Message: |
+    5146 | Wilson’s glazed eyes turned out to the ashheaps, where small gray clouds took on
+         |                                        ^~~~~~~~ `ashheaps` should probably be written as `ash heaps`.
+    5147 | fantastic shapes and scurried here and there in the faint dawn wind.
+Suggest:
+  - Replace with: “ash heaps”
+
+
+
 Lint:    Spelling (63 priority)
 Message: |
     5155 | Standing behind him, Michaelis saw with a shock that he was looking at the eyes
-         |                      ^~~~~~~~~ Did you mean `Michael`?
+         |                      ^~~~~~~~~ Did you mean to spell `Michaelis` this way?
 Suggest:
-  - Replace with: “Michael”
+  - Replace with: “Michael's”
+  - Replace with: “Michaela's”
+  - Replace with: “Micheal's”
 
 
 
@@ -6395,9 +6611,9 @@ Message: |
     5156 | of Doctor T. J. Eckleburg, which had just emerged, pale and enormous, from the
          |           ^~ Did you mean to spell `T.` this way?
 Suggest:
-  - Replace with: “Tr”
-  - Replace with: “T”
-  - Replace with: “Tb”
+  - Replace with: “Ti”
+  - Replace with: “To”
+  - Replace with: “Th”
 
 
 
@@ -6406,9 +6622,9 @@ Message: |
     5156 | of Doctor T. J. Eckleburg, which had just emerged, pale and enormous, from the
          |              ^~ Did you mean to spell `J.` this way?
 Suggest:
-  - Replace with: “Jr”
-  - Replace with: “J”
+  - Replace with: “Jo”
   - Replace with: “Jg”
+  - Replace with: “Jr”
 
 
 
@@ -6419,16 +6635,18 @@ Message: |
 Suggest:
   - Replace with: “Excalibur”
   - Replace with: “Vicksburg”
-  - Replace with: “Iceberg”
+  - Replace with: “Heckler”
 
 
 
 Lint:    Spelling (63 priority)
 Message: |
     5161 | “That’s an advertisement,” Michaelis assured him. Something made him turn away
-         |                            ^~~~~~~~~ Did you mean `Michael`?
+         |                            ^~~~~~~~~ Did you mean to spell `Michaelis` this way?
 Suggest:
-  - Replace with: “Michael”
+  - Replace with: “Michael's”
+  - Replace with: “Michaela's”
+  - Replace with: “Micheal's”
 
 
 
@@ -6445,18 +6663,22 @@ Suggest:
 Lint:    Spelling (63 priority)
 Message: |
     5165 | By six o’clock Michaelis was worn out, and grateful for the sound of a car
-         |                ^~~~~~~~~ Did you mean `Michael`?
+         |                ^~~~~~~~~ Did you mean to spell `Michaelis` this way?
 Suggest:
-  - Replace with: “Michael”
+  - Replace with: “Michael's”
+  - Replace with: “Michaela's”
+  - Replace with: “Micheal's”
 
 
 
 Lint:    Spelling (63 priority)
 Message: |
     5168 | man ate together. Wilson was quieter now, and Michaelis went home to sleep; when
-         |                                               ^~~~~~~~~ Did you mean `Michael`?
+         |                                               ^~~~~~~~~ Did you mean to spell `Michaelis` this way?
 Suggest:
-  - Replace with: “Michael”
+  - Replace with: “Michael's”
+  - Replace with: “Michaela's”
+  - Replace with: “Micheal's”
 
 
 
@@ -6466,9 +6688,9 @@ Message: |
     5172 | Roosevelt and then to Gad’s Hill, where he bought a sandwich that he didn’t eat,
          |                       ^~~~~ Did you mean to spell `Gad’s` this way?
 Suggest:
-  - Replace with: “Ga's”
-  - Replace with: “Gd's”
   - Replace with: “Gab's”
+  - Replace with: “Gag's”
+  - Replace with: “Gal's”
 
 
 
@@ -6478,9 +6700,9 @@ Message: |
     5174 | reach Gad’s Hill until noon. Thus far there was no difficulty in accounting for
          |       ^~~~~ Did you mean to spell `Gad’s` this way?
 Suggest:
-  - Replace with: “Ga's”
-  - Replace with: “Gd's”
   - Replace with: “Gab's”
+  - Replace with: “Gag's”
+  - Replace with: “Gal's”
 
 
 
@@ -6488,9 +6710,11 @@ Lint:    Spelling (63 priority)
 Message: |
     5177 | hours he disappeared from view. The police, on the strength of what he said to
     5178 | Michaelis, that he “had a way of finding out,” supposed that he spent that time
-         | ^~~~~~~~~ Did you mean `Michael`?
+         | ^~~~~~~~~ Did you mean to spell `Michaelis` this way?
 Suggest:
-  - Replace with: “Michael”
+  - Replace with: “Michael's”
+  - Replace with: “Michaela's”
+  - Replace with: “Micheal's”
 
 
 
@@ -6527,9 +6751,9 @@ Message: |
     5208 | The chauffeur—he was one of Wolfshiem’s protégés—heard the shots—afterward he
          |                             ^~~~~~~~~~~ Did you mean to spell `Wolfshiem’s` this way?
 Suggest:
+  - Replace with: “Waldheim's”
   - Replace with: “Welshmen's”
   - Replace with: “Wolfe's”
-  - Replace with: “Wolsey's”
 
 
 
@@ -6630,9 +6854,9 @@ Message: |
     5279 | Meyer Wolfshiem’s name wasn’t in the phone book. The butler gave me his office
          |       ^~~~~~~~~~~ Did you mean to spell `Wolfshiem’s` this way?
 Suggest:
+  - Replace with: “Waldheim's”
   - Replace with: “Welshmen's”
   - Replace with: “Wolfe's”
-  - Replace with: “Wolsey's”
 
 
 
@@ -6642,6 +6866,16 @@ Message: |
          | ^~~~~~~~ Did you mean the closed compound `someone`?
 Suggest:
   - Replace with: “Someone”
+
+
+
+Lint:    Spelling (127 priority)
+Message: |
+    5299 | Some one started to ask me questions, but I broke away and going up-stairs
+         |                                                                  ^~~~~~~~~ This looks like a prefix that can be joined with the rest of the word.
+    5300 | looked hastily through the unlocked parts of his desk—he’d never told me
+Suggest:
+  - Replace with: “upstairs”
 
 
 
@@ -6670,9 +6904,9 @@ Message: |
          |                                                               ^~~~~~~~~~~ Did you mean to spell `Wolfshiem’s` this way?
     5310 | I began to have a feeling of defiance, of scornful solidarity between Gatsby and
 Suggest:
+  - Replace with: “Waldheim's”
   - Replace with: “Welshmen's”
   - Replace with: “Wolfe's”
-  - Replace with: “Wolsey's”
 
 
 
@@ -6682,18 +6916,8 @@ Message: |
          |          ^~~~~~~~ Did you mean to spell `Carraway` this way?
 Suggest:
   - Replace with: “Caraway”
-  - Replace with: “Faraway”
-
-
-
-Lint:    Repetition (63 priority)
-Message: |
-    5313 | Dear Mr. Carraway. This has been one of the most terrible shocks of my life to
-    5314 | me I hardly can believe it that it is true at all. Such a mad act as that man
-         | ^~~~ There are too many personal pronouns in sequence here.
-Suggest:
-  - Replace with: “me”
-  - Replace with: “I”
+  - Replace with: “Caraways”
+  - Replace with: “Castaway”
 
 
 
@@ -6714,7 +6938,7 @@ Message: |
 Suggest:
   - Replace with: “eta”
   - Replace with: “etc.”
-  - Replace with: “etch”
+  - Replace with: “enc”
 
 
 
@@ -6723,9 +6947,9 @@ Message: |
     5333 | “This is Slagle speaking . . .”
          |          ^~~~~~ Did you mean to spell `Slagle` this way?
 Suggest:
-  - Replace with: “Beagle”
-  - Replace with: “Eagle”
-  - Replace with: “Plague”
+  - Replace with: “Slag's”
+  - Replace with: “Sable”
+  - Replace with: “Sage”
 
 
 
@@ -6743,9 +6967,9 @@ Message: |
     5341 | “Young Parke’s in trouble,” he said rapidly. “They picked him up when he handed
          |        ^~~~~~~ Did you mean to spell `Parke’s` this way?
 Suggest:
-  - Replace with: “Parks's”
   - Replace with: “Parker's”
-  - Replace with: “Paige's”
+  - Replace with: “Parks's”
+  - Replace with: “Park's”
 
 
 
@@ -6783,9 +7007,9 @@ Message: |
     5352 | I think it was on the third day that a telegram signed Henry C. Gatz arrived
          |                                                              ^~ Did you mean to spell `C.` this way?
 Suggest:
+  - Replace with: “Co”
   - Replace with: “Cu”
-  - Replace with: “C”
-  - Replace with: “Cc”
+  - Replace with: “CI”
 
 
 
@@ -6795,9 +7019,9 @@ Message: |
          |                                                                 ^~~~ Did you mean to spell `Gatz` this way?
     5353 | from a town in Minnesota. It said only that the sender was leaving immediately
 Suggest:
-  - Replace with: “Ga's”
   - Replace with: “Gate”
-  - Replace with: “GHz”
+  - Replace with: “Garth”
+  - Replace with: “Goth”
 
 
 
@@ -6817,7 +7041,8 @@ Message: |
          |  ^~~~~~~~ Did you mean to spell `Carraway` this way?
 Suggest:
   - Replace with: “Caraway”
-  - Replace with: “Faraway”
+  - Replace with: “Caraways”
+  - Replace with: “Castaway”
 
 
 
@@ -6826,9 +7051,9 @@ Message: |
     5385 | After a little while Mr. Gatz opened the door and came out, his mouth ajar, his
          |                          ^~~~ Did you mean to spell `Gatz` this way?
 Suggest:
-  - Replace with: “Ga's”
   - Replace with: “Gate”
-  - Replace with: “GHz”
+  - Replace with: “Garth”
+  - Replace with: “Goth”
 
 
 
@@ -6856,14 +7081,23 @@ Message: |
 
 
 
+Lint:    Spelling (127 priority)
+Message: |
+    5390 | began to be mixed with an awed pride. I helped him to a bedroom up-stairs; while
+         |                                                                 ^~~~~~~~~ This looks like a prefix that can be joined with the rest of the word.
+Suggest:
+  - Replace with: “upstairs”
+
+
+
 Lint:    Spelling (63 priority)
 Message: |
     5396 | “Gatz is my name.”
          |  ^~~~ Did you mean to spell `Gatz` this way?
 Suggest:
-  - Replace with: “Ga's”
   - Replace with: “Gate”
-  - Replace with: “GHz”
+  - Replace with: “Garth”
+  - Replace with: “Goth”
 
 
 
@@ -6872,9 +7106,9 @@ Message: |
     5398 | “—Mr. Gatz. I thought you might want to take the body West.”
          |       ^~~~ Did you mean to spell `Gatz` this way?
 Suggest:
-  - Replace with: “Ga's”
   - Replace with: “Gate”
-  - Replace with: “GHz”
+  - Replace with: “Garth”
+  - Replace with: “Goth”
 
 
 
@@ -6890,9 +7124,9 @@ Message: |
     5412 | “If he’d of lived, he’d of been a great man. A man like James J. Hill. He’d of
          |                                                               ^~ Did you mean to spell `J.` this way?
 Suggest:
-  - Replace with: “Jr”
-  - Replace with: “J”
+  - Replace with: “Jo”
   - Replace with: “Jg”
+  - Replace with: “Jr”
 
 
 
@@ -6902,14 +7136,17 @@ Message: |
          |              ^~~~~~~~ Did you mean to spell `Carraway` this way?
 Suggest:
   - Replace with: “Caraway”
-  - Replace with: “Faraway”
+  - Replace with: “Caraways”
+  - Replace with: “Castaway”
 
 
 
 Lint:    Spelling (63 priority)
 Message: |
     5425 | “Oh!” He sounded relieved. “This is Klipspringer.”
-         |                                     ^~~~~~~~~~~~ Did you mean to spell `Klipspringer` this way?
+         |                                     ^~~~~~~~~~~~ Did you mean `Kissinger`?
+Suggest:
+  - Replace with: “Kissinger”
 
 
 
@@ -6918,9 +7155,9 @@ Message: |
     5455 | and I’m sort of helpless without them. My address is care of B. F.———”
          |                                                              ^~ Did you mean to spell `B.` this way?
 Suggest:
-  - Replace with: “Bu”
   - Replace with: “Be”
-  - Replace with: “Bk”
+  - Replace with: “Bi”
+  - Replace with: “BO”
 
 
 
@@ -6929,9 +7166,9 @@ Message: |
     5455 | and I’m sort of helpless without them. My address is care of B. F.———”
          |                                                                 ^~ Did you mean to spell `F.` this way?
 Suggest:
+  - Replace with: “Fa”
+  - Replace with: “Fe”
   - Replace with: “Ft”
-  - Replace with: “F”
-  - Replace with: “Ff”
 
 
 
@@ -6949,9 +7186,9 @@ Message: |
     5472 | “Nobody’s in,” she said. “Mr. Wolfshiem’s gone to Chicago.”
          |                               ^~~~~~~~~~~ Did you mean to spell `Wolfshiem’s` this way?
 Suggest:
+  - Replace with: “Waldheim's”
   - Replace with: “Welshmen's”
   - Replace with: “Wolfe's”
-  - Replace with: “Wolsey's”
 
 
 
@@ -6971,7 +7208,8 @@ Message: |
          |                      ^~~~~~~~ Did you mean to spell `Carraway` this way?
 Suggest:
   - Replace with: “Caraway”
-  - Replace with: “Faraway”
+  - Replace with: “Caraways”
+  - Replace with: “Castaway”
 
 
 
@@ -6980,9 +7218,16 @@ Message: |
     5481 | At this moment a voice, unmistakably Wolfshiem’s, called “Stella!” from the
          |                                      ^~~~~~~~~~~ Did you mean to spell `Wolfshiem’s` this way?
 Suggest:
+  - Replace with: “Waldheim's”
   - Replace with: “Welshmen's”
   - Replace with: “Wolfe's”
-  - Replace with: “Wolsey's”
+
+
+
+Lint:    Formatting (255 priority)
+Message: |
+    5498 | “Oh-h!” She looked at me over again. ‘‘Will you just— What was your name?”
+         |                                                                          ^ This quote has no termination.
 
 
 
@@ -6993,20 +7238,36 @@ Message: |
     5501 | out both hands. He drew me into his office, remarking in a reverent voice that
 Suggest:
   - Replace with: “Waldheim”
-  - Replace with: “Wolfe's”
-  - Replace with: “Wilhelm”
+  - Replace with: “Florsheim”
+
+
+
+Lint:    Agreement (127 priority)
+Message: |
+    5507 | First time I saw him was when he come into Winebrenner’s poolroom at Forty-third
+         |                                  ^~~~ The form of the verb must agree in grammatical number with the pronoun.
+Suggest:
+  - Replace with: “comes”
 
 
 
 Lint:    Spelling (63 priority)
 Message: |
     5507 | First time I saw him was when he come into Winebrenner’s poolroom at Forty-third
-         |                                            ^~~~~~~~~~~~~ Did you mean to spell `Winebrenner’s` this way?
+         |                                            ^~~~~~~~~~~~~ Did you mean `Windbreaker's`?
     5508 | Street and asked for a job. He hadn’t eat anything for a couple of days. ‘Come
 Suggest:
   - Replace with: “Windbreaker's”
-  - Replace with: “Icebreaker's”
-  - Replace with: “Tiebreaker's”
+
+
+
+Lint:    Capitalization (127 priority)
+Message: |
+    5508 | Street and asked for a job. He hadn’t eat anything for a couple of days. ‘Come
+    5509 | on have some lunch with me,’ I sid. He ate more than four dollars’ worth of food
+         |                                ^~~ The canonical dictionary spelling is title case: `Sid`.
+Suggest:
+  - Replace with: “Sid”
 
 
 
@@ -7029,8 +7290,7 @@ Message: |
          | ^~~~~~~~ Did you mean to spell `Oggsford` this way?
 Suggest:
   - Replace with: “Oxford”
-  - Replace with: “Osborn”
-  - Replace with: “Osgood”
+  - Replace with: “Longsword”
 
 
 
@@ -7050,9 +7310,18 @@ Message: |
          |                                                                   ^~~~ Did you mean to spell `Gatz` this way?
     5560 | up and down excitedly in the hall. His pride in his son and in his son’s
 Suggest:
-  - Replace with: “Ga's”
   - Replace with: “Gate”
-  - Replace with: “GHz”
+  - Replace with: “Garth”
+  - Replace with: “Goth”
+
+
+
+Lint:    Agreement (127 priority)
+Message: |
+    5575 | “He come out to see me two years ago and bought me the house I live in now. Of
+         |     ^~~~ The form of the verb must agree in grammatical number with the pronoun.
+Suggest:
+  - Replace with: “comes”
 
 
 
@@ -7066,14 +7335,34 @@ Suggest:
 
 
 
+Lint:    Grammar (127 priority)
+Message: |
+    5575 | “He come out to see me two years ago and bought me the house I live in now. Of
+    5576 | course we was broke up when he run off from home, but I see now there was a
+         |               ^~~~~ Use the past participle `broken` instead of `broke` when using compound tenses or passive voice.
+Suggest:
+  - Replace with: “broken”
+
+
+
+Lint:    Agreement (127 priority)
+Message: |
+    5575 | “He come out to see me two years ago and bought me the house I live in now. Of
+    5576 | course we was broke up when he run off from home, but I see now there was a
+         |                                ^~~ The form of the verb must agree in grammatical number with the pronoun.
+Suggest:
+  - Replace with: “runs”
+
+
+
 Lint:    Spelling (63 priority)
 Message: |
     5582 | pocket a ragged old copy of a book called “Hopalong Cassidy.”
          |                                            ^~~~~~~~ Did you mean to spell `Hopalong` this way?
 Suggest:
-  - Replace with: “Along”
-  - Replace with: “Oblong”
-  - Replace with: “Coaling”
+  - Replace with: “Hopping”
+  - Replace with: “Haling”
+  - Replace with: “Haloing”
 
 
 
@@ -7083,9 +7372,9 @@ Message: |
     5602 | > No wasting time at Shafters or [a name, indecipherable] No more smokeing or
          |                      ^~~~~~~~ Did you mean to spell `Shafters` this way?
 Suggest:
-  - Replace with: “Shaffer's”
   - Replace with: “Shatters”
   - Replace with: “Shifters”
+  - Replace with: “Shaffer's”
 
 
 
@@ -7101,13 +7390,12 @@ Suggest:
 
 
 
-Lint:    Repetition (63 priority)
+Lint:    Capitalization (127 priority)
 Message: |
     5613 | great for that. He told me I et like a hog once, and I beat him for it.”
-         |                         ^~~~ There are too many personal pronouns in sequence here.
+         |                              ^~ This word's canonical spelling is all-caps.
 Suggest:
-  - Replace with: “me”
-  - Replace with: “I”
+  - Replace with: “ET”
 
 
 
@@ -7116,9 +7404,9 @@ Message: |
     5613 | great for that. He told me I et like a hog once, and I beat him for it.”
          |                              ^~ Did you mean to spell `et` this way?
 Suggest:
-  - Replace with: “e”
-  - Replace with: “ea”
   - Replace with: “eat”
+  - Replace with: “eh”
+  - Replace with: “em”
 
 
 
@@ -7127,9 +7415,9 @@ Message: |
     5629 | then Mr. Gatz and the minister and I in the limousine, and a little later four
          |          ^~~~ Did you mean to spell `Gatz` this way?
 Suggest:
-  - Replace with: “Ga's”
   - Replace with: “Gate”
-  - Replace with: “GHz”
+  - Replace with: “Garth”
+  - Replace with: “Goth”
 
 
 
@@ -7140,6 +7428,16 @@ Message: |
          |                            ^~~~~~~~ Did you mean the closed compound `someone`?
 Suggest:
   - Replace with: “someone”
+
+
+
+Lint:    Agreement (31 priority)
+Message: |
+    5631 | wet to the skin. As we started through the gate into the cemetery I heard a car
+    5632 | stop and then the sound of some one splashing after us over the soggy ground. I
+         |                                 ^~~~~~~~~~~~~ `splashing` is a mass noun.
+Suggest:
+  - Replace with: “one piece of splashing”
 
 
 
@@ -7237,6 +7535,7 @@ Message: |
     5666 | going to the Ordways’? the Herseys’? the Schultzes’?” and the long green tickets
          |              ^~~~~~~ Did you mean to spell `Ordways` this way?
 Suggest:
+  - Replace with: “Ordeals”
   - Replace with: “Endways”
   - Replace with: “Midways”
 
@@ -7256,8 +7555,10 @@ Suggest:
 Lint:    Spelling (63 priority)
 Message: |
     5666 | going to the Ordways’? the Herseys’? the Schultzes’?” and the long green tickets
-         |                                          ^~~~~~~~~ Did you mean `Schultz`?
+         |                                          ^~~~~~~~~ Did you mean to spell `Schultzes` this way?
 Suggest:
+  - Replace with: “Schultz's”
+  - Replace with: “Schulz's”
   - Replace with: “Schultz”
 
 
@@ -7305,7 +7606,8 @@ Message: |
     5683 | city where dwellings are still called through decades by a family’s name. I see
 Suggest:
   - Replace with: “Caraway”
-  - Replace with: “Faraway”
+  - Replace with: “Caraways”
+  - Replace with: “Castaway”
 
 
 
@@ -7360,9 +7662,9 @@ Message: |
     5692 | figures in my more fantastic dreams. I see it as a night scene by El Greco: a
          |                                                                   ^~ Did you mean to spell `El` this way?
 Suggest:
-  - Replace with: “Ea”
-  - Replace with: “Ed”
-  - Replace with: “En”
+  - Replace with: “Ell”
+  - Replace with: “Eel”
+  - Replace with: “Eh”
 
 
 
@@ -7371,9 +7673,9 @@ Message: |
     5692 | figures in my more fantastic dreams. I see it as a night scene by El Greco: a
          |                                                                      ^~~~~ Did you mean to spell `Greco` this way?
 Suggest:
-  - Replace with: “Geo”
-  - Replace with: “Greece”
-  - Replace with: “Greek”
+  - Replace with: “Gecko”
+  - Replace with: “Grace”
+  - Replace with: “Great”
 
 
 
@@ -7407,12 +7709,28 @@ Suggest:
 
 
 
+Lint:    Typo (31 priority)
+Message: |
+    5714 | leaf, her face the same brown tint as the fingerless glove on her knee. When I
+         |                                           ^~~~~~~~~~ `fingerless` should probably be written as `finger less`.
+Suggest:
+  - Replace with: “finger less”
+
+
+
 Lint:    Punctuation (31 priority)
 Message: |
     5721 | “Nevertheless you did throw me over,” said Jordan suddenly. ‘‘You threw me over
          |  ^~~~~~~~~~~~ Discourse markers at the beginning of a sentence should be followed by a comma.
 Suggest:
   - Insert “,”
+
+
+
+Lint:    Formatting (255 priority)
+Message: |
+    5723 | for me, and I felt a little dizzy for a while.”
+         |                                               ^ This quote has no termination.
 
 
 
@@ -7426,6 +7744,16 @@ Message: |
          | ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     5746 | adapting itself to his restless eyes. Just as I slowed up to avoid overtaking
          | ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ This sentence is 41 words long.
+
+
+
+Lint:    Spelling (127 priority)
+Message: |
+    5764 | ready to leave, and when I sent down word that we weren’t in he tried to force
+    5765 | his way up-stairs. He was crazy enough to kill me if I hadn’t told him who owned
+         |         ^~~~~~~~~ This looks like a prefix that can be joined with the rest of the word.
+Suggest:
+  - Replace with: “upstairs”
 
 
 
@@ -7543,8 +7871,8 @@ Message: |
     5818 | contemplation he neither understood nor desired, face to face for the last time
 Suggest:
   - Replace with: “aesthetic”
-  - Replace with: “aesthetics”
   - Replace with: “pathetic”
+  - Replace with: “aesthetics”
 
 
 

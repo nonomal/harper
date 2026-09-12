@@ -2,6 +2,7 @@ use crate::expr::Expr;
 use crate::expr::SequenceExpr;
 use crate::{Token, TokenStringExt};
 
+use crate::linting::expr_linter::Chunk;
 use crate::linting::{ExprLinter, Lint, LintKind, Suggestion};
 
 /// See also:
@@ -15,7 +16,9 @@ pub struct LetUsRedundancy {
 
 impl Default for LetUsRedundancy {
     fn default() -> Self {
-        let pattern = SequenceExpr::aco("let's").then_whitespace().then_pronoun();
+        let pattern = SequenceExpr::aco("let's")
+            .then_whitespace()
+            .then_object_pronoun();
 
         Self {
             expr: Box::new(pattern),
@@ -24,13 +27,15 @@ impl Default for LetUsRedundancy {
 }
 
 impl ExprLinter for LetUsRedundancy {
+    type Unit = Chunk;
+
     fn expr(&self) -> &dyn Expr {
         self.expr.as_ref()
     }
 
     fn match_to_lint(&self, matched_tokens: &[Token], source: &[char]) -> Option<Lint> {
         let template = matched_tokens.span()?.get_content(source);
-        let pronoun = matched_tokens.last()?.span.get_content_string(source);
+        let pronoun = matched_tokens.last()?.get_str(source);
 
         Some(Lint {
             span: matched_tokens.span()?,
@@ -40,10 +45,7 @@ impl ExprLinter for LetUsRedundancy {
                     format!("lets {pronoun}").chars().collect(),
                     template,
                 ),
-                Suggestion::replace_with_match_case(
-                    "let's".to_string().chars().collect(),
-                    template,
-                ),
+                Suggestion::replace_with_match_case("let's".chars().collect(), template),
             ],
             message: "`let's` stands for `let us`, so including another pronoun is redundant."
                 .to_owned(),

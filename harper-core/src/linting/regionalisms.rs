@@ -1,11 +1,12 @@
 use crate::{
-    Dialect::{self, American, Australian, British, Canadian},
+    Dialect::{self, American, Australian, British, Canadian, Indian},
     Token, TokenStringExt,
     expr::{Expr, FirstMatchOf, FixedPhrase},
-    linting::{Lint, LintKind, Suggestion},
+    linting::{Lint, LintKind, Suggestion, spell_check},
 };
 
 use super::ExprLinter;
+use crate::linting::expr_linter::Chunk;
 
 #[derive(PartialEq)]
 enum CanFlag {
@@ -22,19 +23,31 @@ use CanFlag::*;
 /// Represents a unique concept that has different regional terms across English dialects.
 /// Each is named by an alphabetical concatenation of the terms that refer to the same concept.
 /// This allows us to suggest appropriate regional alternatives when a term from another dialect is detected.
-#[derive(PartialEq)]
+#[derive(PartialEq, Copy, Clone)]
 enum Concept {
-    AubergineEggplant,
+    AubergineBrinjalEggplant,
+    AuberginesBrinjalsEggplants,
+    BharatIndia,
+    // BiscuitCookie - biscuit names different foods in UK/Aus vs US; cookie has other meanings
+    // BiscuitCracker - cracker also has other meanings
+    BloodNoseNosebleed,
+    BritBritisher,
+    BritsBritishers,
     BumBagFannyPack,
     BurglarizeBurgle,
     CampervanRv,
     CaravanTrailer,
     CatsupKetchupTomatoSauce,
     CellPhoneMobilePhone,
-    CoolboxCoolerEsky,
+    CheckCheque,
+    CheckbookChequebook,
     ChipsCrisps,
     CilantroCoriander,
+    CoolboxCoolerEsky,
+    Crore,
+    Crores,
     DiaperNappy,
+    DoonaDuvet,
     DummyPacifier,
     FaucetTap,
     FlashlightTorch,
@@ -42,17 +55,26 @@ enum Concept {
     FootpathPavementSidewalk,
     GasolinePetrol,
     GasStationPetrolStationServiceStation,
+    GodownWarehouse,
     // HooverVacuumCleaner - Hoover is also a surname and vacuum cleaner is universal.
     JumperSweater,
+    Lakh,
+    Lakhs,
     LightBulbLightGlobe,
     LorryTruck,
     MotorhomeRv,
+    NoughtZero,
     PhotocopierXerox,
     PhotocopyXerox,
     PickupUte,
     PramStroller,
+    Prepone,
     SpannerWrench,
     StationWagonEstate,
+    TireTyre,
+    UpdatesUpdations,
+    UpdateUpdation,
+    WindscreenWindshield,
 }
 
 use Concept::*;
@@ -77,7 +99,61 @@ const REGIONAL_TERMS: &[Term<'_>] = &[
         term: "aubergine",
         flag: Flag,
         dialects: &[British],
-        concept: AubergineEggplant,
+        concept: AubergineBrinjalEggplant,
+    },
+    Term {
+        term: "aubergines",
+        flag: Flag,
+        dialects: &[British],
+        concept: AuberginesBrinjalsEggplants,
+    },
+    Term {
+        term: "Bharat",
+        flag: Flag,
+        dialects: &[Indian],
+        concept: BharatIndia,
+    },
+    Term {
+        term: "brinjal",
+        flag: Flag,
+        dialects: &[Indian],
+        concept: AubergineBrinjalEggplant,
+    },
+    Term {
+        term: "brinjals",
+        flag: Flag,
+        dialects: &[Indian],
+        concept: AuberginesBrinjalsEggplants,
+    },
+    Term {
+        term: "Brit",
+        flag: UniversalTerm,
+        dialects: &[American, Australian, British, Canadian],
+        concept: BritBritisher,
+    },
+    Term {
+        term: "Brits",
+        flag: UniversalTerm,
+        dialects: &[American, Australian, British, Canadian],
+        concept: BritsBritishers,
+    },
+    Term {
+        term: "Britisher",
+        flag: Flag,
+        dialects: &[Indian],
+        concept: BritBritisher,
+    },
+    Term {
+        term: "Britishers",
+        flag: Flag,
+        dialects: &[Indian],
+        concept: BritsBritishers,
+    },
+    Term {
+        term: "blood nose",
+        flag: Flag,
+        dialects: &[Australian],
+        concept: BloodNoseNosebleed,
     },
     Term {
         term: "bum bag",
@@ -122,6 +198,30 @@ const REGIONAL_TERMS: &[Term<'_>] = &[
         concept: CellPhoneMobilePhone,
     },
     Term {
+        term: "check",
+        flag: UniversalTerm,
+        dialects: &[American],
+        concept: CheckCheque,
+    },
+    Term {
+        term: "checkbook",
+        flag: Flag,
+        dialects: &[American],
+        concept: CheckbookChequebook,
+    },
+    Term {
+        term: "cheque",
+        flag: Flag,
+        dialects: &[Australian, British, Canadian, Indian],
+        concept: CheckCheque,
+    },
+    Term {
+        term: "chequebook",
+        flag: Flag,
+        dialects: &[Australian, British, Canadian, Indian],
+        concept: CheckbookChequebook,
+    },
+    Term {
         term: "chips",
         flag: UniversalTerm,
         dialects: &[American, Australian],
@@ -158,10 +258,28 @@ const REGIONAL_TERMS: &[Term<'_>] = &[
         concept: ChipsCrisps,
     },
     Term {
+        term: "crore",
+        flag: Flag,
+        dialects: &[Indian],
+        concept: Crore,
+    },
+    Term {
+        term: "crores",
+        flag: Flag,
+        dialects: &[Indian],
+        concept: Crores,
+    },
+    Term {
         term: "diaper",
         flag: Flag,
         dialects: &[American, Canadian],
         concept: DiaperNappy,
+    },
+    Term {
+        term: "doona",
+        flag: Flag,
+        dialects: &[Australian],
+        concept: DoonaDuvet,
     },
     Term {
         term: "dummy",
@@ -170,10 +288,22 @@ const REGIONAL_TERMS: &[Term<'_>] = &[
         concept: DummyPacifier,
     },
     Term {
+        term: "duvet",
+        flag: Flag,
+        dialects: &[Australian],
+        concept: DoonaDuvet,
+    },
+    Term {
         term: "eggplant",
         flag: Flag,
         dialects: &[American, Australian],
-        concept: AubergineEggplant,
+        concept: AubergineBrinjalEggplant,
+    },
+    Term {
+        term: "eggplants",
+        flag: Flag,
+        dialects: &[American, Australian],
+        concept: AuberginesBrinjalsEggplants,
     },
     Term {
         term: "esky",
@@ -236,6 +366,18 @@ const REGIONAL_TERMS: &[Term<'_>] = &[
         concept: GasolinePetrol,
     },
     Term {
+        term: "godown",
+        flag: Flag,
+        dialects: &[Indian],
+        concept: GodownWarehouse,
+    },
+    Term {
+        term: "India",
+        flag: UniversalTerm,
+        dialects: &[American, Australian, British, Canadian, Indian],
+        concept: BharatIndia,
+    },
+    Term {
         term: "jumper",
         flag: HasOtherMeanings,
         dialects: &[Australian],
@@ -246,6 +388,18 @@ const REGIONAL_TERMS: &[Term<'_>] = &[
         flag: Flag,
         dialects: &[American, Canadian],
         concept: CatsupKetchupTomatoSauce,
+    },
+    Term {
+        term: "lakh",
+        flag: Flag,
+        dialects: &[Indian],
+        concept: Lakh,
+    },
+    Term {
+        term: "lakhs",
+        flag: Flag,
+        dialects: &[Indian],
+        concept: Lakhs,
     },
     Term {
         term: "light bulb",
@@ -282,6 +436,18 @@ const REGIONAL_TERMS: &[Term<'_>] = &[
         flag: Flag,
         dialects: &[Australian, British],
         concept: DiaperNappy,
+    },
+    Term {
+        term: "nosebleed",
+        flag: UniversalTerm,
+        dialects: &[American, Australian, British, Canadian],
+        concept: BloodNoseNosebleed,
+    },
+    Term {
+        term: "nought",
+        flag: Flag,
+        dialects: &[Australian, British, Canadian, Indian],
+        concept: NoughtZero,
     },
     Term {
         term: "pacifier",
@@ -330,6 +496,12 @@ const REGIONAL_TERMS: &[Term<'_>] = &[
         flag: Flag,
         dialects: &[Australian, British],
         concept: PramStroller,
+    },
+    Term {
+        term: "prepone",
+        flag: Flag,
+        dialects: &[Indian],
+        concept: Prepone,
     },
     Term {
         // Must be normalized to lowercase
@@ -387,6 +559,18 @@ const REGIONAL_TERMS: &[Term<'_>] = &[
         concept: FaucetTap,
     },
     Term {
+        term: "tire",
+        flag: HasOtherMeanings,
+        dialects: &[American, Canadian],
+        concept: TireTyre,
+    },
+    Term {
+        term: "tyre",
+        flag: Flag,
+        dialects: &[Australian, British, Indian],
+        concept: TireTyre,
+    },
+    Term {
         term: "tomato sauce",
         flag: HasOtherMeanings,
         dialects: &[Australian],
@@ -411,6 +595,30 @@ const REGIONAL_TERMS: &[Term<'_>] = &[
         concept: LorryTruck,
     },
     Term {
+        term: "update",
+        flag: UniversalTerm,
+        dialects: &[American, Australian, British, Canadian],
+        concept: UpdateUpdation,
+    },
+    Term {
+        term: "updates",
+        flag: UniversalTerm,
+        dialects: &[American, Australian, British, Canadian],
+        concept: UpdateUpdation,
+    },
+    Term {
+        term: "updation",
+        flag: Flag,
+        dialects: &[Indian],
+        concept: UpdateUpdation,
+    },
+    Term {
+        term: "updations",
+        flag: Flag,
+        dialects: &[Indian],
+        concept: UpdatesUpdations,
+    },
+    Term {
         term: "ute",
         flag: Flag,
         dialects: &[Australian],
@@ -429,15 +637,39 @@ const REGIONAL_TERMS: &[Term<'_>] = &[
         concept: PhotocopyXerox,
     },
     Term {
+        term: "warehouse",
+        flag: UniversalTerm,
+        dialects: &[American, Australian, British, Canadian],
+        concept: GodownWarehouse,
+    },
+    Term {
         term: "wrench",
         flag: Flag,
         dialects: &[American],
         concept: SpannerWrench,
     },
+    Term {
+        term: "windscreen",
+        flag: Flag,
+        dialects: &[British, Australian],
+        concept: WindscreenWindshield,
+    },
+    Term {
+        term: "windshield",
+        flag: Flag,
+        dialects: &[American, Canadian],
+        concept: WindscreenWindshield,
+    },
+    Term {
+        term: "zero",
+        flag: UniversalTerm,
+        dialects: &[American, Australian, British, Canadian, Indian],
+        concept: NoughtZero,
+    },
 ];
 
 pub struct Regionalisms {
-    expr: Box<dyn Expr>,
+    expr: FirstMatchOf,
     dialect: Dialect,
 }
 
@@ -450,15 +682,17 @@ impl Regionalisms {
             .collect();
 
         Self {
-            expr: Box::new(FirstMatchOf::new(terms)),
+            expr: FirstMatchOf::new(terms),
             dialect,
         }
     }
 }
 
 impl ExprLinter for Regionalisms {
+    type Unit = Chunk;
+
     fn expr(&self) -> &dyn Expr {
-        self.expr.as_ref()
+        &self.expr
     }
 
     fn match_to_lint(&self, toks: &[Token], src: &[char]) -> Option<Lint> {
@@ -476,17 +710,14 @@ impl ExprLinter for Regionalisms {
             return None;
         }
 
-        let concept = match REGIONAL_TERMS
+        let concept = REGIONAL_TERMS
             .iter()
-            .find(|row| row.term == flagged_term_string)
-        {
-            Some(term) => &term.concept,
-            None => return None, // No matching term found, so nothing to lint
-        };
+            .find(|row| row.term == flagged_term_string)?
+            .concept;
 
         let other_terms = REGIONAL_TERMS
             .iter()
-            .filter(|row| row.concept == *concept)
+            .filter(|row| row.concept == concept)
             .filter_map(|row| {
                 if row.dialects.contains(&linter_dialect) {
                     Some(&row.term)
@@ -495,10 +726,6 @@ impl ExprLinter for Regionalisms {
                 }
             })
             .collect::<Vec<_>>();
-
-        if other_terms.is_empty() {
-            return None;
-        }
 
         let suggestions = other_terms
             .iter()
@@ -519,7 +746,9 @@ impl ExprLinter for Regionalisms {
             lint_kind: LintKind::Regionalism,
             suggestions,
             message,
-            priority: 64,
+            // TODO is the priority below confusing the higher priority and higher number?
+            // TODO was 64 here vs 63 in spellcheck
+            priority: spell_check::SPELL_CHECK_PRIORITY + 1, // higher priority = lower number
         })
     }
 
@@ -531,11 +760,11 @@ impl ExprLinter for Regionalisms {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::linting::tests::{assert_lint_count, assert_top3_suggestion_result};
+    use crate::linting::tests::{assert_lint_count, assert_suggestion_result};
 
     #[test]
     fn uk_to_us_food() {
-        assert_top3_suggestion_result(
+        assert_suggestion_result(
             "I can't eat aubergine or coriander, so I'll just have a bag of crisps.",
             Regionalisms::new(Dialect::American),
             "I can't eat eggplant or cilantro, so I'll just have a bag of chips.",
@@ -544,7 +773,7 @@ mod tests {
 
     #[test]
     fn au_to_us_phone() {
-        assert_top3_suggestion_result(
+        assert_suggestion_result(
             "I dropped my mobile phone in the esky and now it's covered in tomato sauce.",
             Regionalisms::new(Dialect::American),
             // Tomato sauce is valid in American English, it just means pasta sauce rather than ketchup.
@@ -554,7 +783,7 @@ mod tests {
 
     #[test]
     fn au_to_uk_cars() {
-        assert_top3_suggestion_result(
+        assert_suggestion_result(
             "Drive the station wagon onto the footpath and hand me that spanner.",
             Regionalisms::new(Dialect::British),
             "Drive the estate onto the pavement and hand me that spanner.",
@@ -563,7 +792,7 @@ mod tests {
 
     #[test]
     fn au_to_us_cars() {
-        assert_top3_suggestion_result(
+        assert_suggestion_result(
             "Drive the station wagon onto the footpath and hand me that spanner.",
             Regionalisms::new(Dialect::American),
             "Drive the station wagon onto the sidewalk and hand me that wrench.",
@@ -572,7 +801,7 @@ mod tests {
 
     #[test]
     fn us_to_au_baby() {
-        assert_top3_suggestion_result(
+        assert_suggestion_result(
             "Wash the pacifier under the faucet.",
             Regionalisms::new(Dialect::Australian),
             "Wash the dummy under the tap.",
@@ -581,7 +810,7 @@ mod tests {
 
     #[test]
     fn us_to_uk_fuel() {
-        assert_top3_suggestion_result(
+        assert_suggestion_result(
             "I needed more gasoline to drive the truck to the soccer match.",
             Regionalisms::new(Dialect::British),
             "I needed more petrol to drive the truck to the football match.",
@@ -590,7 +819,7 @@ mod tests {
 
     #[test]
     fn au_to_uk_light() {
-        assert_top3_suggestion_result(
+        assert_suggestion_result(
             "Can you sell me a light globe for this torch?",
             Regionalisms::new(Dialect::British),
             "Can you sell me a light bulb for this torch?",
@@ -599,7 +828,7 @@ mod tests {
 
     #[test]
     fn us_to_au_oops() {
-        assert_top3_suggestion_result(
+        assert_suggestion_result(
             "I spilled ketchup on my clean sweater.",
             Regionalisms::new(Dialect::Australian),
             "I spilled tomato sauce on my clean jumper.",
@@ -613,5 +842,87 @@ mod tests {
             Regionalisms::new(Dialect::British),
             0,
         )
+    }
+
+    #[test]
+    fn uk_to_us_windscreen() {
+        assert_suggestion_result(
+            "Detect raindrops on vehicle windscreen by combining various region proposal algorithm with Convolutional Neural Network.",
+            Regionalisms::new(Dialect::American),
+            "Detect raindrops on vehicle windshield by combining various region proposal algorithm with Convolutional Neural Network.",
+        )
+    }
+
+    #[test]
+    fn au_to_uk_blood_nose() {
+        assert_suggestion_result(
+            "Oh no! I got a blood nose.",
+            Regionalisms::new(Dialect::British),
+            "Oh no! I got a nosebleed.",
+        )
+    }
+
+    #[test]
+    fn in_to_non_in_updation() {
+        assert_suggestion_result(
+            "Add apps to queue for updation or installation and resize it.",
+            Regionalisms::new(Dialect::American),
+            "Add apps to queue for update or installation and resize it.",
+        )
+    }
+
+    #[test]
+    fn dont_flag_update_or_updation_for_indian() {
+        assert_lint_count(
+            "Hey, the colab notebook which you have provided, required lot of updations, Can you pls update it.",
+            Regionalisms::new(Dialect::Indian),
+            0,
+        )
+    }
+
+    #[test]
+    fn flag_crore_and_lakh_for_non_indian() {
+        assert_lint_count(
+            "There are 100 lakhs in one crore.",
+            Regionalisms::new(Dialect::American),
+            2,
+        )
+    }
+
+    #[test]
+    fn dont_flag_lakh_or_crore_for_indian() {
+        assert_lint_count(
+            "There are 100 lakhs in one crore.",
+            Regionalisms::new(Dialect::Indian),
+            0,
+        )
+    }
+
+    #[test]
+    fn a_brinjal_is_an_aubergine() {
+        assert_suggestion_result(
+            "Is brinjal used in curries or chutneys?",
+            Regionalisms::new(Dialect::British),
+            "Is aubergine used in curries or chutneys?",
+        );
+    }
+
+    #[test]
+    fn a_brinjal_is_an_eggplant() {
+        assert_suggestion_result(
+            "Is brinjal used in curries or chutneys?",
+            Regionalisms::new(Dialect::Australian),
+            "Is eggplant used in curries or chutneys?",
+        );
+    }
+
+    #[test]
+    fn americans_dont_say_nought() {
+        assert_suggestion_result("nought", Regionalisms::new(Dialect::American), "zero");
+    }
+
+    #[test]
+    fn godown_isnt_used_outside_asia() {
+        assert_suggestion_result("godown", Regionalisms::new(Dialect::American), "warehouse");
     }
 }

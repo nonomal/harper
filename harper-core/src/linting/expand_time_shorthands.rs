@@ -5,32 +5,24 @@ use std::sync::Arc;
 use super::{ExprLinter, Lint, LintKind};
 use crate::Token;
 use crate::linting::Suggestion;
+use crate::linting::expr_linter::Chunk;
 use crate::patterns::{ImpliesQuantity, WordSet};
 
 pub struct ExpandTimeShorthands {
-    expr: Box<dyn Expr>,
+    expr: SequenceExpr,
 }
 
 impl ExpandTimeShorthands {
     pub fn new() -> Self {
-        let hotwords = Arc::new(WordSet::new(&[
+        let hotwords = Arc::new(WordSet::new([
             "hr", "hrs", "min", "mins", "sec", "secs", "ms", "msec", "msecs",
         ]));
 
         Self {
-            expr: Box::new(
-                SequenceExpr::default()
-                    .then(ImpliesQuantity)
-                    .then_longest_of(vec![
-                        Box::new(SequenceExpr::default().then(hotwords.clone())),
-                        Box::new(
-                            SequenceExpr::default()
-                                .then_whitespace()
-                                .then(hotwords.clone()),
-                        ),
-                        Box::new(SequenceExpr::default().then_hyphen().then(hotwords.clone())),
-                    ]),
-            ),
+            expr: SequenceExpr::with(ImpliesQuantity).then_longest_of(vec![
+                Box::new(SequenceExpr::with(hotwords.clone())),
+                Box::new(SequenceExpr::default().t_ws_h().then(hotwords.clone())),
+            ]),
         }
     }
 
@@ -57,8 +49,10 @@ impl Default for ExpandTimeShorthands {
 }
 
 impl ExprLinter for ExpandTimeShorthands {
+    type Unit = Chunk;
+
     fn expr(&self) -> &dyn Expr {
-        self.expr.as_ref()
+        &self.expr
     }
 
     fn match_to_lint(&self, matched_tokens: &[Token], source: &[char]) -> Option<Lint> {

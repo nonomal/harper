@@ -1,56 +1,45 @@
 use crate::expr::Expr;
 use crate::expr::SequenceExpr;
 use crate::expr::TimeUnitExpr;
+use crate::linting::expr_linter::Chunk;
 use crate::{
-    Lrc, Token,
+    Token,
     linting::{ExprLinter, Lint, Suggestion},
 };
 
 pub struct FewUnitsOfTimeAgo {
-    expr: Box<dyn Expr>,
+    expr: SequenceExpr,
 }
 
 impl Default for FewUnitsOfTimeAgo {
     fn default() -> Self {
-        let units = TimeUnitExpr;
+        let units = TimeUnitExpr::default();
 
-        let start = SequenceExpr::default()
-            .then(|tok: &Token, src: &[char]| {
-                if tok.kind.is_word() {
-                    let chars = tok.span.get_content(src);
-                    chars != ['a'] && chars != ['A']
-                } else {
-                    true
-                }
-            })
-            .t_ws();
+        let start = SequenceExpr::default().then_word_except(&["a"]).t_ws();
 
-        let expr = Lrc::new(
-            SequenceExpr::default()
-                .then(start)
-                .t_aco("few")
-                .then_whitespace()
-                .then(units)
-                .then_whitespace()
-                .t_aco("ago"),
-        );
+        let expr = SequenceExpr::with(start)
+            .t_aco("few")
+            .then_whitespace()
+            .then(units)
+            .then_whitespace()
+            .t_aco("ago");
 
-        Self {
-            expr: Box::new(expr),
-        }
+        Self { expr }
     }
 }
 
 impl ExprLinter for FewUnitsOfTimeAgo {
+    type Unit = Chunk;
+
     fn expr(&self) -> &dyn Expr {
-        self.expr.as_ref()
+        &self.expr
     }
 
     fn match_to_lint(&self, toks: &[Token], src: &[char]) -> Option<Lint> {
         let mut span = None;
 
         for tok in toks.iter().take(3) {
-            if tok.span.get_content_string(src).eq_ignore_ascii_case("few") {
+            if tok.get_str(src).eq_ignore_ascii_case("few") {
                 span = Some(tok.span);
                 break;
             }
@@ -61,7 +50,7 @@ impl ExprLinter for FewUnitsOfTimeAgo {
         Some(Lint {
             span: span.unwrap(),
             message: "In this construction you need to use `a few` instead of just `few`."
-                .to_string(),
+                .to_owned(),
             suggestions: vec![Suggestion::replace_with_match_case_str(
                 "a few",
                 span.unwrap().get_content(src),
@@ -78,9 +67,7 @@ impl ExprLinter for FewUnitsOfTimeAgo {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::linting::tests::{
-        assert_lint_count, assert_suggestion_result, assert_top3_suggestion_result,
-    };
+    use crate::linting::tests::{assert_lint_count, assert_suggestion_result};
 
     // Basic unit tests
 
@@ -101,7 +88,7 @@ mod tests {
 
     #[test]
     fn fix_done_few_minutes_ago() {
-        assert_top3_suggestion_result(
+        assert_suggestion_result(
             "Done few minutes ago",
             FewUnitsOfTimeAgo::default(),
             "Done a few minutes ago",

@@ -1,17 +1,17 @@
-> Spell
-# NSg/V
+>              Spell
+# HeadingStart NSg/VB
 >
 #
-> This    document contains a   list  of words  spelled correctly in      some     dialects of English   , but     not   American English   . This    is designed to test  the spelling suggestions we   give  for such   mistakes .
-# I/Ddem+ NSg/V    V        D/P NSg/V P  NPl/V+ V/J     R         NPr/J/P I/J/R/Dq NPl      P  NPr🅪/V/J+ . NSg/C/P NSg/C NPr/J+   NPr🅪/V/J+ . I/Ddem+ VL V/J      P  NSg/V D+  NSg/V+   NPl+        IPl+ NSg/V C/P NSg/I+ NPl/V+   .
+> This    document contains a   list   of words   spelled correctly in        some     dialects of English      , but     not     American English      . This    is  designed to test   the spelling suggestions we   give   for   such   mistakes .
+# I/Ddem+ NSg/VB+  V3       D/P NSg/VB P  NPl/V3+ VP/J    R         NPr/J/R/P I/J/R/Dq NPl      P  NPr🅪Sg/VB/J+ . NSg/C/P NSg/R/C NPr/J    NPr🅪Sg/VB/J+ . I/Ddem+ VL3 VP/J     P  NSg/VB D+  Nᴹ/Vg/J+ NPl+        IPl+ NSg/VB R/C/P NSg/I+ NPl/V3+  .
 >
 #
-> To achieve this   , the filename of this    file   contains `.US       , which will   tell  the snapshot generator to use   the American dialect , rather  than trying  to use   an  automatically detected dialect .
-# P  V       I/Ddem . D   NSg      P  I/Ddem+ NSg/V+ V        Unlintable . I/C+  NPr/VX NPr/V D+  NSg/V+   NSg       P  NSg/V D+  NPr/J+   NSg+    . NPr/V/J C/P  NSg/V/J P  NSg/V D/P W?            V/J      NSg+    .
+> To achieve this    , the filename of this   file    contains `.US.`     , which will    tell   the snapshot generator to use     the American dialect , rather than trying  to use     an  automatically detected dialect .
+# P  VB      I/Ddem+ . D   NSg      P  I/Ddem NSg/VB+ V3       Unlintable . I/C+  NPr/VXB NPr/VB D   NSg/VB+  NSg       P  N🅪Sg/VB D   NPr/J    NSg+    . NPr/R  C/P  Nᴹ/Vg/J P  N🅪Sg/VB D/P R             VP/J     NSg+    .
 >
 #
-> Words
-# NPl/V
+>              Words
+# HeadingStart NPl/V3+
 >
 #
 >
@@ -22,57 +22,57 @@
 # R/Comm     .
 >
 #
-> Centre      .
-# NSg/V/Comm+ .
+> Centre       .
+# NSg/VB/Comm+ .
 >
 #
 > Labelled  .
-# V/J/Comm+ .
+# VP/J/Comm .
 >
 #
-> Flavour      .
-# N🅪Sg/V/Comm+ .
+> Flavour       .
+# N🅪Sg/VB/Comm+ .
 >
 #
 > Favoured  .
-# V/J/Comm+ .
+# VP/J/Comm .
 >
 #
-> Honour       .
-# N🅪Sg/V/Comm+ .
+> Honour        .
+# N🅪Sg/VB/Comm+ .
 >
 #
-> Grey          .
-# NPr/V/J/Comm+ .
+> Grey             .
+# NPr🅪Sg/VB/J/Comm .
 >
 #
 > Quarrelled .
-# V/Comm+    .
+# VP/Comm    .
 >
 #
-> Quarrelling  .
-# NᴹSg/V/Comm+ .
+> Quarrelling .
+# Nᴹ/Vg/Comm  .
 >
 #
 > Recognised .
-# V/J/Au/Br+ .
+# VP/J/Au/Br .
 >
 #
-> Neighbour     .
-# NSg/V/J/Comm+ .
+> Neighbour      .
+# NSg/VB/J/Comm+ .
 >
 #
 > Neighbouring .
-# V/Comm+      .
+# Nᴹ/Vg/J/Comm .
 >
 #
 > Clamour     .
-# NSg/V/Comm+ .
+# NSg/VB/Comm .
 >
 #
 > Theatre    .
 # N🅪Sg/Comm+ .
 >
 #
-> Analyse .
-# V/Au/Br .
+> Analyse  .
+# VB/Au/Br .

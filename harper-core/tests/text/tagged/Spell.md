@@ -1,26 +1,26 @@
-> Spell
-# NSg/V
+>              Spell
+# HeadingStart NSg/VB
 >
 #
-> This    document contains example sentences with misspelled words  that          we   want  to test  the spell checker on  .
-# I/Ddem+ NSg/V    V        NSg/V+  NPl/V     P    V/J+       NPl/V+ NSg/I/C/Ddem+ IPl+ NSg/V P  NSg/V D   NSg/V NSg/V   J/P .
+> This    document contains example sentences with misspelled words   that      we   want   to test   the spell  checker on  .
+# I/Ddem+ NSg/VB+  V3       NSg/VB+ NPl/V3+   P    VP/J       NPl/V3+ I/C/Ddem+ IPl+ NSg/VB P  NSg/VB D   NSg/VB NSg/VB  J/P .
 >
 #
-> Example Sentences
-# NSg/V+  NPl/V
+>              Example Sentences
+# HeadingStart NSg/VB+ NPl/V3+
 >
 #
-> My  favourite    color       is  blu .
-# D$+ NSg/V/J/Comm N🅪Sg/V/J/Am VL+ W?  .
-> I    must  defend my  honour       !
-# ISg+ NSg/V NSg/V  D$+ N🅪Sg/V/Comm+ .
-> I    recognize that         you    recognise me       .
-# ISg+ V         NSg/I/C/Ddem ISgPl+ V/Au/Br   NPr/ISg+ .
-> I    analyze how   you    infantilize me       .
-# ISg+ V       NSg/C ISgPl+ V           NPr/ISg+ .
-> I    analyse how   you    infantilise me       .
-# ISg+ V/Au/Br NSg/C ISgPl+ ?           NPr/ISg+ .
+> My  favourite      color         is  blu .
+# D$+ NSg/VB/J/Comm+ N🅪Sg/VB/J/Am+ VL3 W?  .
+> I       must    defend my  honour        !
+# ISg/#r+ NSg/VXB NSg/VB D$+ N🅪Sg/VB/Comm+ .
+> I       recognize that     you    recognise me       .
+# ISg/#r+ VB        I/C/Ddem ISgPl+ VB/Au/Br  NPr/ISg+ .
+> I       analyze how   you    infantilize me       .
+# ISg/#r+ VB      NSg/C ISgPl+ VB          NPr/ISg+ .
+> I       analyse  how   you    infantilise me       .
+# ISg/#r+ VB/Au/Br NSg/C ISgPl+ VB/Au/Br    NPr/ISg+ .
 > Careful , traveller !
 # J       . NSg/Comm+ .
-> At    the centre     of the theatre    I    dropped a   litre    of coke    .
-# NSg/P D   NSg/V/Comm P  D+  N🅪Sg/Comm+ ISg+ V/J     D/P NSg/Comm P  NPr🅪/V+ .
+> At    the centre      of the theatre    I       dropped a   litre    of coke       .
+# NSg/P D   NSg/VB/Comm P  D+  N🅪Sg/Comm+ ISg/#r+ VP/J    D/P NSg/Comm P  NPr🅪Sg/VB+ .

@@ -52,7 +52,7 @@ fn generate_lint_for_tokens(a: &Token, b: &Token, document: &Document) -> Option
             span,
             lint_kind: LintKind::Formatting,
             suggestions: vec![Suggestion::ReplaceWith(correct)],
-            message: "The position of the currency symbol matters.".to_string(),
+            message: "The position of the currency symbol matters.".to_owned(),
             priority: 63,
         })
     } else {
@@ -62,7 +62,9 @@ fn generate_lint_for_tokens(a: &Token, b: &Token, document: &Document) -> Option
 
 #[cfg(test)]
 mod tests {
-    use crate::linting::tests::{assert_lint_count, assert_suggestion_result};
+    use crate::linting::tests::{
+        assert_lint_count, assert_markdown_suggestion_result, assert_suggestion_result,
+    };
 
     use super::CurrencyPlacement;
 
@@ -108,7 +110,16 @@ mod tests {
     }
 
     #[test]
-    fn multiple_dollar() {
+    fn multiple_dollar_markdown() {
+        assert_markdown_suggestion_result(
+            "They were either 25\\$ 24\\$ or 23\\$.",
+            CurrencyPlacement::default(),
+            "They were either $25 $24 or $23.",
+        );
+    }
+
+    #[test]
+    fn multiple_dollar_plain_english() {
         assert_suggestion_result(
             "They were either 25$ 24$ or 23$.",
             CurrencyPlacement::default(),

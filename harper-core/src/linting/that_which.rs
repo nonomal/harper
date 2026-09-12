@@ -1,4 +1,5 @@
 use crate::expr::Expr;
+use crate::expr::FirstMatchOf;
 use crate::expr::SequenceExpr;
 use crate::expr::WordExprGroup;
 use itertools::Itertools;
@@ -6,34 +7,30 @@ use itertools::Itertools;
 use crate::{Lrc, Token, TokenStringExt};
 
 use super::{ExprLinter, Lint, LintKind, Suggestion};
+use crate::linting::expr_linter::Chunk;
 
 pub struct ThatWhich {
-    expr: Box<dyn Expr>,
+    expr: WordExprGroup<FirstMatchOf>,
 }
 
 impl Default for ThatWhich {
     fn default() -> Self {
         let mut pattern = WordExprGroup::default();
 
-        let matching_pattern = Lrc::new(
-            SequenceExpr::default()
-                .then_any_capitalization_of("that")
-                .then_whitespace()
-                .then_any_capitalization_of("that"),
-        );
+        let matching_pattern = Lrc::new(SequenceExpr::word_seq(&["that", "that"]));
 
         pattern.add("that", matching_pattern.clone());
         pattern.add("That", matching_pattern);
 
-        Self {
-            expr: Box::new(pattern),
-        }
+        Self { expr: pattern }
     }
 }
 
 impl ExprLinter for ThatWhich {
+    type Unit = Chunk;
+
     fn expr(&self) -> &dyn Expr {
-        self.expr.as_ref()
+        &self.expr
     }
 
     fn match_to_lint(&self, matched_tokens: &[Token], source: &[char]) -> Option<Lint> {
@@ -52,7 +49,7 @@ impl ExprLinter for ThatWhich {
             span: matched_tokens.span()?,
             lint_kind: LintKind::Repetition,
             suggestions: vec![Suggestion::ReplaceWith(suggestion)],
-            message: "“that that” sometimes means “that which”, which is clearer.".to_string(),
+            message: "“that that” sometimes means “that which”, which is clearer.".to_owned(),
             priority: 126,
         })
     }

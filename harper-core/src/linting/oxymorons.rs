@@ -1,35 +1,37 @@
 use crate::expr::Expr;
 use crate::expr::FirstMatchOf;
 use crate::expr::FixedPhrase;
+use crate::linting::expr_linter::Chunk;
 use crate::linting::{ExprLinter, Lint, LintKind};
 use crate::{Token, TokenStringExt};
 
 /// A linter that flags oxymoronic phrases.
 pub struct Oxymorons {
-    expr: Box<dyn Expr>,
+    expr: FirstMatchOf,
 }
 
 impl Oxymorons {
     pub fn new() -> Self {
         // List of phrases that are considered oxymoronic.
         let phrases = vec![
-            "amateur expert",
-            "increasingly less",
-            "advancing backwards?",
+            "advancing backwards",
             "alludes explicitly to",
-            "explicitly alludes to",
-            "totally obsolescent",
-            "completely obsolescent",
-            "generally always",
-            "usually always",
+            "amateur expert",
             "build down",
+            "completely obsolescent",
             "conspicuous absence",
             "exact estimate",
+            "explicitly alludes to",
             "found missing",
+            "generally always",
+            "increasingly less",
             "intense apathy",
             "mandatory choice",
             "nonworking mother",
             "organized mess",
+            "standard Option",
+            "totally obsolescent",
+            "usually always",
         ];
 
         // Build a vector of exact-match patterns for each oxymoron.
@@ -38,8 +40,9 @@ impl Oxymorons {
             .map(|s| Box::new(FixedPhrase::from_phrase(s)) as Box<dyn Expr>)
             .collect();
 
-        let expr = Box::new(FirstMatchOf::new(exprs));
-        Self { expr }
+        Self {
+            expr: FirstMatchOf::new(exprs),
+        }
     }
 }
 
@@ -50,9 +53,11 @@ impl Default for Oxymorons {
 }
 
 impl ExprLinter for Oxymorons {
+    type Unit = Chunk;
+
     /// Returns the underlying pattern.
     fn expr(&self) -> &dyn Expr {
-        self.expr.as_ref()
+        &self.expr
     }
 
     fn match_to_lint(&self, matched_tokens: &[Token], source: &[char]) -> Option<Lint> {
@@ -137,6 +142,15 @@ mod tests {
     fn phrase_split_by_line_break() {
         assert_lint_count(
             "nonworking\nmother is not a term to be used.",
+            Oxymorons::new(),
+            1,
+        );
+    }
+
+    #[test]
+    fn detects_standard_option() {
+        assert_lint_count(
+            "and that probably correlates with CD players becoming a standard option in cars",
             Oxymorons::new(),
             1,
         );

@@ -13,6 +13,12 @@ use super::error_counter::{ErrorCounter, ErrorKind};
 
 use crate::{Tagger, UPOS};
 
+/// A [`Tagger`] implementation based on the work by Eric Brill.
+///
+/// Additional reading:
+///
+/// - [Brill tagger](https://en.wikipedia.org/wiki/Brill_tagger)
+/// - [Transformation-based Learning for POS Tagging](https://elijahpotter.dev/articles/transformation-based-learning)
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct BrillTagger<B>
 where
@@ -77,18 +83,17 @@ impl BrillTagger<FreqDict> {
         self.apply_patches(sentence, &mut base_tags);
 
         for ((tag, correct_tag), word) in base_tags.iter().zip(correct_tags.iter()).zip(sentence) {
-            if let Some(tag) = tag {
-                if let Some(correct_tag) = correct_tag {
-                    if tag != correct_tag {
-                        errors.inc(
-                            ErrorKind {
-                                was_tagged: *tag,
-                                correct_tag: *correct_tag,
-                            },
-                            word.as_str(),
-                        )
-                    }
-                }
+            if let Some(tag) = tag
+                && let Some(correct_tag) = correct_tag
+                && tag != correct_tag
+            {
+                errors.inc(
+                    ErrorKind {
+                        was_tagged: *tag,
+                        correct_tag: *correct_tag,
+                    },
+                    word.as_str(),
+                )
             }
         }
     }
@@ -105,18 +110,17 @@ impl BrillTagger<FreqDict> {
         let mut errors = ErrorCounter::new();
 
         for ((tag, correct_tag), word) in tags.iter().zip(correct_tags.iter()).zip(sentence) {
-            if let Some(tag) = tag {
-                if let Some(correct_tag) = correct_tag {
-                    if tag != correct_tag {
-                        errors.inc(
-                            ErrorKind {
-                                was_tagged: *tag,
-                                correct_tag: *correct_tag,
-                            },
-                            word.as_str(),
-                        )
-                    }
-                }
+            if let Some(tag) = tag
+                && let Some(correct_tag) = correct_tag
+                && tag != correct_tag
+            {
+                errors.inc(
+                    ErrorKind {
+                        was_tagged: *tag,
+                        correct_tag: *correct_tag,
+                    },
+                    word.as_str(),
+                )
             }
         }
 
@@ -188,7 +192,7 @@ impl BrillTagger<FreqDict> {
         }
 
         let all_candidates = Patch::generate_candidate_patches(&error_counter);
-        let mut pruned_candidates: Vec<Patch> = rand::seq::IndexedRandom::choose_multiple(
+        let mut pruned_candidates: Vec<Patch> = rand::seq::IndexedRandom::sample(
             all_candidates.as_slice(),
             &mut rand::rng(),
             (all_candidates.len() as f32 * candidate_selection_chance) as usize,

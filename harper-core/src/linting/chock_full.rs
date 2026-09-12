@@ -1,9 +1,9 @@
 use crate::expr::Expr;
-use crate::expr::SequenceExpr;
-use crate::expr::SpaceOrHyphen;
-use crate::{Token, TokenStringExt, patterns::WordSet};
+use crate::weir::weir_expr_to_expr;
+use crate::{Token, TokenStringExt};
 
 use super::{ExprLinter, Lint, LintKind, Suggestion};
+use crate::linting::expr_linter::Chunk;
 
 pub struct ChockFull {
     expr: Box<dyn Expr>,
@@ -12,17 +12,15 @@ pub struct ChockFull {
 impl Default for ChockFull {
     fn default() -> Self {
         Self {
-            expr: Box::new(
-                SequenceExpr::default()
-                    .then(WordSet::new(&["chalk", "choke"]))
-                    .then(SpaceOrHyphen)
-                    .then_exact_word("full"),
-            ),
+            expr: weir_expr_to_expr("[chalk, choke, chocked, chucked, choked][( ), -]full")
+                .unwrap(),
         }
     }
 }
 
 impl ExprLinter for ChockFull {
+    type Unit = Chunk;
+
     fn expr(&self) -> &dyn Expr {
         self.expr.as_ref()
     }
@@ -137,6 +135,43 @@ mod tests {
             "Choke-full of pitfalls; let's consider alternatives.",
             ChockFull::default(),
             "Chock-full of pitfalls; let's consider alternatives.",
+        );
+    }
+
+    #[test]
+    fn lower_space_chocked() {
+        assert_suggestion_result(
+            "The computer was chocked full with 64KB general use RAM (expandable up to 256KB)",
+            ChockFull::default(),
+            "The computer was chock-full with 64KB general use RAM (expandable up to 256KB)",
+        );
+    }
+
+    #[test]
+    fn lower_space_chucked() {
+        assert_suggestion_result(
+            "The Mandalorian is chucked full of references and callbacks, mostly to previous Star Wars content.",
+            ChockFull::default(),
+            "The Mandalorian is chock-full of references and callbacks, mostly to previous Star Wars content.",
+        );
+    }
+
+    #[test]
+    fn lower_space_choked() {
+        assert_suggestion_result(
+            "I was making decent money, single and choked full of self-importance.",
+            ChockFull::default(),
+            "I was making decent money, single and chock-full of self-importance.",
+        );
+    }
+
+    #[test]
+    #[ignore = "replace_with_match_case quirks generated 'CHOCK-Full' instead of 'CHOCK-full'"]
+    fn upper_space_choked() {
+        assert_suggestion_result(
+            "Also being a family computer it’s CHOKED full, lots of unnecessary documents no one will sort",
+            ChockFull::default(),
+            "Also being a family computer it’s CHOCK-full, lots of unnecessary documents no one will sort",
         );
     }
 }

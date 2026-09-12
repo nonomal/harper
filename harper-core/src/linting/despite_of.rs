@@ -3,9 +3,10 @@ use crate::expr::SequenceExpr;
 use crate::{Token, TokenStringExt};
 
 use super::{ExprLinter, Lint, LintKind, Suggestion};
+use crate::linting::expr_linter::Chunk;
 
 pub struct DespiteOf {
-    expr: Box<dyn Expr>,
+    expr: SequenceExpr,
 }
 
 impl Default for DespiteOf {
@@ -14,15 +15,15 @@ impl Default for DespiteOf {
             .then_whitespace()
             .then_exact_word("of");
 
-        Self {
-            expr: Box::new(pattern),
-        }
+        Self { expr: pattern }
     }
 }
 
 impl ExprLinter for DespiteOf {
+    type Unit = Chunk;
+
     fn expr(&self) -> &dyn Expr {
-        self.expr.as_ref()
+        &self.expr
     }
 
     fn match_to_lint(&self, matched: &[Token], source: &[char]) -> Option<Lint> {
@@ -36,7 +37,7 @@ impl ExprLinter for DespiteOf {
                 Suggestion::replace_with_match_case_str("despite", matched),
                 Suggestion::replace_with_match_case_str("in spite of", matched)
             ],
-            message: "The phrase “despite of” is incorrect. Please use either “despite” or “in spite of” instead.".to_string(),
+            message: "The phrase “despite of” is incorrect. Please use either “despite” or “in spite of” instead.".to_owned(),
             priority: 126,
         })
     }

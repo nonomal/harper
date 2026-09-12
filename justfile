@@ -1,20 +1,89 @@
+default:
+  @just --list
+
+# Clean build artifacts (but keep dependencies)
+alias clean := soft-clean
+soft-clean:
+  #!/usr/bin/env bash
+  set -eo pipefail
+
+  # Clean target + all harper-* directories as they all have a rust backend and build into target
+  cargo clean
+
+  # Handle packages/*
+
+  # The path stem is not combined into one file expansion because if they pop up into
+  # another directory, there is a chance they should not be removed.
+
+  rm -rf "{{justfile_directory()}}"/packages/chrome-plugin/{build,package}
+  rm -rf "{{justfile_directory()}}"/packages/components/{.svelte-kit,dist}
+  rm -rf "{{justfile_directory()}}"/packages/harper.js/{dist,markdown,temp}
+  rm -rf "{{justfile_directory()}}"/packages/lint-framework/{dist}
+  rm -rf "{{justfile_directory()}}"/packages/obsidian-plugin/{harper-obsidian-plugin.zip,main.js}
+  rm -rf "{{justfile_directory()}}"/packages/vscode-plugin/{.vscode-test,bin,build}
+  rm -rf "{{justfile_directory()}}"/packages/web/{.svelte-kit,.sveltepress,build}
+  rm -rf "{{justfile_directory()}}"/packages/wordpress-plugin/{build,harper.zip}
+  rm -rf "{{justfile_directory()}}"/harper-desktop/{.svelte-kit,build,package}
+  rm -rf "{{justfile_directory()}}"/harper-wasm/pkg
+
+# Hard clean all build artifacts and dependencies
+hard-clean: soft-clean
+  #!/usr/bin/env bash
+  set -eo pipefail
+
+  # Remove all node dependencies
+  find "{{justfile_directory()}}" -type d -name "node_modules" -prune -exec rm -rf {} +
+  # Prune node cache
+  pnpm store prune
+
 # Format entire project
+alias fmt := format
 format:
-  cargo fmt  
+  cargo fmt
   pnpm format
 
-# Build the WebAssembly for a specific target (usually either `web` or `bundler`)
-build-wasm:
-  cd "{{justfile_directory()}}/harper-wasm" && wasm-pack build --target web
+# Build the shared component library
+build-components:
+  #!/usr/bin/env bash
+  set -eo pipefail
 
+  cd "{{justfile_directory()}}/packages/components"
+  pnpm install --engine-strict=false
+  pnpm build
+
+# Build the shared Harper editor library
+build-harper-editor: build-lint-framework build-components   
+  #!/usr/bin/env bash
+  set -eo pipefail
+
+  cd "{{justfile_directory()}}/packages/harper-editor"
+  pnpm install --engine-strict=false
+  pnpm build
+
+# Build the WebAssembly module
+build-wasm:
+  #!/usr/bin/env bash
+
+  export CARGO_TERM_QUIET=true
+
+  cd "{{justfile_directory()}}/harper-wasm"
+  if [ "${DISABLE_WASM_OPT:-0}" -eq 1 ]; then
+    wasm-pack build --target web --no-opt --out-name harper_wasm
+    wasm-pack build --target web --no-opt --out-name harper_wasm_slim --no-default-features 
+  else
+    wasm-pack build --target web --out-name harper_wasm
+    wasm-pack build --target web --out-name harper_wasm_slim --no-default-features 
+  fi
 
 # Build `harper.js` with all size optimizations available.
-build-harperjs: build-wasm 
+alias build-harper-js := build-harperjs
+build-harperjs: build-wasm
   #!/usr/bin/env bash
   set -eo pipefail
 
   # Removes a duplicate copy of the WASM binary if Vite is left to its devices.
   perl -pi -e 's/new URL\(.*\)/new URL()/g' "{{justfile_directory()}}/harper-wasm/pkg/harper_wasm.js"
+  perl -pi -e 's/new URL\(.*\)/new URL()/g' "{{justfile_directory()}}/harper-wasm/pkg/harper_wasm_slim.js"
 
   cd "{{justfile_directory()}}/packages/harper.js"
   pnpm install
@@ -23,6 +92,16 @@ build-harperjs: build-wasm
   # Generate API reference
   ./docs.sh
 
+# Build the browser lint framework module
+build-lint-framework: build-harperjs
+  #!/usr/bin/env bash
+  set -eo pipefail
+
+  cd "{{justfile_directory()}}/packages/lint-framework"
+  pnpm install
+  pnpm build
+
+alias test-harper-js := test-harperjs
 test-harperjs: build-harperjs
   #!/usr/bin/env bash
   set -eo pipefail
@@ -42,8 +121,10 @@ test-obsidian: build-obsidian
 
   pnpm install
   cd "{{justfile_directory()}}/packages/obsidian-plugin"
+  pnpm playwright install
   pnpm test
 
+alias dev-wordpress := dev-wp
 dev-wp: build-harperjs
   #!/usr/bin/env bash
 
@@ -52,9 +133,10 @@ dev-wp: build-harperjs
   cd "{{justfile_directory()}}/packages/wordpress-plugin"
   pnpm install
   pnpm wp-now start &
-  pnpm start 
+  pnpm start
 
 # Build the WordPress plugin
+alias build-wordpress := build-wp
 build-wp: build-harperjs
   #!/usr/bin/env bash
   set -eo pipefail
@@ -65,7 +147,7 @@ build-wp: build-harperjs
   pnpm plugin-zip
 
 # Compile the website's dependencies and start a development server. Note that if you make changes to `harper-wasm`, you will have to re-run this command.
-dev-web: build-harperjs
+dev-web: build-harperjs build-lint-framework build-components build-harper-editor
   #!/usr/bin/env bash
   set -eo pipefail
 
@@ -74,56 +156,151 @@ dev-web: build-harperjs
   pnpm dev
 
 # Build the Harper website.
-build-web: build-harperjs
+build-web: build-harperjs build-lint-framework build-components build-harper-editor
   #!/usr/bin/env bash
   set -eo pipefail
-  
+
   cd "{{justfile_directory()}}/packages/web"
   pnpm install
-  pnpm build
+  ENABLE_ADMIN_ROUTES=false pnpm build
+
+# Start a development server for Harper Desktop.
+dev-desktop: build-harperjs build-lint-framework build-components build-harper-editor
+  #!/usr/bin/env bash
+  set -eo pipefail
+
+  cd "{{justfile_directory()}}/harper-desktop"
+  pnpm install
+  pnpm tauri dev
+
+# Start the Harper Desktop highlighter process directly.
+dev-desktop-highlighter:
+  #!/usr/bin/env bash
+  set -eo pipefail
+
+  cargo run -p harper-desktop -- highlighter
+
+# Check Harper Desktop frontend and Rust targets.
+check-desktop: build-harperjs build-lint-framework build-components build-harper-editor
+  #!/usr/bin/env bash
+  set -eo pipefail
+
+  cd "{{justfile_directory()}}/harper-desktop"
+  pnpm install
+  pnpm check
+
+  cd "{{justfile_directory()}}"
+  cargo check -p harper-desktop --all-targets
+
+# Build Harper Desktop Linux bundles.
+build-desktop-linux: build-harperjs build-lint-framework build-components build-harper-editor
+  #!/usr/bin/env bash
+  set -eo pipefail
+
+  cd "{{justfile_directory()}}/harper-desktop"
+  pnpm install
+  pnpm tauri build -b deb,rpm,appimage
+
+# Build Harper Desktop Windows bundles.
+build-desktop-windows: build-harperjs build-lint-framework build-components build-harper-editor
+  #!/usr/bin/env bash
+  set -eo pipefail
+
+  rustup target add x86_64-pc-windows-msvc
+
+  cd "{{justfile_directory()}}/harper-desktop"
+  pnpm install
+  pnpm tauri build --runner cargo-xwin --target x86_64-pc-windows-msvc -b nsis --config '{"bundle":{"createUpdaterArtifacts":false}}'
+
+# Build Harper Desktop for Apple Silicon only — faster than the universal recipe below.
+build-desktop-macos-arm64: build-harperjs build-lint-framework build-components build-harper-editor
+  #!/usr/bin/env bash
+  set -eo pipefail
+
+  cd "{{justfile_directory()}}/harper-desktop"
+  pnpm install
+  pnpm tauri build -b app,dmg --target aarch64-apple-darwin
+
+# Build Harper Desktop macOS bundles.
+build-desktop-macos: build-harperjs build-lint-framework build-components build-harper-editor
+  #!/usr/bin/env bash
+  set -eo pipefail
+
+  cd "{{justfile_directory()}}/harper-desktop"
+  pnpm install
+  pnpm tauri build -b app,dmg --target universal-apple-darwin
+
+# Build Harper Desktop macOS bundles without updater artifacts.
+build-desktop-macos-unsigned: build-harperjs build-lint-framework build-components build-harper-editor
+  #!/usr/bin/env bash
+  set -eo pipefail
+
+  cd "{{justfile_directory()}}/harper-desktop"
+  pnpm install
+  pnpm tauri build -b app,dmg --config '{"bundle":{"createUpdaterArtifacts":false}}' --target universal-apple-darwin
 
 # Build the Harper Obsidian plugin.
 build-obsidian: build-harperjs
   #!/usr/bin/env bash
   set -eo pipefail
-  
+
   cd "{{justfile_directory()}}/packages/obsidian-plugin"
+
+  max_bundle_size_bytes=$((30 * 1024 * 1024))
 
   pnpm install
   pnpm build
 
+  bundle_size_bytes=$(wc -c < main.js | tr -d '[:space:]')
+
+  if [ "$bundle_size_bytes" -gt "$max_bundle_size_bytes" ]; then
+    bundle_size_mb=$(awk "BEGIN { printf \"%.2f\", $bundle_size_bytes / 1024 / 1024 }")
+    max_bundle_size_mb=$(awk "BEGIN { printf \"%.2f\", $max_bundle_size_bytes / 1024 / 1024 }")
+
+    echo "Obsidian plugin bundle size ${bundle_size_mb} MB exceeds the ${max_bundle_size_mb} MB limit. This can cause problems for mobile devices with limited memory." >&2
+    exit 1
+  fi
+
   zip harper-obsidian-plugin.zip manifest.json main.js
 
 # Build the Chrome extension.
-build-chrome-plugin: build-harperjs
+alias build-chrome := build-chrome-plugin
+alias build-chrome-extension := build-chrome-plugin
+build-chrome-plugin: build-harperjs build-lint-framework build-components
   #!/usr/bin/env bash
   set -eo pipefail
-  
+
   cd "{{justfile_directory()}}/packages/chrome-plugin"
 
-  pnpm install 
+  pnpm install
   pnpm zip-for-chrome
 
 # Start a development server for the Chrome extension.
-dev-chrome-plugin: build-harperjs
+alias dev-chrome := dev-chrome-plugin
+alias dev-chrome-extension := dev-chrome-plugin
+dev-chrome-plugin: build-harperjs build-lint-framework build-components
   #!/usr/bin/env bash
   set -eo pipefail
-  
+
   cd "{{justfile_directory()}}/packages/chrome-plugin"
 
-  pnpm install 
+  pnpm install
   pnpm dev
 
 # Build the Firefox extension.
-build-firefox-plugin: build-harperjs
+alias build-firefox := build-firefox-plugin
+alias build-firefox-extension := build-firefox-plugin
+build-firefox-plugin: build-harperjs build-lint-framework build-components
   #!/usr/bin/env bash
   set -eo pipefail
-  
+
   cd "{{justfile_directory()}}/packages/chrome-plugin"
 
-  pnpm install 
+  pnpm install
   pnpm zip-for-firefox
 
+alias test-chrome := test-chrome-plugin
+alias test-chrome-extension := test-chrome-plugin
 test-chrome-plugin: build-chrome-plugin
   #!/usr/bin/env bash
   set -eo pipefail
@@ -133,12 +310,16 @@ test-chrome-plugin: build-chrome-plugin
   pnpm playwright install
 
   # For environments without displays like CI servers or containers
-  if [[ "$(uname)" == "Linux" ]] && [[ -z "$DISPLAY" ]]; then
-    xvfb-run --auto-servernum pnpm test --project chromium
+  if [[ "$(uname)" == "Linux" ]]; then
+    env -u WAYLAND_DISPLAY XDG_SESSION_TYPE=x11 \
+    xvfb-run --auto-servernum pnpm test --project chromium 
   else
-    pnpm test --project chromium
+    pnpm test --project chromium 
   fi
 
+
+alias test-firefox := test-firefox-plugin
+alias test-firefox-extension := test-firefox-plugin
 test-firefox-plugin: build-firefox-plugin
   #!/usr/bin/env bash
   set -eo pipefail
@@ -146,18 +327,23 @@ test-firefox-plugin: build-firefox-plugin
   pnpm install
   cd "{{justfile_directory()}}/packages/chrome-plugin"
   pnpm playwright install
+
   # For environments without displays like CI servers or containers
-  if [[ "$(uname)" == "Linux" ]] && [[ -z "$DISPLAY" ]]; then
-    xvfb-run --auto-servernum pnpm test --project firefox
+  if [[ "$(uname)" == "Linux" ]]; then
+    env -u WAYLAND_DISPLAY XDG_SESSION_TYPE=x11 \
+    xvfb-run --auto-servernum pnpm test --project firefox 
   else
     pnpm test --project firefox 
   fi
 
-
 # Run VSCode plugin unit and integration tests.
-test-vscode:
+alias test-vscode-extension := test-vscode
+test-vscode: 
   #!/usr/bin/env bash
   set -eo pipefail
+
+  # Needed so `pnpm install` can succeed.
+  DISABLE_WASM_OPT=1 just build-harperjs
 
   ext_dir="{{justfile_directory()}}/packages/vscode-plugin"
   bin_dir="${ext_dir}/bin"
@@ -166,7 +352,8 @@ test-vscode:
     mkdir "$bin_dir"
   fi
 
-  cargo build --release
+  echo Building binaries
+  cargo build --release -p harper-ls
 
   cp "{{justfile_directory()}}/target/release/harper-ls"* "$bin_dir"
 
@@ -180,8 +367,23 @@ test-vscode:
     pnpm test
   fi
 
+  # Over time, VSCode test versions take up space that can be hard to track down
+  if [[ -d .vscode-test ]]; then
+    all_versions=$(ls -1 .vscode-test | grep "^vscode-" | sort -V)
+    latest_version=$(echo "$all_versions" | tail -n 1)
+    old_versions=$(echo "$all_versions" | sed '$d')  # Delete last line instead
+    if [[ -n "$old_versions" ]]; then
+      count=$(echo "$old_versions" | wc -l)
+      echo "$old_versions" | xargs -I {} rm -rf .vscode-test/{}
+      echo "✓ Deleted $count old VSCode versions, keeping $latest_version"
+    else
+      echo "✓ No old versions to clean (keeping $latest_version)"
+    fi
+  fi
+
 # Build and package the Visual Studio Code extension.
 # If `target` is passed, it is assumed that `harper-ls` has been compiled beforehand and is in `packages/vscode-plugin/bin`. This is used in CI.
+alias package-vscode-extension := package-vscode
 package-vscode target="":
   #!/usr/bin/env bash
   set -eo pipefail
@@ -192,7 +394,8 @@ package-vscode target="":
   cp LICENSE "$ext_dir"
 
   if [[ -z "{{target}}" ]]; then
-    cargo build --release
+    echo Building binaries
+    cargo build --release -q
 
     if ! [[ -d "$bin_dir" ]]; then
       mkdir "$bin_dir"
@@ -214,44 +417,47 @@ update-vscode-linters:
   #!/usr/bin/env bash
   set -eo pipefail
 
-  linters=$(
-    cargo run --bin harper-cli -- config |
-      jq 'with_entries(.key |= "harper.linters." + . |
-        .value |= {
-          "scope": "resource",
-          "type": "boolean",
-          "default": .default_value,
-          "description": .description
-        }
-      )'
-  )
+  linters_file="$(mktemp)"
+  output_file="$(mktemp)"
+  trap 'rm -f "$linters_file" "$output_file"' EXIT
+
+  cargo run --bin harper-cli -- config |
+    jq 'with_entries(.key |= "harper.linters." + . |
+      .value |= {
+        "scope": "resource",
+        "type": "boolean",
+        "default": .default_value,
+        "description": .description
+      }
+    )' > "$linters_file"
 
   cd "{{justfile_directory()}}/packages/vscode-plugin"
 
-  manifest_without_linters=$(
-    jq 'walk(
-      if type == "object" then
-        with_entries(select(.key | startswith("harper.linters") | not))
-      end
-    )' package.json
-  )
-
-  jq --argjson linters "$linters" \
-    '.contributes.configuration.properties += $linters' <<< \
-    "$manifest_without_linters" > \
-    package.json
+  jq 'walk(
+    if type == "object" then
+      with_entries(select(.key | startswith("harper.linters") | not))
+    end
+  )' package.json |
+    jq --slurpfile linters "$linters_file" \
+      '.contributes.configuration.properties += $linters[0]' > \
+      "$output_file"
+  mv "$output_file" package.json
   just format
 
 # Run Rust formatting and linting.
-check-rust:
+check-rust: audit-dictionary
   #!/usr/bin/env bash
   set -eo pipefail
 
   cargo fmt -- --check
   cargo clippy -- -Dwarnings -D clippy::dbg_macro -D clippy::needless_raw_string_hashes
 
+  cargo hack check --each-feature
+
 # Perform format and type checking.
-check: check-rust build-web
+check: check-rust check-js
+
+check-js: build-harperjs build-lint-framework build-components build-harper-editor build-web
   #!/usr/bin/env bash
   set -eo pipefail
 
@@ -260,54 +466,68 @@ check: check-rust build-web
 
   # Needed because Svelte has special linters
   cd "{{justfile_directory()}}/packages/web"
-  pnpm check
+  ENABLE_ADMIN_ROUTES=false pnpm check
 
 # Populate build caches and install necessary local tooling (tools callable via `pnpm run <tool>`).
 setup: build-harperjs test-harperjs test-vscode build-web build-wp build-obsidian build-chrome-plugin
 
 # Perform full format and type checking, build all projects and run all tests. Run this before pushing your code.
-precommit: check test build-harperjs build-obsidian build-web build-wp build-firefox-plugin build-chrome-plugin 
+precommit: check test build-harperjs build-obsidian build-web build-wp build-firefox-plugin build-chrome-plugin
   #!/usr/bin/env bash
   set -eo pipefail
 
-  cargo build --all-targets
-  cargo hack check --each-feature
+  echo Building binaries
+  cargo build --all-targets -q
 
 # Install `harper-cli` and `harper-ls` to your machine via `cargo`
 install:
-  cargo install --path harper-ls --locked 
-  cargo install --path harper-cli --locked 
+  cargo install --path harper-ls --locked
+  cargo install --path harper-cli --locked
 
 # Run `harper-cli` on the Harper repository
 dogfood:
   #!/usr/bin/env bash
   cargo build --release
-  for file in `fd -e rs`
-  do
-    echo Linting $file
-    ./target/release/harper-cli lint $file
+
+  if command -v fd &> /dev/null; then
+    # Use fd if available (faster and more user-friendly)
+    fd_cmd() { fd -e rs; }
+  else
+    # Fall back to find if fd is not installed
+    fd_cmd() { find . -name "*.rs" -type f; }
+  fi
+
+  fd_cmd | while read -r file; do
+    echo "Linting $file"
+    ./target/release/harper-cli lint "$file"
   done
 
+test-rust:
+  echo Running all Rust tests
+  cargo test -q
+
 # Test everything.
-test: test-harperjs test-vscode test-obsidian test-chrome-plugin test-firefox-plugin
-  cargo test
+test: test-rust test-harperjs test-vscode test-obsidian test-chrome-plugin test-firefox-plugin
 
 # Use `harper-cli` to parse a provided file and print out the resulting tokens.
 parse file:
   cargo run --bin harper-cli -- parse {{file}}
 
-# Lint a provided file using Harper and print the results.
-lint file:
-  cargo run --bin harper-cli -- lint {{file}}
+# Lint provided inputs using Harper and print the results.
+# The inputs can be files, directories, or a string on the command line.
+# If no inputs are provided, lint stdin.
+lint *inputs:
+  cargo run --bin harper-cli -- lint {{inputs}}
 
 # Show the spans of the parsed tokens overlapped in the provided file.
 spans file:
   cargo run --bin harper-cli -- spans {{file}}
 
 # Add a noun to Harper's curated dictionary.
+alias add-noun := addnoun
 addnoun noun:
   #!/usr/bin/env bash
-  DICT_FILE=./harper-core/dictionary.dict 
+  DICT_FILE=./harper-core/dictionary.dict
 
   cat $DICT_FILE | grep "^{{noun}}/"
 
@@ -334,7 +554,7 @@ addnoun noun:
   echo "{{noun}}/$flags" >> "$DICT_FILE"
 
 # Search Harper's curated dictionary for a specific word
-searchdictfor word:
+search-dict-for word:
   #!/usr/bin/env bash
   if command -v rg > /dev/null; then
     cargo run --bin harper-cli -- words | rg {{word}}
@@ -343,7 +563,7 @@ searchdictfor word:
   fi
 
 # Find words in the user's `harper-ls/dictionary.txt` for words already in the curated dictionary.
-userdictoverlap:
+user-dict-overlap:
   #!/usr/bin/env bash
   USER_DICT_FILE="$HOME/.config/harper-ls/dictionary.txt"
 
@@ -351,17 +571,22 @@ userdictoverlap:
     just searchdictfor $line 2> /dev/null
   done < $USER_DICT_FILE
 
-# Get the metadata associated with a particular word in Harper's dictionary as JSON.
-getmetadata word:
-  cargo run --bin harper-cli -- metadata {{word}}
+# Get the metadata associated with one or more words in Harper's dictionary as JSON.
+get-metadata *words:
+  cargo run --bin harper-cli -- metadata {{words}}
+
+get-metadata-brief *words:
+  cargo run --bin harper-cli -- metadata --brief {{words}}
+
 # Get all the forms of a word using the affixes.
-getforms word:
-  cargo run --bin harper-cli -- forms {{word}}
+get-forms +words:
+  cargo run --bin harper-cli -- forms {{words}}
+
 # Get a random sample of words from Harper's dictionary and list all forms of each.
-sampleforms count:
+sample-forms count:
   #!/usr/bin/env bash
   set -eo pipefail
-  DICT_FILE=./harper-core/dictionary.dict 
+  DICT_FILE=./harper-core/dictionary.dict
   # USER_DICT_FILE="$HOME/.config/harper-ls/dictionary.txt"
 
   if [ "{{count}}" -eq 0 ]; then
@@ -369,7 +594,7 @@ sampleforms count:
   fi
 
   total_lines=$(wc -l < $DICT_FILE)
-  
+
   # Cross-platform random line selection
   if command -v shuf >/dev/null 2>&1; then
     words=$(shuf -n "{{count}}" "$DICT_FILE")
@@ -381,14 +606,15 @@ sampleforms count:
     echo "Error: Neither 'shuf' nor 'jot' found. Cannot generate random words." >&2
     exit 1
   fi
-  
+
   cargo run --bin harper-cli -- forms $words
 
 bump-versions: update-vscode-linters
   #!/usr/bin/env bash
   set -eo pipefail
 
-  cargo ws version --no-git-push --no-git-tag --force '*'
+  # Include private crates such as harper-desktop so their versions stay in sync.
+  cargo ws version --all --no-git-push --no-git-tag --force '*'
 
   HARPER_VERSION=$(tq --raw --file harper-core/Cargo.toml .package.version)
 
@@ -412,6 +638,16 @@ bump-versions: update-vscode-linters
   cat package.json | jq ".version = \"$HARPER_VERSION\"" > package.json.edited
   mv package.json.edited package.json
 
+  cd "{{justfile_directory()}}/harper-desktop"
+
+  cat package.json | jq ".version = \"$HARPER_VERSION\"" > package.json.edited
+  mv package.json.edited package.json
+
+  cd "{{justfile_directory()}}/harper-desktop/src-tauri"
+
+  cat tauri.conf.json | jq ".version = \"$HARPER_VERSION\"" > tauri.conf.json.edited
+  mv tauri.conf.json.edited tauri.conf.json
+
   just format
 
   lazygit
@@ -419,7 +655,7 @@ bump-versions: update-vscode-linters
 # Enter an infinite loop of property testing until a bug is found.
 fuzz:
   #!/usr/bin/env bash
-  
+
   while true
   do
       QUICKCHECK_TESTS=100000 cargo test
@@ -428,7 +664,7 @@ fuzz:
       fi
   done
 
-registerlinter module name:
+register-linter module name:
   #!/usr/bin/env bash
 
   D="{{justfile_directory()}}/harper-core/src/linting"
@@ -439,19 +675,18 @@ registerlinter module name:
   just format
 
 # Print annotations and their descriptions from annotations.json
-alias printaffixes := printannotations
-alias getannotations := printannotations
-alias listannotations := printannotations
-alias showannotations := printannotations
-
-printannotations:
+alias print-affixes := print-annotations
+alias get-annotations := print-annotations
+alias list-annotations := print-annotations
+alias show-annotations := print-annotations
+print-annotations:
   #! /usr/bin/env node
   const affixesData = require('{{justfile_directory()}}/harper-core/annotations.json');
   const allEntries = {
     ...affixesData.affixes || {},
     ...affixesData.properties || {}
   };
-  
+
   // Calculate the maximum description length for alignment
   const entries = Object.entries(allEntries);
   const maxDescLength = entries.reduce((max, [flag, fields]) => {
@@ -459,7 +694,7 @@ printannotations:
     const lineLength = flag.length + 2 + description.length; // flag + ': ' + description
     return Math.max(max, lineLength);
   }, 0);
-  
+
   entries.sort((a, b) => a[0].localeCompare(b[0])).forEach(([flag, fields]) => {
     const description = fields['#'] || '';
     const comment = fields['//'] || null;
@@ -469,24 +704,24 @@ printannotations:
       console.log(line + (comment ? `${padding}// ${comment}` : ''));
     }
   });
-  
-  console.log('Available letters for new flags:', [...Array.from({length: 26}, (_, i) => 
+
+  console.log('Available letters for new flags:', [...Array.from({length: 26}, (_, i) =>
     [String.fromCharCode(65 + i), String.fromCharCode(97 + i)]
   ).flat()].filter(letter => !Object.keys(allEntries).includes(letter)).sort().join(' '));
-  console.log('Available digits for new flags:', [...Array.from({length: 10}, (_, i) => 
+  console.log('Available digits for new flags:', [...Array.from({length: 10}, (_, i) =>
     String(i)
   )].filter(digit => !Object.keys(allEntries).includes(digit)).sort().join(' '));
   console.log('Available symbols for new flags:',
     [...Array.from('!"#$%&\'()*+,-./:;<=>?@\[\\\]\^_`{|}~')]
   .filter(symbol => !Object.keys(allEntries).includes(symbol)).sort().join(' '));
-  console.log('Available Latin-1 characters for new flags:'); 
+  console.log('Available Latin-1 characters for new flags:');
   [...Array.from({length: 256-160}, (_, i) => String.fromCharCode(160 + i))]
     .filter(char => !Object.keys(allEntries).includes(char) && char.charCodeAt(0) !== 160 && char.charCodeAt(0) !== 173)
     .sort()
     .join(' ')
     .match(/.{1,64}/g)
     .forEach(line => console.log('  ' + line));
-    
+
 # Get the most recent changes to the curated dictionary. Includes an optional argument to specify the number of commits to look back. Defaults to 1.
 newest-dict-changes *numCommits:
   #! /usr/bin/env node
@@ -590,29 +825,35 @@ newest-dict-changes *numCommits:
     });
   });
 
+# Print the input string or file with nominal phrases highlighted. These are generated using Harper's chunker.
+alias get-nominal-phrases := get-nps
+alias get-noun-phrases := get-nps
+get-nps text:
+  cargo run --bin harper-cli -- nominal-phrases "{{text}}"
+
 # Suggest annotations for a potential new property annotation
-suggestannotation input:
+suggest-annotation input:
   #! /usr/bin/env node
   const affixesData = require('{{justfile_directory()}}/harper-core/annotations.json');
   const allEntries = {
     ...affixesData.affixes || {},
     ...affixesData.properties || {}
   };
-  
+
   // Get all used flags
   const usedFlags = new Set(Object.keys(allEntries));
-  
+
   // Process input string and check both cases
   const input = '{{input}}';
   const normalizedInput = input.replace(/\s/g, '');
   const uniqueChars = [...new Set(normalizedInput.toUpperCase() + normalizedInput.toLowerCase())];
-  
+
   console.log(`Checking input: "${input}"\n${'='.repeat(50)}`);
-  
+
   // Check each character in input
   const availableChars = [...new Set(uniqueChars)]
     .filter(char => !usedFlags.has(char));
-  
+
   if (availableChars.length > 0) {
     console.log(`These characters of "${input}" are available to use for new annotations:`);
     availableChars.forEach(char => console.log(`  '${char}' (${char.charCodeAt(0)})`));
@@ -621,7 +862,7 @@ suggestannotation input:
     const renamable = Object.entries(allEntries)
       .filter(([flag, entry]) => entry.rename_ok && inputChars.has(flag))
       .sort((a, b) => a[0].localeCompare(b[0]));
-    
+
     if (renamable.length > 0) {
       console.log(`None of the characters of "${input}" are available to use for new annotations, but these ones are OK to be moved to make way for new annotations:`);
       renamable.forEach(([flag, entry]) => {
@@ -631,3 +872,138 @@ suggestannotation input:
       console.log(`None of the characters of "${input}" are available to use for new annotations, and none of them are OK to be moved to make way for new annotations.`);
     }
   }
+
+# Audit the curated dictionary for any issues.
+alias audit-dict := audit-dictionary
+audit-dictionary DIR="harper-core":
+  cargo run --bin harper-cli -- audit-dictionary {{DIR}}
+
+alias test-snapshots := run-snapshots
+alias test-pos-tagger := run-snapshots
+alias test-pos-tags := run-snapshots
+alias test-pos-tagging := run-snapshots
+run-snapshots:
+  #!/usr/bin/env bash
+  set -eo pipefail
+
+  cd harper-core
+  cargo test -- test_pos_tagger test_most_lints
+
+# list configuration groups by label and description, with settings if mode is verbose
+ls-config mode="brief":
+  #! /usr/bin/env node
+  const verbose = '{{mode}}' === 'verbose';
+  const config = JSON.parse(require('fs').readFileSync(require('path').join('{{justfile_directory()}}', 'harper-core/default_config.json'), 'utf8')).settings;
+  
+  const formatLine = (items, maxLen = 120) => {
+    const lines = [];
+    let line = '  ';
+    items.forEach((item, i) => {
+      const comma = i < items.length - 1 ? ', ' : '';
+      const wouldExceed = line.length + item.length + comma.length > maxLen;
+      if (wouldExceed && line !== '  ') {
+        lines.push(line);
+        line = '  ';
+      }
+      line += item + comma;
+    });
+    lines.push(line);
+    return lines.join('\n');
+  };
+  
+  config.forEach(g => {
+    console.log(`\x1b[1m${g.Group.label}\x1b[0m: \x1b[36m${g.Group.description}\x1b[0m`);
+    if (verbose) {
+      const names = g.Group.child.settings.map(s => s.Bool.name);
+      console.log(formatLine(names));
+    }
+  });
+
+# Search configuration groups for substring in label or description
+grep-config query:
+  #! /usr/bin/env node
+  const q = '{{query}}'.toLowerCase();
+  const config = JSON.parse(require('fs').readFileSync(require('path').join('{{justfile_directory()}}', 'harper-core/default_config.json'), 'utf8')).settings;
+  
+  config.filter(g => g.Group.label.toLowerCase().includes(q) || g.Group.description.toLowerCase().includes(q))
+        .forEach(g => console.log(`\x1b[1m${g.Group.label}\x1b[0m: \x1b[36m${g.Group.description}\x1b[0m`));
+
+# Run the native allocation profiler for spell-check operations.
+alias alloc-prof := alloc-profile
+alloc-profile:
+  cargo run --example alloc_profile -p harper-core --release
+
+# Run native benchmarks.
+bench:
+  cargo bench
+
+# Build harper-wasm with bench support and run the WASM benchmark harness.
+# Runs wasm-opt by default to match the shipping build; set DISABLE_WASM_OPT=1
+# to skip it (faster rebuilds, non-shipping numbers).
+bench-wasm:
+  #!/usr/bin/env bash
+  set -eo pipefail
+
+  cd "{{justfile_directory()}}/harper-wasm"
+  if [ "${DISABLE_WASM_OPT:-0}" -eq 1 ]; then
+    wasm-pack build --target web --no-opt --out-dir pkg-bench --features bench
+  else
+    wasm-pack build --target web --out-dir pkg-bench --features bench
+  fi
+  node benches/wasm_bench.js
+
+# search configuration group settings for substring in name
+grep-config-settings query:
+  #! /usr/bin/env node
+  const q = '{{query}}'.toLowerCase();
+  const config = JSON.parse(require('fs').readFileSync(require('path').join('{{justfile_directory()}}', 'harper-core/default_config.json'), 'utf8')).settings;
+  
+  const formatLine = (items, maxLen = 120) => {
+    const lines = [];
+    let line = '  ';
+    items.forEach((item, i) => {
+      const comma = i < items.length - 1 ? ', ' : '';
+      const wouldExceed = line.length + item.length + comma.length > maxLen;
+      if (wouldExceed && line !== '  ') {
+        lines.push(line);
+        line = '  ';
+      }
+      line += item + comma;
+    });
+    lines.push(line);
+    return lines.join('\n');
+  };
+  
+  config.forEach(g => {
+    const matches = g.Group.child.settings
+      .filter(s => s.Bool.name.toLowerCase().includes(q))
+      .map(s => s.Bool.name);
+    
+    if (matches.length) {
+      console.log(`\x1b[1m${g.Group.label}\x1b[0m:`);
+      console.log(`\x1b[36m${formatLine(matches)}\x1b[0m`);
+    }
+  });
+
+# Sort nested child settings in default_config.json by name
+sort-config-settings:
+  #! /usr/bin/env node
+  const fs = require('fs');
+  const path = require('path');
+  const configPath = path.join('{{justfile_directory()}}', 'harper-core/default_config.json');
+  const inputJson = JSON.parse(fs.readFileSync(configPath, 'utf8'));
+
+  // Sort the nested child settings
+  inputJson.settings.forEach(item => {
+    if (item.Group && item.Group.child && item.Group.child.settings) {
+      item.Group.child.settings.sort((a, b) => {
+        // Extract the name property from the inner object (e.g., 'Bool')
+        const nameA = Object.values(a)[0].name;
+        const nameB = Object.values(b)[0].name;
+        return nameA.localeCompare(nameB);
+      });
+    }
+  });
+
+  fs.writeFileSync(configPath, JSON.stringify(inputJson, null, 2) + '\n');
+  console.log('Sorted default_config.json child settings by name.');

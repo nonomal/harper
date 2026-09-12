@@ -1,13 +1,15 @@
-use super::{MutableDictionary, WordId};
+use std::{
+    borrow::Cow,
+    cell::RefCell,
+    sync::{Arc, LazyLock},
+};
+
 use fst::{IntoStreamer, Map as FstMap, Streamer, map::StreamWithState};
-use lazy_static::lazy_static;
+use hashbrown::HashMap;
 use levenshtein_automata::{DFA, LevenshteinAutomatonBuilder};
-use std::{cell::RefCell, sync::Arc};
 
-use crate::{CharString, CharStringExt, WordMetadata};
-
-use super::Dictionary;
-use super::FuzzyMatchResult;
+use super::{Dictionary, FuzzyMatchResult, MutableDictionary, WordId};
+use crate::{CharString, CharStringExt, DictWordMetadata};
 
 /// An immutable dictionary allowing for very fast spellchecking.
 ///
@@ -15,19 +17,16 @@ use super::FuzzyMatchResult;
 /// [`MutableDictionary`].
 pub struct FstDictionary {
     /// Underlying [`super::MutableDictionary`] used for everything except fuzzy finding
-    full_dict: Arc<MutableDictionary>,
-    /// Used for fuzzy-finding the index of words or metadata
+    mutable_dict: Arc<MutableDictionary>,
+    /// Used for fuzzy-finding the WordId of words or metadata
     word_map: FstMap<Vec<u8>>,
-    /// Used for fuzzy-finding the index of words or metadata
-    words: Vec<(CharString, WordMetadata)>,
 }
 
 const EXPECTED_DISTANCE: u8 = 3;
-const TRANSPOSITION_COST_ONE: bool = false;
+const TRANSPOSITION_COST_ONE: bool = true;
 
-lazy_static! {
-    static ref DICT: Arc<FstDictionary> = Arc::new((*MutableDictionary::curated()).clone().into());
-}
+static DICT: LazyLock<Arc<FstDictionary>> =
+    LazyLock::new(|| Arc::new((*MutableDictionary::curated()).clone().into()));
 
 thread_local! {
     // Builders are computationally expensive and do not depend on the word, so we store a
@@ -42,7 +41,7 @@ thread_local! {
 
 impl PartialEq for FstDictionary {
     fn eq(&self, other: &Self) -> bool {
-        self.full_dict == other.full_dict
+        self.mutable_dict == other.mutable_dict
     }
 }
 
@@ -53,30 +52,29 @@ impl FstDictionary {
         (*DICT).clone()
     }
 
-    /// Construct a new [`FstDictionary`] using a word list as a source.
+    /// Construct a new [`FstDictionary`] using a wordlist as a source.
     /// This can be expensive, so only use this if fast fuzzy searches are worth it.
-    pub fn new(mut words: Vec<(CharString, WordMetadata)>) -> Self {
+    pub fn new(mut words: Vec<(CharString, DictWordMetadata)>) -> Self {
         words.sort_unstable_by(|(a, _), (b, _)| a.cmp(b));
         words.dedup_by(|(a, _), (b, _)| a == b);
 
         let mut builder = fst::MapBuilder::memory();
-        for (index, (word, _)) in words.iter().enumerate() {
-            let word = word.iter().collect::<String>();
+        for (word_chars, _) in words.iter() {
+            let word = word_chars.iter().collect::<String>();
             builder
-                .insert(word, index as u64)
+                .insert(word, WordId::from_word_chars(word_chars).into())
                 .expect("Insertion not in lexicographical order!");
         }
 
-        let mut full_dict = MutableDictionary::new();
-        full_dict.extend_words(words.iter().cloned());
+        let mut mutable_dict = MutableDictionary::new();
+        mutable_dict.extend_words(words.iter().cloned());
 
         let fst_bytes = builder.into_inner().unwrap();
         let word_map = FstMap::new(fst_bytes).expect("Unable to build FST map.");
 
         FstDictionary {
-            full_dict: Arc::new(full_dict),
+            mutable_dict: Arc::new(mutable_dict),
             word_map,
-            words,
         }
     }
 }
@@ -101,87 +99,110 @@ fn build_dfa(max_distance: u8, query: &str) -> DFA {
     })
 }
 
-/// Consumes a DFA stream and emits the index-edit distance pairs it produces.
+/// Consumes a DFA stream and emits the WordID-edit distance pairs it produces.
 fn stream_distances_vec(stream: &mut StreamWithState<&DFA>, dfa: &DFA) -> Vec<(u64, u8)> {
-    let mut word_index_pairs = Vec::new();
+    let mut word_id_pairs = Vec::new();
     while let Some((_, v, s)) = stream.next() {
-        word_index_pairs.push((v, dfa.distance(s).to_u8()));
+        word_id_pairs.push((v, dfa.distance(s).to_u8()));
     }
 
-    word_index_pairs
+    word_id_pairs
+}
+
+/// Merges WordID-distance pairs, keeping the smallest distance for each word.
+fn merge_best_distances(
+    best_distances: &mut HashMap<u64, u8>,
+    distances: impl IntoIterator<Item = (u64, u8)>,
+) {
+    for (word_id, dist) in distances {
+        best_distances
+            .entry(word_id)
+            .and_modify(|existing| *existing = (*existing).min(dist))
+            .or_insert(dist);
+    }
 }
 
 impl Dictionary for FstDictionary {
     fn contains_word(&self, word: &[char]) -> bool {
-        self.full_dict.contains_word(word)
+        self.mutable_dict.contains_word(word)
     }
 
     fn contains_word_str(&self, word: &str) -> bool {
-        self.full_dict.contains_word_str(word)
+        self.mutable_dict.contains_word_str(word)
     }
 
-    fn get_word_metadata(&self, word: &[char]) -> Option<&WordMetadata> {
-        self.full_dict.get_word_metadata(word)
+    fn get_word_metadata(&self, word: &[char]) -> Option<Cow<'_, DictWordMetadata>> {
+        self.mutable_dict.get_word_metadata(word)
     }
 
-    fn get_word_metadata_str(&self, word: &str) -> Option<&WordMetadata> {
-        self.full_dict.get_word_metadata_str(word)
+    fn get_word_metadata_str(&self, word: &str) -> Option<Cow<'_, DictWordMetadata>> {
+        self.mutable_dict.get_word_metadata_str(word)
     }
 
     fn fuzzy_match(
-        &self,
+        &'_ self,
         word: &[char],
         max_distance: u8,
         max_results: usize,
-    ) -> Vec<FuzzyMatchResult> {
+    ) -> Vec<FuzzyMatchResult<'_>> {
         let misspelled_word_charslice = word.normalized();
         let misspelled_word_string = misspelled_word_charslice.to_string();
+        let misspelled_lower = misspelled_word_string.to_lowercase();
+        let is_already_lower = misspelled_lower == misspelled_word_string;
 
         // Actual FST search
         let dfa = build_dfa(max_distance, &misspelled_word_string);
-        let dfa_lowercase = build_dfa(max_distance, &misspelled_word_string.to_lowercase());
-        let mut word_indexes_stream = self.word_map.search_with_state(&dfa).into_stream();
-        let mut word_indexes_lowercase_stream = self
-            .word_map
-            .search_with_state(&dfa_lowercase)
-            .into_stream();
+        let mut word_ids_stream = self.word_map.search_with_state(&dfa).into_stream();
+        let upper_dists = stream_distances_vec(&mut word_ids_stream, &dfa);
 
-        let upper_dists = stream_distances_vec(&mut word_indexes_stream, &dfa);
-        let lower_dists = stream_distances_vec(&mut word_indexes_lowercase_stream, &dfa_lowercase);
+        // Merge the two results, keeping the smallest distance when both DFAs match.
+        // The uppercase and lowercase searches can return different result counts, so
+        // we can't simply zip the vectors without losing matches.
+        let mut best_distances = HashMap::<u64, u8>::new();
 
-        let mut merged = Vec::with_capacity(upper_dists.len());
+        merge_best_distances(&mut best_distances, upper_dists);
 
-        // Merge the two results
-        for ((i_u, dist_u), (i_l, dist_l)) in upper_dists.into_iter().zip(lower_dists.into_iter()) {
-            let (chosen_index, edit_distance) = if dist_u <= dist_l {
-                (i_u, dist_u)
-            } else {
-                (i_l, dist_l)
-            };
+        // Only build the lowercase DFA when the query is not already lowercase.
+        if !is_already_lower {
+            let dfa_lowercase = build_dfa(max_distance, &misspelled_lower);
+            let mut word_ids_lowercase_stream = self
+                .word_map
+                .search_with_state(&dfa_lowercase)
+                .into_stream();
+            let lower_dists = stream_distances_vec(&mut word_ids_lowercase_stream, &dfa_lowercase);
 
-            let (word, metadata) = &self.words[chosen_index as usize];
+            merge_best_distances(&mut best_distances, lower_dists);
+        }
 
+        let mut merged = Vec::with_capacity(best_distances.len());
+        for (word_id, edit_distance) in best_distances {
+            let word = self.mutable_dict.get_word_from_id(&word_id.into()).unwrap();
+            let metadata = self.mutable_dict.get_word_metadata(word).unwrap();
             merged.push(FuzzyMatchResult {
                 word,
                 edit_distance,
                 metadata,
-            })
+            });
         }
 
-        merged.sort_unstable_by_key(|v| v.word);
-        merged.dedup_by_key(|v| v.word);
-        merged.sort_unstable_by_key(|v| v.edit_distance);
+        // Ignore exact matches
+        merged.retain(|v| v.edit_distance > 0);
+        merged.sort_unstable_by(|a, b| {
+            a.edit_distance
+                .cmp(&b.edit_distance)
+                .then_with(|| a.word.cmp(b.word))
+        });
         merged.truncate(max_results);
 
         merged
     }
 
     fn fuzzy_match_str(
-        &self,
+        &'_ self,
         word: &str,
         max_distance: u8,
         max_results: usize,
-    ) -> Vec<FuzzyMatchResult> {
+    ) -> Vec<FuzzyMatchResult<'_>> {
         self.fuzzy_match(
             word.chars().collect::<Vec<_>>().as_slice(),
             max_distance,
@@ -190,27 +211,35 @@ impl Dictionary for FstDictionary {
     }
 
     fn words_iter(&self) -> Box<dyn Iterator<Item = &'_ [char]> + Send + '_> {
-        self.full_dict.words_iter()
+        self.mutable_dict.words_iter()
     }
 
     fn word_count(&self) -> usize {
-        self.full_dict.word_count()
+        self.mutable_dict.word_count()
     }
 
     fn contains_exact_word(&self, word: &[char]) -> bool {
-        self.full_dict.contains_exact_word(word)
+        self.mutable_dict.contains_exact_word(word)
     }
 
     fn contains_exact_word_str(&self, word: &str) -> bool {
-        self.full_dict.contains_exact_word_str(word)
+        self.mutable_dict.contains_exact_word_str(word)
     }
 
     fn get_correct_capitalization_of(&self, word: &[char]) -> Option<&'_ [char]> {
-        self.full_dict.get_correct_capitalization_of(word)
+        self.mutable_dict.get_correct_capitalization_of(word)
     }
 
     fn get_word_from_id(&self, id: &WordId) -> Option<&[char]> {
-        self.full_dict.get_word_from_id(id)
+        self.mutable_dict.get_word_from_id(id)
+    }
+
+    fn find_words_with_prefix(&self, prefix: &[char]) -> Vec<Cow<'_, [char]>> {
+        self.mutable_dict.find_words_with_prefix(prefix)
+    }
+
+    fn find_words_with_common_prefix(&self, word: &[char]) -> Vec<Cow<'_, [char]>> {
+        self.mutable_dict.find_words_with_common_prefix(word)
     }
 }
 
@@ -219,12 +248,61 @@ mod tests {
     use itertools::Itertools;
 
     use crate::CharStringExt;
-    use crate::spell::{Dictionary, WordId};
+    use crate::DictWordMetadata;
+    use crate::spell::{Dictionary, MutableDictionary, WordId};
 
     use super::FstDictionary;
 
+    fn test_dictionaries(words: &[&str]) -> (MutableDictionary, FstDictionary) {
+        let mut mutable = MutableDictionary::new();
+
+        for word in words {
+            mutable.append_word_str(word, DictWordMetadata::default());
+        }
+
+        let fst = FstDictionary::from(mutable.clone());
+
+        (mutable, fst)
+    }
+
+    fn fuzzy_matches<D: Dictionary + ?Sized>(
+        dict: &D,
+        word: &str,
+        max_distance: u8,
+        max_results: usize,
+    ) -> Vec<(String, u8)> {
+        let mut matches = dict
+            .fuzzy_match_str(word, max_distance, max_results)
+            .into_iter()
+            .map(|result| (result.word.iter().collect::<String>(), result.edit_distance))
+            .collect_vec();
+
+        matches.sort_unstable_by(|a, b| a.1.cmp(&b.1).then_with(|| a.0.cmp(&b.0)));
+        matches
+    }
+
     #[test]
-    fn fst_map_contains_all_in_full_dict() {
+    fn damerau_transposition_costs_one() {
+        let lev_automata =
+            levenshtein_automata::LevenshteinAutomatonBuilder::new(1, true).build_dfa("woof");
+        assert_eq!(
+            lev_automata.eval("wofo"),
+            levenshtein_automata::Distance::Exact(1)
+        );
+    }
+
+    #[test]
+    fn damerau_transposition_costs_two() {
+        let lev_automata =
+            levenshtein_automata::LevenshteinAutomatonBuilder::new(1, false).build_dfa("woof");
+        assert_eq!(
+            lev_automata.eval("wofo"),
+            levenshtein_automata::Distance::AtLeast(2)
+        );
+    }
+
+    #[test]
+    fn fst_map_contains_all_in_mutable_dict() {
         let dict = FstDictionary::curated();
 
         for word in dict.words_iter() {
@@ -235,10 +313,7 @@ mod tests {
             dbg!(&misspelled_lower);
 
             assert!(!misspelled_word.is_empty());
-            assert!(
-                dict.word_map.contains_key(misspelled_word)
-                    || dict.word_map.contains_key(misspelled_lower)
-            );
+            assert!(dict.word_map.contains_key(misspelled_word));
         }
     }
 
@@ -266,6 +341,18 @@ mod tests {
     }
 
     #[test]
+    fn dickens_is_not_a_swear_1656() {
+        let dict = FstDictionary::curated();
+        let metadata = dict.get_word_metadata_str("Dickens").unwrap();
+
+        assert!(metadata.is_proper_noun());
+        assert!(!metadata.is_swear());
+        assert!(metadata.derived_from.is_none());
+        assert!(dict.contains_exact_word_str("dickens"));
+        assert!(dict.get_word_metadata_str("dick").unwrap().is_swear());
+    }
+
+    #[test]
     fn fuzzy_result_sorted_by_edit_distance() {
         let dict = FstDictionary::curated();
 
@@ -277,13 +364,6 @@ mod tests {
             .all(|(a, b)| a <= b);
 
         assert!(is_sorted_by_dist)
-    }
-
-    #[test]
-    fn curated_contains_no_duplicates() {
-        let dict = FstDictionary::curated();
-
-        assert!(dict.words.iter().map(|(word, _)| word).all_unique());
     }
 
     #[test]
@@ -353,5 +433,54 @@ mod tests {
                 .unwrap(),
             WordId::from_word_str("quick")
         );
+    }
+
+    #[test]
+    fn lowercase_fuzzy_match_matches_mutable_dictionary() {
+        let (mutable, fst) =
+            test_dictionaries(&["spelling", "spilling", "selling", "smelling", "shelling"]);
+
+        let mutable_results = fuzzy_matches(&mutable, "speling", 3, 10);
+        let fst_results = fuzzy_matches(&fst, "speling", 3, 10);
+
+        assert_eq!(fst_results, mutable_results);
+        assert_eq!(fst_results.first(), Some(&(String::from("spelling"), 1)));
+    }
+
+    #[test]
+    fn capitalized_fuzzy_match_matches_mutable_dictionary() {
+        let (mutable, fst) =
+            test_dictionaries(&["spelling", "spilling", "selling", "smelling", "shelling"]);
+
+        let mutable_results = fuzzy_matches(&mutable, "Speling", 3, 10);
+        let fst_results = fuzzy_matches(&fst, "Speling", 3, 10);
+
+        assert_eq!(fst_results, mutable_results);
+        assert_eq!(fst_results.first(), Some(&(String::from("spelling"), 1)));
+    }
+
+    #[test]
+    fn uppercase_fuzzy_match_matches_mutable_dictionary() {
+        let (mutable, fst) =
+            test_dictionaries(&["spelling", "spilling", "selling", "smelling", "shelling"]);
+
+        let mutable_results = fuzzy_matches(&mutable, "SPELING", 3, 10);
+        let fst_results = fuzzy_matches(&fst, "SPELING", 3, 10);
+
+        assert_eq!(fst_results, mutable_results);
+        assert_eq!(fst_results.first(), Some(&(String::from("spelling"), 1)));
+    }
+
+    #[test]
+    fn query_casing_produces_the_same_fuzzy_matches() {
+        let (_, fst) =
+            test_dictionaries(&["spelling", "spilling", "selling", "smelling", "shelling"]);
+
+        let lowercase = fuzzy_matches(&fst, "speling", 3, 10);
+        let capitalized = fuzzy_matches(&fst, "Speling", 3, 10);
+        let uppercase = fuzzy_matches(&fst, "SPELING", 3, 10);
+
+        assert_eq!(lowercase, capitalized);
+        assert_eq!(lowercase, uppercase);
     }
 }

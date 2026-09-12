@@ -41,11 +41,14 @@ Additionally, you can also configure things like which linters to use or how you
 ```toml title=languages.toml
 [language-server.harper-ls.config.harper-ls]
 userDictPath = ""
+workspaceDictPath = ""
 fileDictPath = ""
 diagnosticSeverity = "hint"
 isolateEnglish = false
 dialect = "American"
 maxFileLength = 120000
+ignoredLintsPath = ""
+excludePatterns = []
 
 [language-server.harper-ls.config.harper-ls.linters]
 SpellCheck = true
@@ -53,11 +56,10 @@ SpelledNumbers = false
 AnA = true
 SentenceCapitalization = true
 UnclosedQuotes = true
-WrongQuotes = false
+WrongApostrophe = false
 LongSentences = true
 RepeatedWords = true
 Spaces = true
-Matcher = true
 CorrectNumberSuffix = true
 
 [language-server.harper-ls.config.harper-ls.codeActions]

@@ -2,7 +2,7 @@ use super::super::{ExprLinter, Lint, LintKind};
 use crate::expr::Expr;
 use crate::expr::SequenceExpr;
 use crate::linting::Suggestion;
-use crate::patterns::WordSet;
+use crate::linting::expr_linter::Chunk;
 use crate::{Token, char_string::char_string};
 
 pub struct ToHope {
@@ -14,7 +14,7 @@ impl Default for ToHope {
         let pattern = SequenceExpr::default()
             .then_nominal()
             .then_whitespace()
-            .then(WordSet::new(&["hop", "hopped"]))
+            .then_word_set(["hop", "hopped"])
             .then_whitespace()
             .then_nominal();
 
@@ -25,13 +25,15 @@ impl Default for ToHope {
 }
 
 impl ExprLinter for ToHope {
+    type Unit = Chunk;
+
     fn expr(&self) -> &dyn Expr {
         self.expr.as_ref()
     }
 
     fn match_to_lint(&self, matched_tokens: &[Token], source: &[char]) -> Option<Lint> {
         let offending_word = &matched_tokens[2];
-        let word_chars = offending_word.span.get_content(source);
+        let word_chars = offending_word.get_ch(source);
 
         Some(Lint {
             span: offending_word.span,
@@ -40,7 +42,7 @@ impl ExprLinter for ToHope {
                 char_string!("hope").to_vec(),
                 word_chars,
             )],
-            message: "Did you mean to use 'hope' instead of 'hop' in this context?".to_string(),
+            message: "Did you mean to use 'hope' instead of 'hop' in this context?".to_owned(),
             ..Default::default()
         })
     }

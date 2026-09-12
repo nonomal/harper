@@ -1,62 +1,69 @@
+use harper_brill::UPOS;
+
+use crate::CharStringExt;
 use crate::expr::Expr;
 use crate::expr::SequenceExpr;
+use crate::linting::expr_linter::Chunk;
 use crate::{
     Token,
+    dict_word_metadata::Person,
     linting::{ExprLinter, Lint, LintKind, Suggestion},
     patterns::WordSet,
-    word_metadata::Person,
 };
 
 pub struct NominalWants {
-    expr: Box<dyn Expr>,
+    expr: SequenceExpr,
 }
 
 impl Default for NominalWants {
     fn default() -> Self {
         fn is_applicable_pronoun(tok: &Token, src: &[char]) -> bool {
-            if tok.kind.is_pronoun() {
-                let pron = tok.span.get_content_string(src).to_lowercase();
-                // "That" can act as two kinds of pronoun: demonstrative and relative.
-                // As a demonstrative pronoun, it's third person singular.
-                // As a relative pronoun, it's behaves as any person:
-                // I am the one that wants to. He is the one that wants to.
-                pron != "that"
+            if tok.kind.is_pronoun() && tok.kind.is_upos(UPOS::PRON) {
+                let pron = tok.get_ch(src);
+                !pron.eq_any_ignore_ascii_case_chars(&[
+                    // "That" can act as two kinds of pronoun: demonstrative and relative.
+                    // As a demonstrative pronoun, it's third person singular.
+                    // As a relative pronoun, it's behaves as any person:
+                    // I am the one that wants to. He is the one that wants to.
+                    &['t', 'h', 'a', 't'],
                     // Personal pronouns have case. Object case personal pronouns
                     // can come after "want":
                     // Make them want to believe.
                     // Note: "you" and "it" are both subject and object case.
-                    && pron != "me"
-                    && pron != "us"
+                    &['m', 'e'],
+                    &['u', 's'],
                     // "you" is subject and object both OK before "want".
-                    && pron != "him"
-                    && pron != "her"
+                    &['h', 'i', 'm'],
+                    &['h', 'e', 'r'],
                     // "it" is both subject and object. Subject before "wants", object before "want".
-                    && pron != "it"
-                    && pron != "them"
+                    &['i', 't'],
+                    &['t', 'h', 'e', 'm'],
+                    &['w', 'h', 'o'],
+                ])
             } else {
                 false
             }
         }
 
-        let miss = WordSet::new(&["wont", "wonts", "want", "wants"]);
-        let pattern = SequenceExpr::default()
-            .then(is_applicable_pronoun)
+        let miss = WordSet::new(["wont", "wonts", "want", "wants"]);
+        let pattern = SequenceExpr::with(is_applicable_pronoun)
             .then_whitespace()
             .then(miss);
-        Self {
-            expr: Box::new(pattern),
-        }
+
+        Self { expr: pattern }
     }
 }
 
 impl ExprLinter for NominalWants {
+    type Unit = Chunk;
+
     fn expr(&self) -> &dyn Expr {
-        self.expr.as_ref()
+        &self.expr
     }
 
     fn match_to_lint(&self, toks: &[Token], source: &[char]) -> Option<Lint> {
         let subject = toks.first()?;
-        let offender = toks.last()?;
+        let offender = &toks.last()?;
 
         let plural = subject.kind.is_plural_nominal();
 
@@ -78,14 +85,20 @@ impl ExprLinter for NominalWants {
 
         let replacement_chars: Vec<char> = replacement.chars().collect();
 
-        if offender.span.get_content(source) == replacement_chars.as_slice() {
+        let offender_span = offender.span;
+        let offender_chars = offender_span.get_content(source);
+
+        if offender_chars.eq_ch(&replacement_chars) {
             return None;
         }
 
         Some(Lint {
-            span: offender.span,
+            span: offender_span,
             lint_kind: LintKind::Miscellaneous,
-            suggestions: vec![Suggestion::ReplaceWith(replacement_chars)],
+            suggestions: vec![Suggestion::replace_with_match_case(
+                replacement_chars,
+                offender_chars,
+            )],
             message: format!("Did you mean `{replacement}`?"),
             priority: 55,
         })
@@ -99,7 +112,7 @@ impl ExprLinter for NominalWants {
 #[cfg(test)]
 mod tests {
     use super::NominalWants;
-    use crate::linting::tests::{assert_lint_count, assert_suggestion_result};
+    use crate::linting::tests::{assert_lint_count, assert_no_lints, assert_suggestion_result};
 
     #[test]
     fn fixes_he_wonts() {
@@ -296,5 +309,21 @@ mod tests {
     #[test]
     fn ignores_correct_usage_help_them() {
         assert_lint_count("And help them want to do it.", NominalWants::default(), 0)
+    }
+
+    #[test]
+    fn allows_want_to() {
+        assert_no_lints(
+            "Harper is a grammar checker for people who want to write fast.",
+            NominalWants::default(),
+        );
+    }
+
+    #[test]
+    fn test_2007() {
+        assert_no_lints(
+            "### 🙌 **We Want to Hear From You!**",
+            NominalWants::default(),
+        )
     }
 }

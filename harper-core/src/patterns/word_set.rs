@@ -1,7 +1,7 @@
 use super::SingleTokenPattern;
 use smallvec::SmallVec;
 
-use crate::{CharString, Token};
+use crate::{CharString, Token, char_ext::CharExt};
 
 /// A [`super::Pattern`] that matches against any of a set of provided words.
 /// For small sets of short words, it doesn't allocate.
@@ -21,18 +21,41 @@ impl WordSet {
         }
     }
 
+    pub fn add_chars(&mut self, chars: &[char]) {
+        if !self.words.iter().any(|i| i.as_ref() == chars) {
+            self.words.push(chars.into());
+        }
+    }
+
     pub fn contains(&self, word: &str) -> bool {
         self.words.contains(&word.chars().collect())
     }
 
     /// Create a new word set that matches against any word in the provided list.
-    pub fn new(words: &[&'static str]) -> Self {
+    pub fn new<I, S>(words: I) -> Self
+    where
+        I: IntoIterator<Item = S>,
+        S: AsRef<str>,
+    {
         let mut set = Self::default();
 
         for str in words {
-            set.add(str);
+            set.add(str.as_ref());
         }
 
+        set
+    }
+}
+
+impl<S> FromIterator<S> for WordSet
+where
+    S: AsRef<str>,
+{
+    fn from_iter<I: IntoIterator<Item = S>>(iter: I) -> Self {
+        let mut set = Self::default();
+        for str in iter {
+            set.add(str.as_ref());
+        }
         set
     }
 }
@@ -43,26 +66,17 @@ impl SingleTokenPattern for WordSet {
             return false;
         }
 
-        let tok_chars = token.span.get_content(source);
+        let tok_chars = token.get_ch(source);
 
         for word in &self.words {
             if tok_chars.len() != word.len() {
                 continue;
             }
 
-            fn canonical(c: &char) -> char {
-                match c {
-                    '\u{2018}' | '\u{2019}' | '\u{02BC}' | '\u{FF07}' => '\'',
-                    '\u{201C}' | '\u{201D}' | '\u{FF02}' => '"',
-                    '\u{2013}' | '\u{2014}' | '\u{2212}' | '\u{FF0D}' => '-',
-                    _ => *c,
-                }
-            }
-
             let partial_match = tok_chars
                 .iter()
-                .map(canonical)
-                .zip(word.iter().map(canonical))
+                .map(CharExt::normalized)
+                .zip(word.iter().map(CharExt::normalized))
                 .all(|(a, b)| a.eq_ignore_ascii_case(&b));
 
             if partial_match {

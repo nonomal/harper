@@ -1,13 +1,14 @@
+use crate::TokenKind;
 use crate::expr::Expr;
 use crate::expr::LongestMatchOf;
 use crate::expr::SequenceExpr;
 use crate::{
     Token,
     linting::{Lint, LintKind, Suggestion},
-    patterns::WordSet,
 };
 
 use crate::linting::ExprLinter;
+use crate::linting::expr_linter::Chunk;
 
 /// See also:
 /// harper-core/src/linting/compound_nouns/implied_ownership_compound_nouns.rs
@@ -21,30 +22,27 @@ pub struct NoContractionWithVerb {
 impl Default for NoContractionWithVerb {
     fn default() -> Self {
         // Only tests "let".
-        let let_ws = SequenceExpr::default()
-            .then(WordSet::new(&["lets", "let"]))
-            .then_whitespace();
+        let let_ws = SequenceExpr::word_set(["lets", "let"]).then_whitespace();
 
-        // Match verbs that are only verbs (not also nouns/adjectives) and not in -ing form
-        let non_ing_verb = SequenceExpr::default().then(|tok: &Token, _src: &[char]| {
-            let Some(Some(meta)) = tok.kind.as_word() else {
-                return false;
-            };
-            meta.is_verb()
-                && !meta.is_noun()
-                && !meta.is_adjective()
-                && !meta.is_verb_progressive_form()
-        });
+        let non_ing_verb = SequenceExpr::default().then_kind_is_but_isnt_any_of(
+            TokenKind::is_verb,
+            &[
+                TokenKind::is_noun,
+                TokenKind::is_adjective,
+                TokenKind::is_verb_progressive_form,
+            ] as &[_],
+        );
 
         // Ambiguous word is a verb determined by heuristic of following word's part of speech
         // Tests the next two words after "let".
         let verb_due_to_following_pos = SequenceExpr::default()
-            .then(|tok: &Token, _source: &[char]| tok.kind.is_verb())
+            .then_verb()
             .then_whitespace()
-            .then(|tok: &Token, _source: &[char]| {
-                // The 3rd word after let/lets and a verb
-                tok.kind.is_determiner() || tok.kind.is_pronoun() || tok.kind.is_conjunction()
-            });
+            .then_kind_any(&[
+                TokenKind::is_determiner,
+                TokenKind::is_pronoun,
+                TokenKind::is_conjunction,
+            ] as &[_]);
 
         let let_then_verb = let_ws.then(LongestMatchOf::new(vec![
             Box::new(non_ing_verb),
@@ -58,14 +56,16 @@ impl Default for NoContractionWithVerb {
 }
 
 impl ExprLinter for NoContractionWithVerb {
+    type Unit = Chunk;
+
     fn expr(&self) -> &dyn Expr {
         self.expr.as_ref()
     }
 
     fn match_to_lint(&self, matched_tokens: &[Token], source: &[char]) -> Option<Lint> {
         let (let_string, verb_string) = (
-            matched_tokens[0].span.get_content_string(source),
-            matched_tokens[2].span.get_content_string(source),
+            matched_tokens[0].get_str(source),
+            matched_tokens[2].get_str(source),
         );
 
         // "to let go" is a phrasal verb but "lets go" is quite a common mistake for "let's go"

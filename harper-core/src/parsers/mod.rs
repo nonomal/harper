@@ -4,6 +4,7 @@ mod collapse_identifiers;
 mod isolate_english;
 mod markdown;
 mod mask;
+mod oops_all_headings;
 mod org_mode;
 mod plain_english;
 
@@ -12,13 +13,14 @@ pub use collapse_identifiers::CollapseIdentifiers;
 pub use isolate_english::IsolateEnglish;
 pub use markdown::{Markdown, MarkdownOptions};
 pub use mask::Mask;
+pub use oops_all_headings::OopsAllHeadings;
 pub use org_mode::OrgMode;
 pub use plain_english::PlainEnglish;
 
 use crate::{LSend, Token, TokenStringExt};
 
-#[cfg_attr(feature = "concurrent", blanket(derive(Box, Arc)))]
-#[cfg_attr(not(feature = "concurrent"), blanket(derive(Box, Rc)))]
+#[cfg_attr(feature = "concurrent", blanket(derive(Ref, Box, Arc)))]
+#[cfg_attr(not(feature = "concurrent"), blanket(derive(Ref, Box, Rc)))]
 pub trait Parser: LSend {
     fn parse(&self, source: &[char]) -> Vec<Token>;
 }

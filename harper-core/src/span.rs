@@ -4,7 +4,7 @@ use serde::{Deserialize, Serialize};
 
 use crate::Token;
 
-/// A window in a [`T`] sequence.
+/// A window in a `T` sequence.
 ///
 /// Note that the range covered by a [`Span`] is end-exclusive, meaning that the end index is not
 /// included in the range covered by the [`Span`]. If you're familiar with the Rust range syntax,
@@ -15,7 +15,7 @@ use crate::Token;
 /// behavior or panics.
 ///
 /// Although specific to `harper.js`, [this page may clear up any questions you have](https://writewithharper.com/docs/harperjs/spans).
-#[derive(Debug, Serialize, Deserialize, Default, PartialEq, Eq)]
+#[derive(Debug, Serialize, Deserialize, Default, PartialEq, Eq, Hash)]
 pub struct Span<T> {
     /// The start index of the span.
     pub start: usize,
@@ -24,16 +24,13 @@ pub struct Span<T> {
     /// Note that [`Span`] represents an exclusive range. This means that a `Span::new(0, 5)` will
     /// cover the values `0, 1, 2, 3, 4`; it will not cover the `5`.
     pub end: usize,
+    #[serde(skip)]
     span_type: PhantomData<T>,
 }
 
 impl<T> Span<T> {
-    /// An empty [`Span`].
-    pub const EMPTY: Self = Self {
-        start: 0,
-        end: 0,
-        span_type: PhantomData,
-    };
+    /// A [`Span`] with a start and end index of 0.
+    pub const ZERO: Self = Self::empty(0);
 
     /// Creates a new [`Span`] with the provided start and end indices.
     ///
@@ -60,6 +57,15 @@ impl<T> Span<T> {
         }
     }
 
+    /// Creates a new empty [`Span`] with the provided position.
+    pub const fn empty(pos: usize) -> Self {
+        Self {
+            start: pos,
+            end: pos,
+            span_type: PhantomData,
+        }
+    }
+
     /// The length of the [`Span`].
     pub fn len(&self) -> usize {
         self.end - self.start
@@ -74,8 +80,6 @@ impl<T> Span<T> {
 
     /// Checks whether `idx` is within the range of the span.
     pub fn contains(&self, idx: usize) -> bool {
-        assert!(self.start <= self.end);
-
         self.start <= idx && idx < self.end
     }
 
@@ -84,17 +88,14 @@ impl<T> Span<T> {
         (self.start < other.end) && (other.start < self.end)
     }
 
-    /// Get the associated content. Will return [`None`] if any aspect is
+    /// Get the associated content. Will return [`None`] if the span is non-empty and any aspect is
     /// invalid.
     pub fn try_get_content<'a>(&self, source: &'a [T]) -> Option<&'a [T]> {
-        if (self.start > self.end) || (self.start >= source.len()) || (self.end > source.len()) {
-            if self.is_empty() {
-                return Some(&source[0..0]);
-            }
-            return None;
+        if self.is_empty() {
+            Some(&source[0..0])
+        } else {
+            source.get(self.start..self.end)
         }
-
-        Some(&source[self.start..self.end])
     }
 
     /// Expand the span by either modifying [`Self::start`] or [`Self::end`] to include the target
@@ -160,13 +161,6 @@ impl<T> Span<T> {
         clone.end -= by;
         Some(clone)
     }
-
-    /// Add an amount to a copy of both [`Self::start`] and [`Self::end`]
-    pub fn with_offset(&self, by: usize) -> Self {
-        let mut clone = *self;
-        clone.push_by(by);
-        clone
-    }
 }
 
 /// Additional functions for types that implement [`std::fmt::Debug`] and [`Display`].
@@ -190,7 +184,7 @@ impl Span<Token> {
     /// this span is required.
     pub fn to_char_span(&self, source_document_tokens: &[Token]) -> Span<char> {
         if self.is_empty() {
-            Span::EMPTY
+            Span::ZERO
         } else {
             let target_tokens = &source_document_tokens[self.start..self.end];
             Span::new(
@@ -274,13 +268,12 @@ mod tests {
         let doc = Document::new_plain_english_curated("Hello world!");
 
         // Empty span.
-        let token_span = Span::EMPTY;
+        let token_span = Span::ZERO;
         let converted = token_span.to_char_span(doc.get_tokens());
         assert!(converted.is_empty());
 
         // Span from `Expr`.
-        let token_span = SequenceExpr::default()
-            .then_any_word()
+        let token_span = SequenceExpr::any_word()
             .t_ws()
             .then_any_word()
             .iter_matches_in_doc(&doc)

@@ -7,7 +7,7 @@ use crate::{Span, render_markdown::render_markdown};
 use super::{LintKind, Suggestion};
 
 /// An error found in text.
-#[derive(Debug, Clone, Serialize, Deserialize, PartialEq)]
+#[derive(Debug, Clone, Serialize, Deserialize, PartialEq, Hash)]
 pub struct Lint {
     /// The location in the source text the error lies.
     /// Important for automatic lint resolution through [`Self::suggestions`].
@@ -46,6 +46,16 @@ impl Lint {
     /// Interpret the message as Markdown and render it to HTML.
     pub fn message_html(&self) -> String {
         render_markdown(&self.message)
+    }
+
+    /// Get the lint's span content as a slice of characters.
+    pub fn get_ch<'a>(&self, source: &'a [char]) -> &'a [char] {
+        self.span.get_content(source)
+    }
+
+    /// Get the lint's span content as a string.
+    pub fn get_str(&self, source: &[char]) -> String {
+        self.span.get_content_string(source)
     }
 }
 

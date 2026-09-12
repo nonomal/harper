@@ -1,30 +1,32 @@
 use crate::expr::Expr;
 use crate::expr::SequenceExpr;
-use crate::{Token, TokenStringExt};
+use crate::{Token, TokenKind, TokenStringExt};
 
 use super::{ExprLinter, Lint, LintKind, Suggestion};
+use crate::linting::expr_linter::Chunk;
 
 pub struct Hereby {
-    expr: Box<dyn Expr>,
+    expr: SequenceExpr,
 }
 
 impl Default for Hereby {
     fn default() -> Self {
-        let pattern = SequenceExpr::aco("here")
+        // Require a verb that is not also a noun. Otherwise sentences like
+        // "I got here by skill" — where "skill" is a noun object of "by" —
+        // match because "skill" is tagged as both verb and noun.
+        let pattern = SequenceExpr::word_seq(&["here", "by"])
             .then_whitespace()
-            .t_aco("by")
-            .then_whitespace()
-            .then_verb();
+            .then_kind_is_but_is_not(TokenKind::is_verb, TokenKind::is_noun);
 
-        Self {
-            expr: Box::new(pattern),
-        }
+        Self { expr: pattern }
     }
 }
 
 impl ExprLinter for Hereby {
+    type Unit = Chunk;
+
     fn expr(&self) -> &dyn Expr {
-        self.expr.as_ref()
+        &self.expr
     }
 
     fn match_to_lint(&self, matched_tokens: &[Token], source: &[char]) -> Option<Lint> {
@@ -60,5 +62,11 @@ mod tests {
             Hereby::default(),
             "I hereby declare this state to be free.",
         );
+    }
+
+    #[test]
+    fn allows_here_by_noun() {
+        use crate::linting::tests::assert_no_lints;
+        assert_no_lints("I got here by skill.", Hereby::default());
     }
 }

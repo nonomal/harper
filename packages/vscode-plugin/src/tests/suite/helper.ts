@@ -44,13 +44,13 @@ export async function openUntitled(text: string): Promise<Uri> {
 
 export async function setTextDocumentLanguage(uri: Uri, languageId: string): Promise<void> {
 	const document = await workspace.openTextDocument(uri);
-	languages.setTextDocumentLanguage(document, languageId);
+	await languages.setTextDocumentLanguage(document, languageId);
 }
 
 export function createExpectedDiagnostics(
-	...data: { message: string; range: Range }[]
+	...data: { message: string; range: Range; source: string; code: string }[]
 ): Diagnostic[] {
-	return data.map((d) => ({ ...d, source: 'Harper', severity: DiagnosticSeverity.Information }));
+	return data.map((d) => ({ ...d, severity: DiagnosticSeverity.Information }));
 }
 
 export function compareActualVsExpectedDiagnostics(
@@ -79,7 +79,7 @@ export function createRange(
 }
 
 function getActualDiagnostics(resource: Uri): Diagnostic[] {
-	return languages.getDiagnostics(resource).filter((d) => d.source === 'Harper');
+	return languages.getDiagnostics(resource).filter((d) => d.source?.includes('Harper'));
 }
 
 /** Note that this function times out if there is no change detected. */
@@ -91,8 +91,8 @@ export function waitForDiagnosticsChange(
 		const before = func ? getActualDiagnostics(uri) : [];
 
 		(func || (async () => {}))().then(() => {
-			const delay = 10;
-			const limit = 10;
+			const delay = 50;
+			const limit = 20;
 			let counter = 0;
 
 			const tryCompare = () => {

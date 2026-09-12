@@ -1,74 +1,74 @@
-> " This    " and " that          " are common  and fulfill multiple purposes in      everyday English   .
-# . I/Ddem+ . V/C . NSg/I/C/Ddem+ . V   NSg/V/J V/C V/NoAm  NSg/J/Dq NPl/V    NPr/J/P NSg/J+   NPr🅪/V/J+ .
+> " This    " and  " that      " are common and  fulfill multiple purposes in        everyday English      .
+# . I/Ddem+ . VB/C . I/C/Ddem+ . VLB VB/J   VB/C VB/NoAm NSg/J/Dq NPl/V3   NPr/J/R/P NSg/J+   NPr🅪Sg/VB/J+ .
 > As    such  , disambiguating them     is  necessary .
-# NSg/R NSg/I . V              NSg/IPl+ VL+ NSg/J     .
+# R/C/P NSg/I . Nᴹ/Vg/J        NSg/IPl+ VL3 NSg/J     .
 >
 #
-> This    document contains various sentences that          use   " this    " , " that          " , " these   " , and
-# I/Ddem+ NSg/V    V        J       NPl/V+    NSg/I/C/Ddem+ NSg/V . I/Ddem+ . . . NSg/I/C/Ddem+ . . . I/Ddem+ . . V/C
-> " those  " in      different contexts with a   lot   of edge   cases  .
-# . I/Ddem . NPr/J/P NSg/J     NPl/V    P    D/P NPr/V P  NSg/V+ NPl/V+ .
+> This    document contains various sentences that      use     " this    " , " that      " , " these  " , and
+# I/Ddem+ NSg/VB+  V3       J+      NPl/V3+   I/C/Ddem+ N🅪Sg/VB . I/Ddem+ . . . I/C/Ddem+ . . . I/Ddem . . VB/C
+> " those  " in        different contexts with a   lot    of edge    cases   .
+# . I/Ddem . NPr/J/R/P NSg/J     NPl/V3   P    D/P NPr/VB P  NSg/VB+ NPl/V3+ .
 >
 #
-> Examples
-# NPl/V+
+>              Examples
+# HeadingStart NPl/V3+
 >
 #
-> This    triangle is  nice     .
-# I/Ddem+ NSg+     VL+ NPr/V/J+ .
-> This    is  nice     .
-# I/Ddem+ VL+ NPr/V/J+ .
-> That          triangle is  nice     .
-# NSg/I/C/Ddem+ NSg+     VL+ NPr/V/J+ .
-> That          is  nice     .
-# NSg/I/C/Ddem+ VL+ NPr/V/J+ .
-> These   triangles are nice     .
-# I/Ddem+ NPl+      V+  NPr/V/J+ .
-> These   are nice     .
-# I/Ddem+ V+  NPr/V/J+ .
-> Those   triangles are nice     .
-# I/Ddem+ NPl+      V+  NPr/V/J+ .
-> Those   are nice    .
-# I/Ddem+ V+  NPr/V/J .
+> This   triangle is  nice  .
+# I/Ddem NSg      VL3 NPr/J .
+> This    is  nice  .
+# I/Ddem+ VL3 NPr/J .
+> That      triangle is  nice  .
+# I/C/Ddem+ NSg      VL3 NPr/J .
+> That      is  nice  .
+# I/C/Ddem+ VL3 NPr/J .
+> These  triangles are nice  .
+# I/Ddem NPl       VLB NPr/J .
+> These   are nice  .
+# I/Ddem+ VLB NPr/J .
+> Those  triangles are nice  .
+# I/Ddem NPl       VLB NPr/J .
+> Those   are nice  .
+# I/Ddem+ VLB NPr/J .
 >
 #
-> This    massage is  nice     .
-# I/Ddem+ NSg/V+  VL+ NPr/V/J+ .
-> That         massage is  nice     .
-# NSg/I/C/Ddem NSg/V+  VL+ NPr/V/J+ .
-> These   massages are nice     .
-# I/Ddem+ NPl/V+   V+  NPr/V/J+ .
-> Those   massages are nice     .
-# I/Ddem+ NPl/V+   V+  NPr/V/J+ .
-> This    massages well     .
-# I/Ddem+ NPl/V+   NSg/V/J+ .
-> That          massages well     .
-# NSg/I/C/Ddem+ NPl/V+   NSg/V/J+ .
-> These   massage well     .
-# I/Ddem+ NSg/V+  NSg/V/J+ .
-> Those   massage well     .
-# I/Ddem+ NSg/V+  NSg/V/J+ .
+> This    massage is  nice  .
+# I/Ddem+ NSg/VB+ VL3 NPr/J .
+> That     massage is  nice  .
+# I/C/Ddem NSg/VB+ VL3 NPr/J .
+> These   massages are nice  .
+# I/Ddem+ NPl/V3+  VLB NPr/J .
+> Those   massages are nice  .
+# I/Ddem+ NPl/V3+  VLB NPr/J .
+> This    massages well       .
+# I/Ddem+ NPl/V3+  NSg/VB/J/R .
+> That      massages well       .
+# I/C/Ddem+ NPl/V3+  NSg/VB/J/R .
+> These   massage well       .
+# I/Ddem+ NSg/VB+ NSg/VB/J/R .
+> Those   massage well       .
+# I/Ddem+ NSg/VB+ NSg/VB/J/R .
 >
 #
-> That          could  be     a   solution .
-# NSg/I/C/Ddem+ NSg/VX NSg/VX D/P NSg      .
-> Find  all           candidates that          could  be     a   solution .
-# NSg/V NSg/I/J/C/Dq+ NPl/V+     NSg/I/C/Ddem+ NSg/VX NSg/VX D/P NSg+     .
+> That      could be       a    solution .
+# I/C/Ddem+ VXB   NSg/VLXB D/P+ N🅪Sg+    .
+> Find   all           candidates that      could be       a    solution .
+# NSg/VB NSg/I/J/C/Dq+ NPl/V3+    I/C/Ddem+ VXB   NSg/VLXB D/P+ N🅪Sg+    .
 >
 #
-> This    is all          that         I    have    .
-# I/Ddem+ VL NSg/I/J/C/Dq NSg/I/C/Ddem ISg+ NSg/VX+ .
-> This    is all          that         solutions can     do     .
-# I/Ddem+ VL NSg/I/J/C/Dq NSg/I/C/Ddem NPl+      NPr/VX+ NSg/VX .
-> That         solution can     do     .
-# NSg/I/C/Ddem NSg+     NPr/VX+ NSg/VX .
+> This    is  all          that     I       have    .
+# I/Ddem+ VL3 NSg/I/J/C/Dq I/C/Ddem ISg/#r+ NSg/VXB .
+> This    is  all          that     solutions can     do  .
+# I/Ddem+ VL3 NSg/I/J/C/Dq I/C/Ddem NPl+      NPr/VXB VXB .
+> That     solution can     do  .
+# I/C/Ddem N🅪Sg+    NPr/VXB VXB .
 >
 #
-> We   can    do     this    !
-# IPl+ NPr/VX NSg/VX I/Ddem+ .
-> I    can    do     this   and that          .
-# ISg+ NPr/VX NSg/VX I/Ddem V/C NSg/I/C/Ddem+ .
+> We   can     do  this    !
+# IPl+ NPr/VXB VXB I/Ddem+ .
+> I       can     do  this   and  that      .
+# ISg/#r+ NPr/VXB VXB I/Ddem VB/C I/C/Ddem+ .
 >
 #
-> We   unite to stand united in      unity .
-# IPl+ NSg/V P  NSg/V V/J    NPr/J/P NSg+  .
+> We   unite  to stand  united in        unity .
+# IPl+ NSg/VB P  NSg/VB VP/J   NPr/J/R/P Nᴹ+   .

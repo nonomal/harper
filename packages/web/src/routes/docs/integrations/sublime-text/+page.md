@@ -27,6 +27,7 @@ Open `Preferences > Package Settings > LSP > Settings` and add the `harper-ls` c
       "settings": {
         "harper-ls": {
           "userDictPath": "",
+          "workspaceDictPath": "",
           "fileDictPath": "",
           "linters": {
             "SpellCheck": true,
@@ -34,11 +35,10 @@ Open `Preferences > Package Settings > LSP > Settings` and add the `harper-ls` c
             "AnA": true,
             "SentenceCapitalization": true,
             "UnclosedQuotes": true,
-            "WrongQuotes": false,
+            "WrongApostrophe": false,
             "LongSentences": true,
             "RepeatedWords": true,
             "Spaces": true,
-            "Matcher": true,
             "CorrectNumberSuffix": true
           },
           "codeActions": {
@@ -49,12 +49,15 @@ Open `Preferences > Package Settings > LSP > Settings` and add the `harper-ls` c
           },
           "diagnosticSeverity": "hint",
           "isolateEnglish": false,
-          "dialect": "American"
+          "dialect": "American",
+          "maxFileLength": 120000,
+          "ignoredLintsPath": "",
+          "excludePatterns": []
         }
       }
     }
   }
-}          
+}
 ```
 
 For more information on what each of these configs do, you can head over to the [configuration section](./language-server#Configuration) of our `harper-ls` documentation.

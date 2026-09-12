@@ -1,30 +1,26 @@
 use crate::Token;
-use crate::expr::Expr;
-use crate::expr::SequenceExpr;
+use crate::expr::{Expr, SequenceExpr};
 
 use super::{ExprLinter, Lint, LintKind, Suggestion};
+use crate::linting::expr_linter::Chunk;
 
 pub struct SomewhatSomething {
-    expr: Box<dyn Expr>,
+    expr: SequenceExpr,
 }
 
 impl Default for SomewhatSomething {
     fn default() -> Self {
-        let pattern = SequenceExpr::aco("somewhat")
-            .then_whitespace()
-            .t_aco("of")
-            .then_whitespace()
-            .t_aco("a");
-
         Self {
-            expr: Box::new(pattern),
+            expr: SequenceExpr::word_seq(&["somewhat", "of", "a"]),
         }
     }
 }
 
 impl ExprLinter for SomewhatSomething {
+    type Unit = Chunk;
+
     fn expr(&self) -> &dyn Expr {
-        self.expr.as_ref()
+        &self.expr
     }
 
     fn match_to_lint(&self, matched_tokens: &[Token], source: &[char]) -> Option<Lint> {
@@ -35,13 +31,13 @@ impl ExprLinter for SomewhatSomething {
             span,
             lint_kind: LintKind::Style,
             suggestions: vec![Suggestion::replace_with_match_case_str("something", og)],
-            message: "Use the traditional form.".to_owned(),
+            message: "Consider using `something of a` in more formal writing.".to_owned(),
             priority: 63,
         })
     }
 
     fn description(&self) -> &'static str {
-        "When describing a single instance of a noun, use `something` rather than `somewhat`."
+        "Flags the phrase `somewhat of a` in favor of `something of a`, which can be considered more traditional."
     }
 }
 
@@ -57,6 +53,15 @@ mod tests {
             "This may be somewhat of a surprise.",
             SomewhatSomething::default(),
             "This may be something of a surprise.",
+        );
+    }
+
+    #[test]
+    fn flag_these() {
+        assert_suggestion_result(
+            "These are somewhat of a cult data structure.",
+            SomewhatSomething::default(),
+            "These are something of a cult data structure.",
         );
     }
 }

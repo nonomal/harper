@@ -1,4 +1,5 @@
-use crate::{Span, Token, expr::Expr};
+use super::{AsBoxedExpr, Expr};
+use crate::{Span, Token};
 
 /// An [`Expr`] that returns the farthest offset of the longest match in a list of expressions.
 #[derive(Default)]
@@ -7,33 +8,26 @@ pub struct LongestMatchOf {
 }
 
 impl LongestMatchOf {
-    pub fn new(exprs: Vec<Box<dyn Expr>>) -> Self {
-        Self { exprs }
+    pub fn new(exprs: impl IntoIterator<Item = impl AsBoxedExpr>) -> Self {
+        Self {
+            exprs: exprs.into_iter().map(|e| e.into_boxed_expr()).collect(),
+        }
     }
 
     pub fn add(&mut self, expr: impl Expr + 'static) {
         self.exprs.push(Box::new(expr));
     }
+
+    pub fn add_boxed(&mut self, expr: Box<dyn Expr>) {
+        self.exprs.push(expr);
+    }
 }
 
 impl Expr for LongestMatchOf {
     fn run(&self, cursor: usize, tokens: &[Token], source: &[char]) -> Option<Span<Token>> {
-        let mut longest: Option<Span<Token>> = None;
-
-        for expr in self.exprs.iter() {
-            let Some(window) = expr.run(cursor, tokens, source) else {
-                continue;
-            };
-
-            if let Some(longest_window) = longest {
-                if window.len() > longest_window.len() {
-                    longest = Some(window);
-                }
-            } else {
-                longest = Some(window);
-            }
-        }
-
-        longest
+        self.exprs
+            .iter()
+            .filter_map(|expr| expr.run(cursor, tokens, source))
+            .max_by_key(Span::len)
     }
 }

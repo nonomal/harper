@@ -1,26 +1,28 @@
-use crate::expr::Expr;
-use crate::expr::LongestMatchOf;
-use crate::expr::SequenceExpr;
+use crate::expr::{Expr, LongestMatchOf, SequenceExpr};
 use crate::{Lrc, Token, patterns::WordSet};
 
 use super::{ExprLinter, Lint, LintKind, Suggestion};
+use crate::linting::expr_linter::Chunk;
 use hashbrown::HashMap;
 
 pub struct OpenCompounds {
-    expr: Box<dyn Expr>,
+    expr: LongestMatchOf,
     compound_to_phrase: HashMap<String, String>,
 }
 
 impl Default for OpenCompounds {
     fn default() -> Self {
         let phrases = [
+            "a few",
             "a lot",
-            "a while",
             "as well",
+            "at all",
             "at least",
             "each other",
             "in case",
+            "in fact",
             "in front",
+            "up to",
         ];
         let mut compound_to_phrase = HashMap::new();
         for phrase in phrases {
@@ -37,36 +39,33 @@ impl Default for OpenCompounds {
         for compound in compound_to_phrase.keys().cloned().collect::<Vec<_>>() {
             compound_wordset.add(&compound);
         }
-        let compound = Lrc::new(SequenceExpr::default().then(compound_wordset));
+        let compound = Lrc::new(SequenceExpr::with(compound_wordset));
 
-        let with_prev = SequenceExpr::default()
-            .then_anything()
-            .then(compound.clone());
+        let with_prev = SequenceExpr::anything().then(compound.clone());
 
-        let with_next = SequenceExpr::default()
-            .then(compound.clone())
-            .then_anything();
+        let with_next = SequenceExpr::with(compound.clone()).then_anything();
 
-        let with_prev_and_next = SequenceExpr::default()
-            .then_anything()
+        let with_prev_and_next = SequenceExpr::anything()
             .then(compound.clone())
             .then_anything();
 
         Self {
-            expr: Box::new(LongestMatchOf::new(vec![
-                Box::new(with_prev_and_next),
+            expr: LongestMatchOf::new(vec![
+                Box::new(with_prev_and_next) as Box<dyn Expr>,
                 Box::new(with_prev),
                 Box::new(with_next),
                 Box::new(compound),
-            ])),
+            ]),
             compound_to_phrase,
         }
     }
 }
 
 impl ExprLinter for OpenCompounds {
+    type Unit = Chunk;
+
     fn expr(&self) -> &dyn Expr {
-        self.expr.as_ref()
+        &self.expr
     }
 
     fn match_to_lint(&self, matched_toks: &[Token], source_chars: &[char]) -> Option<Lint> {
@@ -101,7 +100,7 @@ impl ExprLinter for OpenCompounds {
 
         Some(Lint {
             span,
-            lint_kind: LintKind::WordChoice,
+            lint_kind: LintKind::BoundaryError,
             suggestions: vec![Suggestion::replace_with_match_case(
                 phrase.chars().collect(),
                 span.get_content(source_chars),
@@ -138,8 +137,7 @@ fn get_compound_idx(toks: &[Token], src: &[char], compound: &str) -> Option<usiz
             } else {
                 Some(
                     !tok0
-                        .span
-                        .get_content(src)
+                        .get_ch(src)
                         .iter()
                         .collect::<String>()
                         .eq_ignore_ascii_case(compound) as usize,
@@ -153,7 +151,10 @@ fn get_compound_idx(toks: &[Token], src: &[char], compound: &str) -> Option<usiz
 #[cfg(test)]
 mod tests {
     use super::OpenCompounds;
+    use crate::linting::pooled_linter::for_tests::create_test_pool;
     use crate::linting::tests::{assert_lint_count, assert_suggestion_result};
+
+    create_test_pool!(OpenCompounds, OpenCompounds, OpenCompounds::default());
 
     // In front
 
@@ -161,7 +162,7 @@ mod tests {
     fn corrects_lone_infront() {
         assert_suggestion_result(
             "Button always overlaps (infront) of other views.",
-            OpenCompounds::default(),
+            test_linter(),
             "Button always overlaps (in front) of other views.",
         );
     }
@@ -170,7 +171,7 @@ mod tests {
     fn corrects_infront() {
         assert_suggestion_result(
             "So if i have no variable or a running process id/name which indicates that liveley is infront/fullscreen i can't do anything further via batch and must wait ...",
-            OpenCompounds::default(),
+            test_linter(),
             "So if i have no variable or a running process id/name which indicates that liveley is in front/fullscreen i can't do anything further via batch and must wait ...",
         );
     }
@@ -179,7 +180,7 @@ mod tests {
     fn ignores_pascalcase() {
         assert_lint_count(
             "InFront Labs, LLC has 16 repositories available. Follow their code on GitHub.",
-            OpenCompounds::default(),
+            test_linter(),
             0,
         );
     }
@@ -188,7 +189,7 @@ mod tests {
     fn ignores_camelcase() {
         assert_lint_count(
             "Click the \"toggle\" button to see how wrapping changes when an inFront is added to a letter in a word.",
-            OpenCompounds::default(),
+            test_linter(),
             0,
         );
     }
@@ -197,26 +198,26 @@ mod tests {
     fn correct_with_period_after() {
         assert_suggestion_result(
             "Car with a reversed ramp infront.",
-            OpenCompounds::default(),
+            test_linter(),
             "Car with a reversed ramp in front.",
         );
     }
 
     #[test]
     fn ignore_hyphen_before() {
-        assert_lint_count("-infront", OpenCompounds::default(), 0);
+        assert_lint_count("-infront", test_linter(), 0);
     }
 
     #[test]
     fn ignore_hyphen_after() {
-        assert_lint_count("infront-", OpenCompounds::default(), 0);
+        assert_lint_count("infront-", test_linter(), 0);
     }
 
     #[test]
     fn ignores_with_hyphen_before() {
         assert_lint_count(
             "Instantly share code, notes, and snippets. @yossi-infront",
-            OpenCompounds::default(),
+            test_linter(),
             0,
         );
     }
@@ -225,17 +226,24 @@ mod tests {
     fn ignores_with_hyphen_after() {
         assert_lint_count(
             "infront-cycle.ipe · infront-cycle.ipe · infront-cycle.svg · infront-cycle.svg · infront-s1s2.ipe · infront-s1s2.ipe · infront-s1s2.svg · infront-s1s2.svg.",
-            OpenCompounds::default(),
+            test_linter(),
             0,
         );
     }
 
     #[test]
     fn even_repeated_infront_works() {
+        assert_suggestion_result("infront infront", test_linter(), "in front in front");
+    }
+
+    // A few
+
+    #[test]
+    fn correct_afew_atomic() {
         assert_suggestion_result(
-            "infront infront",
-            OpenCompounds::default(),
-            "in front in front",
+            "ITK code to generate anisotropic metrics, mostly Riemannian metrics and afew particular cases of Finslerian metrics.",
+            test_linter(),
+            "ITK code to generate anisotropic metrics, mostly Riemannian metrics and a few particular cases of Finslerian metrics.",
         );
     }
 
@@ -243,64 +251,21 @@ mod tests {
 
     #[test]
     fn correct_alot_atomic() {
-        assert_suggestion_result("Alot", OpenCompounds::default(), "A lot");
-    }
-
-    // A while
-
-    #[test]
-    fn correct_awhile_atomic() {
-        assert_suggestion_result("Awhile", OpenCompounds::default(), "A while");
-    }
-
-    #[test]
-    fn test_in_quite_a_while() {
-        assert_suggestion_result(
-            "I haven’t seen him in quite awhile.",
-            OpenCompounds::default(),
-            "I haven’t seen him in quite a while.",
-        );
-    }
-
-    #[test]
-    fn test_in_a_while() {
-        assert_suggestion_result(
-            "I haven't checked in awhile.",
-            OpenCompounds::default(),
-            "I haven't checked in a while.",
-        );
-    }
-
-    #[test]
-    fn correct_for_awhile() {
-        assert_suggestion_result(
-            "Video Element Error: MEDA_ERR_DECODE when chrome is left open for awhile",
-            OpenCompounds::default(),
-            "Video Element Error: MEDA_ERR_DECODE when chrome is left open for a while",
-        );
-    }
-
-    #[test]
-    fn correct_after_awhile() {
-        assert_suggestion_result(
-            "Links on portal stop working after awhile, requiring page refresh.",
-            OpenCompounds::default(),
-            "Links on portal stop working after a while, requiring page refresh.",
-        );
+        assert_suggestion_result("Alot", test_linter(), "A lot");
     }
 
     // As well
 
     #[test]
     fn correct_aswell_atomic() {
-        assert_suggestion_result("Aswell", OpenCompounds::default(), "As well");
+        assert_suggestion_result("Aswell", test_linter(), "As well");
     }
 
     #[test]
     fn corrects_as_keyboards_aswell() {
         assert_suggestion_result(
             "Tool to read physical joystick devices, keyboards aswell, and create virtual joystick devices and output keyboard presses on a Linux system.",
-            OpenCompounds::default(),
+            test_linter(),
             "Tool to read physical joystick devices, keyboards as well, and create virtual joystick devices and output keyboard presses on a Linux system.",
         );
     }
@@ -309,7 +274,7 @@ mod tests {
     fn corrects_aswell_as() {
         assert_suggestion_result(
             "When UseAcrylic is true in Focused aswell as Unfocused Apearance , changing enableUnfocusedAcrylic at runtime doesn't work",
-            OpenCompounds::default(),
+            test_linter(),
             "When UseAcrylic is true in Focused as well as Unfocused Apearance , changing enableUnfocusedAcrylic at runtime doesn't work",
         );
     }
@@ -318,7 +283,7 @@ mod tests {
     fn corrects_toml_aswell() {
         assert_suggestion_result(
             "format Cargo.toml aswell #5893 - rust-lang/rustfmt",
-            OpenCompounds::default(),
+            test_linter(),
             "format Cargo.toml as well #5893 - rust-lang/rustfmt",
         );
     }
@@ -327,8 +292,19 @@ mod tests {
     fn correct_aswell() {
         assert_suggestion_result(
             "'wejoy' is a tool to read physical joystick devices, aswell as keyboards, create virtual joystick devices and output keyboard presses on a Linux system.",
-            OpenCompounds::default(),
+            test_linter(),
             "'wejoy' is a tool to read physical joystick devices, as well as keyboards, create virtual joystick devices and output keyboard presses on a Linux system.",
+        );
+    }
+
+    // At all
+
+    #[test]
+    fn correct_atall() {
+        assert_suggestion_result(
+            "claude code with vs code extension not working atall",
+            test_linter(),
+            "claude code with vs code extension not working at all",
         );
     }
 
@@ -336,14 +312,14 @@ mod tests {
 
     #[test]
     fn correct_atleast_atomic() {
-        assert_suggestion_result("Atleast", OpenCompounds::default(), "At least");
+        assert_suggestion_result("Atleast", test_linter(), "At least");
     }
 
     #[test]
     fn ignore_atleast_pascalcase() {
         assert_lint_count(
             "I want to understand if we are using AtLeast correctly.",
-            OpenCompounds::default(),
+            test_linter(),
             0,
         );
     }
@@ -352,7 +328,7 @@ mod tests {
     fn ignore_atleast_camelcase() {
         assert_lint_count(
             "verfiy with atLeast = 0 should pass even if the mocked function is never called.",
-            OpenCompounds::default(),
+            test_linter(),
             0,
         );
     }
@@ -361,7 +337,7 @@ mod tests {
     fn correct_atleast() {
         assert_suggestion_result(
             "Mar 22, 2562 BE — constructor - expected atleast one input #250.",
-            OpenCompounds::default(),
+            test_linter(),
             "Mar 22, 2562 BE — constructor - expected at least one input #250.",
         );
     }
@@ -370,14 +346,14 @@ mod tests {
 
     #[test]
     fn correct_eachother_atomic() {
-        assert_suggestion_result("Eachother", OpenCompounds::default(), "Each other");
+        assert_suggestion_result("Eachother", test_linter(), "Each other");
     }
 
     #[test]
     fn correct_eachother() {
         assert_suggestion_result(
             "Script parsing fails when two scenes reference eachother",
-            OpenCompounds::default(),
+            test_linter(),
             "Script parsing fails when two scenes reference each other",
         );
     }
@@ -386,14 +362,14 @@ mod tests {
 
     #[test]
     fn correct_incase_atomic() {
-        assert_suggestion_result("Incase", OpenCompounds::default(), "In case");
+        assert_suggestion_result("Incase", test_linter(), "In case");
     }
 
     #[test]
     fn correct_in_case() {
         assert_suggestion_result(
             "Support for enum variable incase of reusable enum class",
-            OpenCompounds::default(),
+            test_linter(),
             "Support for enum variable in case of reusable enum class",
         );
     }
@@ -402,8 +378,30 @@ mod tests {
     fn ignore_incase_pascalcase() {
         assert_lint_count(
             "InCase save your secrets for a friend, so they can use in case it in case you went \"missing\".",
-            OpenCompounds::default(),
+            test_linter(),
             0,
+        );
+    }
+
+    // In fact
+
+    #[test]
+    fn correct_infact_atomic() {
+        assert_suggestion_result(
+            "Yes I do infact exist :O",
+            test_linter(),
+            "Yes I do in fact exist :O",
+        );
+    }
+
+    // up to
+
+    #[test]
+    fn correct_upto() {
+        assert_suggestion_result(
+            "Free for upto 10k subscribers, unlimited push notifications, in-browser messaging",
+            test_linter(),
+            "Free for up to 10k subscribers, unlimited push notifications, in-browser messaging",
         );
     }
 }

@@ -11,17 +11,16 @@ contract TestContract {
      * @notice This is another test function.
      * @dev It has another [link](https://example.com) embedded inside
      * @param p This is a parameter
-     * @return fooBar The return value.
      */
-    function testFunction2(uint256 p) external returns (address fooBar) {}
+    function testFunction2(uint256 p) external {}
 
-    // This is some gibberish to try to trigger a lint for sentences that continue for too long
+    // This is some gibberish to try to trigger a lint for the sentences that continue for too long
     //
-    // This is some gibberish to try to trigger a lint for sentences that continue for too long
+    // This is some gibberish to try to trigger a lint for the sentences that continue for too long
     //
-    // This is some gibberish to try to trigger a lint for sentences that continue for too long
+    // This is some gibberish to try to trigger a lint for the sentences that continue for too long
     //
-    // This is some gibberish to try to trigger a lint for sentences that continue for too long
+    // This is some gibberish to try to trigger a lint for the sentences that continue for too long
     //
-    // This is some gibberish to try to trigger a lint for sentences that continue for too long
+    // This is some gibberish to try to trigger a lint for the sentences that continue for too long
 }

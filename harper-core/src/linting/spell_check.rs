@@ -3,18 +3,21 @@ use std::num::NonZero;
 use lru::LruCache;
 use smallvec::ToSmallVec;
 
-use super::Suggestion;
 use super::{Lint, LintKind, Linter};
+use super::{Suggestion, informal_laughter::is_informal_laughter};
 use crate::document::Document;
+use crate::expr::{Filter, SequenceExpr};
 use crate::spell::{Dictionary, suggest_correct_spelling};
-use crate::{CharString, CharStringExt, Dialect, TokenStringExt};
+use crate::{CharString, CharStringExt, Dialect, TokenStringExt, remove_lints_overlapping_expr};
+
+pub const SPELL_CHECK_PRIORITY: u8 = 63;
 
 pub struct SpellCheck<T>
 where
     T: Dictionary,
 {
     dictionary: T,
-    word_cache: LruCache<CharString, Vec<CharString>>,
+    suggestion_cache: LruCache<CharString, Vec<CharString>>,
     dialect: Dialect,
 }
 
@@ -22,7 +25,7 @@ impl<T: Dictionary> SpellCheck<T> {
     pub fn new(dictionary: T, dialect: Dialect) -> Self {
         Self {
             dictionary,
-            word_cache: LruCache::new(NonZero::new(10000).unwrap()),
+            suggestion_cache: LruCache::new(NonZero::new(10000).unwrap()),
             dialect,
         }
     }
@@ -30,11 +33,11 @@ impl<T: Dictionary> SpellCheck<T> {
     const MAX_SUGGESTIONS: usize = 3;
 
     fn suggest_correct_spelling(&mut self, word: &[char]) -> Vec<CharString> {
-        if let Some(hit) = self.word_cache.get(word) {
+        if let Some(hit) = self.suggestion_cache.get(word) {
             hit.clone()
         } else {
             let suggestions = self.uncached_suggest_correct_spelling(word);
-            self.word_cache.put(word.into(), suggestions.clone());
+            self.suggestion_cache.put(word.into(), suggestions.clone());
             suggestions
         }
     }
@@ -42,10 +45,10 @@ impl<T: Dictionary> SpellCheck<T> {
         // Back off until we find a match.
         for dist in 2..5 {
             let suggestions: Vec<CharString> =
-                suggest_correct_spelling(word, 100, dist, &self.dictionary)
+                suggest_correct_spelling(word, 200, dist, &self.dictionary)
                     .into_iter()
                     .filter(|v| {
-                        // ignore entries outside the configured dialect
+                        // Ignore entries outside the configured dialect
                         self.dictionary
                             .get_word_metadata(v)
                             .unwrap()
@@ -66,6 +69,25 @@ impl<T: Dictionary> SpellCheck<T> {
     }
 }
 
+fn parenthetical_plural_s_expr() -> Filter {
+    Filter::new(vec![
+        Box::new(
+            SequenceExpr::default()
+                .then_any_word()
+                .then_kind_where(|kind| kind.is_open_round())
+                .t_aco("s")
+                .then_kind_where(|kind| kind.is_close_round()),
+        ),
+        Box::new(
+            SequenceExpr::default()
+                .then_kind_where(|kind| kind.is_open_round())
+                .t_aco("s")
+                .then_kind_where(|kind| kind.is_close_round()),
+        ),
+        Box::new(SequenceExpr::aco("s")),
+    ])
+}
+
 impl<T: Dictionary> Linter for SpellCheck<T> {
     fn lint(&mut self, document: &Document) -> Vec<Lint> {
         let mut lints = Vec::new();
@@ -73,35 +95,47 @@ impl<T: Dictionary> Linter for SpellCheck<T> {
         for word in document.iter_words() {
             let word_chars = document.get_span_content(&word.span);
 
-            if let Some(metadata) = word.kind.as_word().unwrap() {
-                if metadata.dialects.is_dialect_enabled(self.dialect)
-                    && (self.dictionary.contains_exact_word(word_chars)
-                        || self.dictionary.contains_exact_word(&word_chars.to_lower()))
-                {
-                    continue;
-                }
+            if is_informal_laughter(word_chars) {
+                continue;
+            }
+
+            if let Some(metadata) = word.kind.as_word().unwrap()
+                && metadata.dialects.is_dialect_enabled(self.dialect)
+                && (self.dictionary.contains_exact_word(word_chars)
+                    || self.dictionary.contains_exact_word(&word_chars.to_lower()))
+            {
+                continue;
             };
 
             let mut possibilities = self.suggest_correct_spelling(word_chars);
 
             // If the misspelled word is capitalized, capitalize the results too.
-            if let Some(mis_f) = word_chars.first() {
-                if mis_f.is_uppercase() {
-                    for sug_f in possibilities.iter_mut().filter_map(|w| w.first_mut()) {
-                        *sug_f = sug_f.to_uppercase().next().unwrap();
-                    }
+            if let Some(mis_f) = word_chars.first()
+                && mis_f.is_uppercase()
+            {
+                for sug_f in possibilities.iter_mut().filter_map(|w| {
+                    // Skip words that have uppercase chars in any position except the first.
+                    // (For words with specific capitalization, like 'macOS')
+                    w.iter()
+                        .skip(1)
+                        .all(|c| !c.is_uppercase())
+                        .then_some(w.first_mut())
+                        .flatten()
+                }) {
+                    *sug_f = sug_f.to_uppercase().next().unwrap();
                 }
             }
 
-            let suggestions = possibilities
+            let suggestions: Vec<_> = possibilities
                 .iter()
-                .map(|word| Suggestion::ReplaceWith(word.to_vec()));
+                .map(|sug| Suggestion::ReplaceWith(sug.to_vec()))
+                .collect();
 
             // If there's only one suggestion, save the user a step in the GUI
             let message = if suggestions.len() == 1 {
                 format!(
                     "Did you mean `{}`?",
-                    possibilities.last().unwrap().iter().collect::<String>()
+                    possibilities.first().unwrap().iter().collect::<String>()
                 )
             } else {
                 format!(
@@ -113,11 +147,13 @@ impl<T: Dictionary> Linter for SpellCheck<T> {
             lints.push(Lint {
                 span: word.span,
                 lint_kind: LintKind::Spelling,
-                suggestions: suggestions.collect(),
+                suggestions,
                 message,
-                priority: 63,
+                priority: SPELL_CHECK_PRIORITY,
             })
         }
+
+        remove_lints_overlapping_expr(&parenthetical_plural_s_expr(), document, &mut lints);
 
         lints
     }
@@ -129,14 +165,26 @@ impl<T: Dictionary> Linter for SpellCheck<T> {
 
 #[cfg(test)]
 mod tests {
+    use strum::IntoEnumIterator;
+
     use super::SpellCheck;
-    use crate::spell::FstDictionary;
+    use crate::dict_word_metadata::DialectFlags;
+    use crate::linting::Linter;
+    use crate::linting::pooled_linter::for_tests::create_test_pool;
+    use crate::linting::tests::{assert_good_and_bad_suggestions, assert_no_lints};
+    use crate::spell::{Dictionary, FstDictionary, MergedDictionary, MutableDictionary};
     use crate::{
         Dialect,
-        linting::tests::{
-            assert_lint_count, assert_suggestion_result, assert_top3_suggestion_result,
-        },
+        linting::tests::{assert_lint_count, assert_suggestion_result},
     };
+    use crate::{DictWordMetadata, Document};
+    use std::sync::Arc;
+
+    create_test_pool!(
+        SpellCheck,
+        SpellCheck<Arc<FstDictionary>>,
+        SpellCheck::new(FstDictionary::curated(), Dialect::American)
+    );
 
     // Capitalization tests
 
@@ -144,7 +192,7 @@ mod tests {
     fn america_capitalized() {
         assert_suggestion_result(
             "The word america should be capitalized.",
-            SpellCheck::new(FstDictionary::curated(), Dialect::American),
+            test_linter(),
             "The word America should be capitalized.",
         );
     }
@@ -153,11 +201,7 @@ mod tests {
 
     #[test]
     fn harper_automattic_capitalized() {
-        assert_lint_count(
-            "So should harper and automattic.",
-            SpellCheck::new(FstDictionary::curated(), Dialect::American),
-            2,
-        );
+        assert_lint_count("So should harper and automattic.", test_linter(), 2);
     }
 
     #[test]
@@ -191,7 +235,7 @@ mod tests {
     fn mum_and_mummy_not_just_commonwealth() {
         assert_lint_count(
             "Mum's the word about that Egyptian mummy.",
-            SpellCheck::new(FstDictionary::curated(), Dialect::American),
+            test_linter(),
             0,
         );
     }
@@ -207,15 +251,11 @@ mod tests {
 
     #[test]
     fn australian_verandah_in_american_dialect() {
-        assert_lint_count(
-            "Our house has a verandah.",
-            SpellCheck::new(FstDictionary::curated(), Dialect::American),
-            1,
-        );
+        assert_lint_count("Our house has a verandah.", test_linter(), 1);
     }
 
     #[test]
-    fn austrlaian_verandah_in_british_dialect() {
+    fn australian_verandah_in_british_dialect() {
         assert_lint_count(
             "Our house has a verandah.",
             SpellCheck::new(FstDictionary::curated(), Dialect::British),
@@ -254,7 +294,7 @@ mod tests {
     fn australian_and_canadian_spellings_that_are_not_american() {
         assert_lint_count(
             "In summer we sit on the verandah and eat yogourt.",
-            SpellCheck::new(FstDictionary::curated(), Dialect::American),
+            test_linter(),
             2,
         );
     }
@@ -281,7 +321,7 @@ mod tests {
     fn australian_words_flagged_for_american_english() {
         assert_lint_count(
             "There's an esky full of beers in the back of the ute.",
-            SpellCheck::new(FstDictionary::curated(), Dialect::American),
+            test_linter(),
             2,
         );
     }
@@ -309,29 +349,21 @@ mod tests {
     #[test]
     fn corrects_abandonedware_1131_1166() {
         // assert_suggestion_result(
-        assert_top3_suggestion_result(
+        assert_suggestion_result(
             "Abandonedware is abandoned. Do not bother submitting issues about the empty page bug. Author moved to greener pastures",
-            SpellCheck::new(FstDictionary::curated(), Dialect::American),
+            test_linter(),
             "Abandonware is abandoned. Do not bother submitting issues about the empty page bug. Author moved to greener pastures",
         );
     }
 
     #[test]
     fn afterwards_not_us() {
-        assert_lint_count(
-            "afterwards",
-            SpellCheck::new(FstDictionary::curated(), Dialect::American),
-            1,
-        );
+        assert_lint_count("afterwards", test_linter(), 1);
     }
 
     #[test]
     fn afterward_is_us() {
-        assert_lint_count(
-            "afterward",
-            SpellCheck::new(FstDictionary::curated(), Dialect::American),
-            0,
-        );
+        assert_lint_count("afterward", test_linter(), 0);
     }
 
     #[test]
@@ -404,5 +436,549 @@ mod tests {
             SpellCheck::new(FstDictionary::curated(), Dialect::British),
             "she's",
         );
+    }
+
+    #[test]
+    fn issue_1876() {
+        let user_dialect = Dialect::American;
+
+        // Create a user dictionary with a word normally of another dialect in it.
+        let mut user_dict = MutableDictionary::new();
+        user_dict.append_word_str(
+            "Calibre",
+            DictWordMetadata {
+                dialects: DialectFlags::from_dialect(user_dialect),
+                ..Default::default()
+            },
+        );
+
+        // Create a merged dictionary, using curated first.
+        let mut merged_dict = MergedDictionary::new();
+        merged_dict.add_dictionary(FstDictionary::curated());
+        merged_dict.add_dictionary(std::sync::Arc::from(user_dict));
+        assert!(merged_dict.contains_word_str("Calibre"));
+
+        // No dialect issues should be found if the word from another dialect is in our user dictionary.
+        assert_eq!(
+            SpellCheck::new(merged_dict.clone(), user_dialect)
+                .lint(&Document::new_markdown_default(
+                    "I like to use the software Calibre.",
+                    &merged_dict
+                ))
+                .len(),
+            0,
+            "Calibre is not part of the user's dialect!"
+        );
+
+        assert_eq!(
+            SpellCheck::new(merged_dict.clone(), user_dialect)
+                .lint(&Document::new_markdown_default(
+                    "I like to use the spelling colour.",
+                    &merged_dict
+                ))
+                .len(),
+            1
+        );
+    }
+
+    #[test]
+    fn matt_is_allowed() {
+        for dialect in Dialect::iter() {
+            dbg!(dialect);
+            assert_no_lints(
+                "Matt is a great name.",
+                SpellCheck::new(FstDictionary::curated(), dialect),
+            );
+        }
+    }
+
+    #[test]
+    fn issue_2026() {
+        assert_suggestion_result(
+            "'Tere' is supposed to be 'There'",
+            SpellCheck::new(FstDictionary::curated(), Dialect::British),
+            "'There' is supposed to be 'There'",
+        );
+
+        assert_suggestion_result(
+            "'fll' is supposed to be 'fill'",
+            SpellCheck::new(FstDictionary::curated(), Dialect::British),
+            "'fill' is supposed to be 'fill'",
+        );
+    }
+    #[test]
+    fn issue_2261() {
+        assert_suggestion_result(
+            "Generaly",
+            SpellCheck::new(FstDictionary::curated(), Dialect::British),
+            "Generally",
+        );
+    }
+
+    #[test]
+    fn flag_prepone_in_non_indian_english() {
+        assert_lint_count("We had to prepone the meeting", test_linter(), 1);
+    }
+
+    #[test]
+    fn dont_flag_prepone_in_indian_english() {
+        assert_no_lints(
+            "We had to prepone the meeting",
+            SpellCheck::new(FstDictionary::curated(), Dialect::Indian),
+        );
+    }
+
+    #[test]
+    fn dont_flag_pr() {
+        assert_no_lints("PR", test_linter());
+    }
+
+    #[test]
+    fn no_improper_suggestion_for_macos() {
+        assert_good_and_bad_suggestions("MacOS", test_linter(), &["macOS"], &["MacOS"]);
+    }
+
+    #[test]
+    fn allows_parenthetical_plural_s() {
+        assert_no_lints("Please ask each person(s) to sign.", test_linter());
+    }
+
+    #[test]
+    fn allows_multiple_parenthetical_plural_s_markers() {
+        assert_no_lints("Review the person(s) and document(s).", test_linter());
+    }
+
+    #[test]
+    fn allows_uppercase_parenthetical_plural_s() {
+        assert_no_lints("CONTACT THE PERSON(S).", test_linter());
+    }
+
+    #[test]
+    fn still_flags_misspelled_word_before_parenthetical_plural_s() {
+        assert_lint_count("Please ask each persson(s) to sign.", test_linter(), 1);
+    }
+
+    #[test]
+    fn still_flags_parenthetical_s_without_preceding_word() {
+        assert_lint_count("Please mark (s) on the form.", test_linter(), 1);
+    }
+
+    #[test]
+    fn still_flags_spaced_parenthetical_s() {
+        assert_lint_count("Please ask each person (s) to sign.", test_linter(), 1);
+    }
+
+    #[test]
+    fn still_flags_longer_parenthetical_marker() {
+        assert_lint_count("Please ask each person(ss) to sign.", test_linter(), 1);
+    }
+
+    // Tests that were previously in `spell/mod.rs`
+
+    // Tests for dialect-specific misspelling patterns
+
+    // is_ou_misspelling
+    #[test]
+    fn suggest_color_for_colour_lowercase() {
+        assert_suggestion_result("colour", test_linter(), "color");
+    }
+
+    #[test]
+    fn suggest_colour_for_color_lowercase() {
+        assert_suggestion_result(
+            "color",
+            SpellCheck::new(FstDictionary::curated(), Dialect::British),
+            "colour",
+        );
+    }
+
+    // titlecase
+    #[test]
+    fn suggest_color_for_colour_titlecase() {
+        assert_suggestion_result("Colour", test_linter(), "Color");
+    }
+
+    #[test]
+    #[ignore = "known failure due to bug"]
+    fn suggest_colour_for_color_titlecase() {
+        assert_suggestion_result(
+            "Color",
+            SpellCheck::new(FstDictionary::curated(), Dialect::British),
+            "Colour",
+        );
+    }
+
+    // all-caps
+    #[test]
+    #[ignore = "known failure due to bug"]
+    fn suggest_color_for_colour_all_caps() {
+        assert_suggestion_result("COLOUR", test_linter(), "COLOR");
+    }
+
+    #[test]
+    #[ignore = "known failure due to bug"]
+    fn suggest_colour_for_color_all_caps() {
+        assert_suggestion_result(
+            "COLOR",
+            SpellCheck::new(FstDictionary::curated(), Dialect::British),
+            "COLOUR",
+        );
+    }
+
+    // is_cksz_misspelling
+
+    // s/z as in realise/realize
+    #[test]
+    #[ignore = "both spellings are acceptable in UK, AU, and IN despite popular opinion"]
+    fn suggest_realise_for_realize() {
+        assert_suggestion_result(
+            "realize",
+            SpellCheck::new(FstDictionary::curated(), Dialect::British),
+            "realise",
+        );
+    }
+
+    #[test]
+    fn suggest_realize_for_realise() {
+        assert_suggestion_result("realise", test_linter(), "realize");
+    }
+
+    #[test]
+    #[ignore = "both spellings are acceptable in UK, AU, and IN despite popular opinion"]
+    fn suggest_realise_for_realize_titlecase() {
+        assert_suggestion_result(
+            "Realize",
+            SpellCheck::new(FstDictionary::curated(), Dialect::British),
+            "Realise",
+        );
+    }
+
+    #[test]
+    #[ignore = "known failure due to bug"]
+    fn suggest_realize_for_realise_titlecase() {
+        assert_suggestion_result("Realise", test_linter(), "Realize");
+    }
+
+    #[test]
+    #[ignore = "known failure due to bug"]
+    fn suggest_realise_for_realize_all_caps() {
+        assert_suggestion_result(
+            "REALIZE",
+            SpellCheck::new(FstDictionary::curated(), Dialect::British),
+            "REALISE",
+        );
+    }
+
+    #[test]
+    #[ignore = "known failure due to bug"]
+    fn suggest_realize_for_realise_all_caps() {
+        assert_suggestion_result("REALISE", test_linter(), "REALIZE");
+    }
+
+    // s/c as in defense/defence
+    #[test]
+    fn suggest_defence_for_defense() {
+        assert_suggestion_result(
+            "defense",
+            SpellCheck::new(FstDictionary::curated(), Dialect::British),
+            "defence",
+        );
+    }
+
+    #[test]
+    fn suggest_defense_for_defence() {
+        assert_suggestion_result("defence", test_linter(), "defense");
+    }
+
+    #[test]
+    fn suggest_defense_for_defence_titlecase() {
+        assert_suggestion_result(
+            "Defense",
+            SpellCheck::new(FstDictionary::curated(), Dialect::British),
+            "Defence",
+        );
+    }
+
+    #[test]
+    fn suggest_defence_for_defense_titlecase() {
+        assert_suggestion_result("Defence", test_linter(), "Defense");
+    }
+
+    #[test]
+    #[ignore = "known failure due to bug"]
+    fn suggest_defense_for_defence_all_caps() {
+        assert_suggestion_result(
+            "DEFENSE",
+            SpellCheck::new(FstDictionary::curated(), Dialect::British),
+            "DEFENCE",
+        );
+    }
+
+    #[test]
+    #[ignore = "known failure due to bug"]
+    fn suggest_defence_for_defense_all_caps() {
+        assert_suggestion_result("DEFENCE", test_linter(), "DEFENSE");
+    }
+
+    // k/c as in skeptic/sceptic
+    #[test]
+    fn suggest_sceptic_for_skeptic() {
+        assert_suggestion_result(
+            "skeptic",
+            SpellCheck::new(FstDictionary::curated(), Dialect::British),
+            "sceptic",
+        );
+    }
+
+    #[test]
+    fn suggest_skeptic_for_sceptic() {
+        assert_suggestion_result("sceptic", test_linter(), "skeptic");
+    }
+
+    #[test]
+    fn suggest_sceptic_for_skeptic_titlecase() {
+        assert_suggestion_result(
+            "Skeptic",
+            SpellCheck::new(FstDictionary::curated(), Dialect::British),
+            "Sceptic",
+        );
+    }
+
+    #[test]
+    #[ignore = "known failure due to bug"]
+    fn suggest_skeptic_for_sceptic_titlecase() {
+        assert_suggestion_result("Sceptic", test_linter(), "Skeptic");
+    }
+
+    #[test]
+    #[ignore = "known failure due to bug"]
+    fn suggest_skeptic_for_sceptic_all_caps() {
+        assert_suggestion_result(
+            "SKEPTIC",
+            SpellCheck::new(FstDictionary::curated(), Dialect::British),
+            "SCEPTIC",
+        );
+    }
+
+    #[test]
+    #[ignore = "known failure due to bug"]
+    fn suggest_sceptic_for_skeptic_all_caps() {
+        assert_suggestion_result("SCEPTIC", test_linter(), "SKEPTIC");
+    }
+
+    // is_er_misspelling
+    // as in meter/metre
+    #[test]
+    fn suggest_centimeter_for_centimetre() {
+        assert_suggestion_result("centimetre", test_linter(), "centimeter");
+    }
+
+    #[test]
+    fn suggest_centimetre_for_centimeter() {
+        assert_suggestion_result(
+            "centimeter",
+            SpellCheck::new(FstDictionary::curated(), Dialect::British),
+            "centimetre",
+        );
+    }
+
+    #[test]
+    fn suggest_centimeter_for_centimetre_titlecase() {
+        assert_suggestion_result("Centimetre", test_linter(), "Centimeter");
+    }
+
+    #[test]
+    #[ignore = "known failure due to bug"]
+    fn suggest_centimetre_for_centimeter_titlecase() {
+        assert_suggestion_result(
+            "Centimeter",
+            SpellCheck::new(FstDictionary::curated(), Dialect::British),
+            "Centimetre",
+        );
+    }
+
+    #[test]
+    #[ignore = "known failure due to bug"]
+    fn suggest_centimeter_for_centimetre_all_caps() {
+        assert_suggestion_result("CENTIMETRE", test_linter(), "CENTIMETER");
+    }
+
+    #[test]
+    #[ignore = "known failure due to bug"]
+    fn suggest_centimetre_for_centimeter_all_caps() {
+        assert_suggestion_result(
+            "CENTIMETER",
+            SpellCheck::new(FstDictionary::curated(), Dialect::British),
+            "CENTIMETRE",
+        );
+    }
+
+    // is_ll_misspelling
+    // as in traveller/traveler
+    #[test]
+    fn suggest_traveler_for_traveller() {
+        assert_suggestion_result("traveller", test_linter(), "traveler");
+    }
+
+    #[test]
+    fn suggest_traveller_for_traveler() {
+        assert_suggestion_result(
+            "traveler",
+            SpellCheck::new(FstDictionary::curated(), Dialect::British),
+            "traveller",
+        );
+    }
+
+    #[test]
+    fn suggest_traveler_for_traveller_titlecase() {
+        assert_suggestion_result("Traveller", test_linter(), "Traveler");
+    }
+
+    #[test]
+    #[ignore = "known failure due to bug"]
+    fn suggest_traveller_for_traveler_titlecase() {
+        assert_suggestion_result(
+            "Traveler",
+            SpellCheck::new(FstDictionary::curated(), Dialect::British),
+            "Traveller",
+        );
+    }
+
+    #[test]
+    #[ignore = "known failure due to bug"]
+    fn suggest_traveler_for_traveller_all_caps() {
+        assert_suggestion_result("TRAVELLER", test_linter(), "TRAVELER");
+    }
+
+    #[test]
+    #[ignore = "known failure due to bug"]
+    fn suggest_traveller_for_traveler_all_caps() {
+        assert_suggestion_result(
+            "TRAVELER",
+            SpellCheck::new(FstDictionary::curated(), Dialect::British),
+            "TRAVELLER",
+        );
+    }
+
+    // is_ay_ey_misspelling
+    // as in gray/grey
+
+    #[test]
+    fn suggest_grey_for_gray_in_non_american() {
+        assert_suggestion_result(
+            "I've got a gray cat.",
+            SpellCheck::new(FstDictionary::curated(), Dialect::British),
+            "I've got a grey cat.",
+        );
+    }
+
+    #[test]
+    fn suggest_gray_for_grey_in_american() {
+        assert_suggestion_result(
+            "It's a greyscale photo.",
+            test_linter(),
+            "It's a grayscale photo.",
+        );
+    }
+
+    #[test]
+    #[ignore = "known failure due to bug"]
+    fn suggest_grey_for_gray_in_non_american_titlecase() {
+        assert_suggestion_result(
+            "I've Got a Gray Cat.",
+            SpellCheck::new(FstDictionary::curated(), Dialect::British),
+            "I've Got a Grey Cat.",
+        );
+    }
+
+    #[test]
+    fn suggest_gray_for_grey_in_american_titlecase() {
+        assert_suggestion_result(
+            "It's a Greyscale Photo.",
+            test_linter(),
+            "It's a Grayscale Photo.",
+        );
+    }
+
+    #[test]
+    #[ignore = "known failure due to bug"]
+    fn suggest_grey_for_gray_in_non_american_all_caps() {
+        assert_suggestion_result(
+            "GRAY",
+            SpellCheck::new(FstDictionary::curated(), Dialect::British),
+            "GREY",
+        );
+    }
+
+    #[test]
+    #[ignore = "known failure due to bug"]
+    fn suggest_gray_for_grey_in_american_all_caps() {
+        assert_suggestion_result("GREY", test_linter(), "GRAY");
+    }
+
+    // Tests for non-dialectal misspelling patterns
+
+    // is_ei_ie_misspelling
+    #[test]
+    fn fix_cheif_and_recieved() {
+        assert_suggestion_result(
+            "The cheif recieved a letter.",
+            SpellCheck::new(FstDictionary::curated(), Dialect::British),
+            "The chief received a letter.",
+        );
+    }
+
+    #[test]
+    #[ignore = "known failure due to bug"]
+    fn fix_cheif_and_recieved_titlecase() {
+        assert_suggestion_result(
+            "The Cheif Recieved a Letter.",
+            SpellCheck::new(FstDictionary::curated(), Dialect::British),
+            "The Chief Received a Letter.",
+        );
+    }
+
+    #[test]
+    #[ignore = "known failure due to bug"]
+    fn fix_cheif_and_recieved_all_caps() {
+        assert_suggestion_result(
+            "THE CHEIF RECIEVED A LETTER.",
+            SpellCheck::new(FstDictionary::curated(), Dialect::British),
+            "THE CHEIF RECEIVED A LETTER.",
+        );
+    }
+
+    #[test]
+    fn fix_vs_apostrophe() {
+        assert_suggestion_result(
+            "v's",
+            SpellCheck::new(FstDictionary::curated(), Dialect::British),
+            "vs",
+        );
+    }
+
+    #[test]
+    fn fix_vs_typographical_apostrophe() {
+        assert_suggestion_result(
+            "v’s",
+            SpellCheck::new(FstDictionary::curated(), Dialect::British),
+            "vs",
+        );
+    }
+
+    #[test]
+    fn fix_childrens_missing_apostrophe() {
+        assert_suggestion_result(
+            "childrens",
+            SpellCheck::new(FstDictionary::curated(), Dialect::British),
+            "children's",
+        );
+    }
+
+    #[test]
+    fn allows_informal_laughter() {
+        for source in ["hahah", "hahaha", "hahahah", "Hahahah", "HAHAHA"] {
+            assert_no_lints(source, test_linter());
+        }
     }
 }

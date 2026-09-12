@@ -5,32 +5,32 @@ use crate::{Token, TokenStringExt};
 
 use super::Suggestion;
 use super::{ExprLinter, Lint, LintKind};
+use crate::linting::expr_linter::Chunk;
 
 pub struct DoubleModal {
-    expr: Box<dyn Expr>,
+    expr: SequenceExpr,
 }
 
 impl Default for DoubleModal {
     fn default() -> Self {
-        let expr = SequenceExpr::default()
-            .then(ModalVerb::default())
+        let expr = SequenceExpr::with(ModalVerb::default())
             .t_ws()
             .then(ModalVerb::default());
 
-        Self {
-            expr: Box::new(expr),
-        }
+        Self { expr }
     }
 }
 
 impl ExprLinter for DoubleModal {
+    type Unit = Chunk;
+
     fn expr(&self) -> &dyn Expr {
-        self.expr.as_ref()
+        &self.expr
     }
 
     fn match_to_lint(&self, matched_tokens: &[Token], source: &[char]) -> Option<Lint> {
-        let first_chars = matched_tokens.first()?.span.get_content(source);
-        let second_chars = matched_tokens.last()?.span.get_content(source);
+        let first_chars = matched_tokens.first()?.get_ch(source);
+        let second_chars = matched_tokens.last()?.get_ch(source);
 
         Some(Lint {
             span: matched_tokens.span()?,
@@ -39,7 +39,7 @@ impl ExprLinter for DoubleModal {
                 Suggestion::ReplaceWith(first_chars.into()),
                 Suggestion::ReplaceWith(second_chars.into()),
             ],
-            message: "Two modal verbs in a row are rarely grammatical; remove one.".to_string(),
+            message: "Two modal verbs in a row are rarely grammatical; remove one.".to_owned(),
             priority: 31,
         })
     }

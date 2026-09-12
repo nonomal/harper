@@ -1,6 +1,16 @@
+import type { StructuredLintConfig, StructuredLintSetting } from 'harper.js';
 import { shuffle } from 'lodash-es';
 import { expect, test } from 'vitest';
 import State from './State';
+
+function randomString(length: number): string {
+	const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz';
+	let result = '';
+	for (let i = 0; i < length; i++) {
+		result += chars.charAt(Math.floor(Math.random() * chars.length));
+	}
+	return result;
+}
 
 /** Create an instance of the test class that doesn't use external persistence. */
 function createEphemeralState(): State {
@@ -9,6 +19,32 @@ function createEphemeralState(): State {
 		() => {},
 		undefined,
 	);
+}
+
+function collectStructuredRuleNames(config: StructuredLintConfig): string[] {
+	const out: string[] = [];
+
+	const visit = (setting: StructuredLintSetting) => {
+		if ('Bool' in setting) {
+			out.push(setting.Bool.name);
+			return;
+		}
+
+		if ('OneOfMany' in setting) {
+			out.push(...setting.OneOfMany.names);
+			return;
+		}
+
+		for (const child of setting.Group.child.settings) {
+			visit(child);
+		}
+	};
+
+	for (const setting of config.settings) {
+		visit(setting);
+	}
+
+	return out;
 }
 
 test('Toggling linting should change extension array.', () => {
@@ -80,7 +116,32 @@ test('Lint settings and descriptions have the same keys', async () => {
 	const settings = await state.getSettings();
 	const descriptions = await state.getDescriptionHTML();
 
-	expect(Object.keys(descriptions).sort()).toStrictEqual(Object.keys(settings.lintSettings).sort());
+	const lintKeys = Object.keys(settings.lintSettings).sort();
+	const descKeys = Object.keys(descriptions).sort();
+
+	const missingInDescriptions = lintKeys.filter((k) => !descKeys.includes(k));
+	const extraInDescriptions = descKeys.filter((k) => !lintKeys.includes(k));
+
+	if (missingInDescriptions.length || extraInDescriptions.length) {
+		// Print the diffs so CI/local run shows the exact keys
+		console.error('Missing in descriptions (present in lintSettings):', missingInDescriptions);
+		console.error('Extra in descriptions (not in lintSettings):', extraInDescriptions);
+	}
+
+	expect(missingInDescriptions.length).toBe(0);
+	expect(extraInDescriptions.length).toBe(0);
+});
+
+test('Structured lint config and flat lint settings have the same keys', async () => {
+	const state = createEphemeralState();
+
+	const settings = await state.getSettings();
+	const structured = await state.getStructuredLintConfig();
+
+	const lintKeys = Object.keys(settings.lintSettings).sort();
+	const structuredKeys = collectStructuredRuleNames(structured).sort();
+
+	expect(structuredKeys).toStrictEqual(lintKeys);
 });
 
 test('Can be initialized with incomplete lint settings and retain default state.', async () => {
@@ -99,4 +160,118 @@ test('Can be initialized with incomplete lint settings and retain default state.
 	await state.initializeFromSettings({ ...defaultSettings, lintSettings: reducedLintSettings });
 
 	expect(await state.getSettings()).toStrictEqual(defaultSettings);
+});
+
+test('resetAllRulesToDefaults sets all overrides to null', async () => {
+	const state = createEphemeralState();
+
+	// Start with all enabled, then reset
+	let settings = await state.getSettings();
+	for (const key of Object.keys(settings.lintSettings)) {
+		settings.lintSettings[key] = true;
+	}
+	await state.initializeFromSettings(settings);
+
+	await state.resetAllRulesToDefaults();
+	settings = await state.getSettings();
+	for (const key of Object.keys(settings.lintSettings)) {
+		expect(settings.lintSettings[key]).toBeNull();
+	}
+});
+
+test('setAllRulesEnabled toggles all rules on and off', async () => {
+	const state = createEphemeralState();
+
+	await state.setAllRulesEnabled(true);
+	let settings = await state.getSettings();
+	for (const key of Object.keys(settings.lintSettings)) {
+		expect(settings.lintSettings[key]).toBe(true);
+	}
+
+	await state.setAllRulesEnabled(false);
+	settings = await state.getSettings();
+	for (const key of Object.keys(settings.lintSettings)) {
+		expect(settings.lintSettings[key]).toBe(false);
+	}
+});
+
+test('getEffectiveLintConfig matches defaults after reset', async () => {
+	const state = createEphemeralState();
+	await state.resetAllRulesToDefaults();
+	const effective = await state.getEffectiveLintConfig();
+	const defaults = (await state.getDefaultLintConfig()) as Record<string, boolean>;
+	expect(Object.keys(effective).sort()).toStrictEqual(Object.keys(defaults).sort());
+	for (const k of Object.keys(defaults)) {
+		expect(effective[k]).toBe(defaults[k]);
+	}
+});
+
+test('getEffectiveLintConfig reflects explicit overrides', async () => {
+	const state = createEphemeralState();
+	const settings = await state.getSettings();
+	for (const key of Object.keys(settings.lintSettings)) {
+		settings.lintSettings[key] = true;
+	}
+	await state.initializeFromSettings(settings);
+	const effective = await state.getEffectiveLintConfig();
+	for (const k of Object.keys(effective)) {
+		expect(effective[k]).toBe(true);
+	}
+});
+
+test('can persist dictionary words in settings', async () => {
+	const state = createEphemeralState();
+	let settings = await state.getSettings();
+
+	const testWord = 'ajhsbdajshdb';
+	settings.userDictionary = [testWord];
+
+	await state.initializeFromSettings(settings);
+
+	settings = await state.getSettings();
+
+	expect(settings.userDictionary).toStrictEqual([testWord]);
+});
+
+test('can persist dictionary order in settings', async () => {
+	const state = createEphemeralState();
+	let settings = await state.getSettings();
+
+	const testDictionary: string[] = [];
+	for (let i = 0; i < 200; i++) {
+		testDictionary.push(randomString(10));
+	}
+
+	settings.userDictionary = testDictionary;
+	await state.initializeFromSettings(settings);
+
+	settings = await state.getSettings();
+
+	const roundOne = settings.userDictionary;
+
+	await state.initializeFromSettings(settings);
+	settings = await state.getSettings();
+	const roundTwo = settings.userDictionary;
+
+	expect(roundOne).toStrictEqual(roundTwo);
+});
+
+test('can overwrite dictionary words in settings', async () => {
+	const state = createEphemeralState();
+	let settings = await state.getSettings();
+
+	const testWord = 'ajhsbdajshdb';
+	settings.userDictionary = [testWord];
+
+	await state.initializeFromSettings(settings);
+	settings = await state.getSettings();
+
+	expect(settings.userDictionary).toStrictEqual([testWord]);
+
+	settings.userDictionary = [];
+
+	await state.initializeFromSettings(settings);
+	settings = await state.getSettings();
+
+	expect(settings.userDictionary).toStrictEqual([]);
 });

@@ -4,6 +4,8 @@ use crate::expr::FixedPhrase;
 use crate::expr::LongestMatchOf;
 use crate::expr::SimilarToPhrase;
 use crate::linting::Suggestion;
+use crate::linting::expr_linter::Chunk;
+use crate::weir::weir_expr_to_expr;
 use crate::{Token, TokenStringExt};
 
 pub struct MapPhraseLinter {
@@ -48,15 +50,10 @@ impl MapPhraseLinter {
         description: impl ToString,
         lint_kind: Option<LintKind>,
     ) -> Self {
-        let patterns = LongestMatchOf::new(
-            phrase
-                .into_iter()
-                .map(|p| {
-                    let expr: Box<dyn Expr> = Box::new(FixedPhrase::from_phrase(p.as_ref()));
-                    expr
-                })
-                .collect(),
-        );
+        let patterns = LongestMatchOf::new(phrase.into_iter().map(|p| {
+            let expr: Box<dyn Expr> = Box::new(weir_expr_to_expr(p.as_ref()).unwrap());
+            expr
+        }));
 
         Self::new(
             Box::new(patterns),
@@ -83,7 +80,10 @@ impl MapPhraseLinter {
         )
     }
 
-    pub fn new_closed_compound(phrase: impl AsRef<str>, correct_form: impl ToString) -> Self {
+    pub fn new_closed_compound(
+        phrases: impl IntoIterator<Item = impl AsRef<str>>,
+        correct_form: impl ToString,
+    ) -> Self {
         let message = format!(
             "Did you mean the closed compound `{}`?",
             correct_form.to_string()
@@ -94,8 +94,8 @@ impl MapPhraseLinter {
             correct_form.to_string()
         );
 
-        Self::new_fixed_phrase(
-            phrase,
+        Self::new_fixed_phrases(
+            phrases,
             [correct_form],
             message,
             description,
@@ -105,6 +105,8 @@ impl MapPhraseLinter {
 }
 
 impl ExprLinter for MapPhraseLinter {
+    type Unit = Chunk;
+
     fn expr(&self) -> &dyn Expr {
         self.expr.as_ref()
     }
@@ -126,7 +128,7 @@ impl ExprLinter for MapPhraseLinter {
                     )
                 })
                 .collect(),
-            message: self.message.to_string(),
+            message: self.message.to_owned(),
             priority: 31,
         })
     }

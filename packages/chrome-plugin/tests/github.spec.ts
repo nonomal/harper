@@ -1,21 +1,32 @@
+import type { Page } from '@playwright/test';
 import { test } from './fixtures';
 import {
 	assertHarperHighlightBoxes,
-	clickHarperHighlight,
-	getHarperHighlights,
 	getTextarea,
 	replaceEditorContent,
-	testBasicSuggestionTextarea,
-	testCanIgnoreTextareaSuggestion,
+	testBasicSuggestion,
+	testCanBlockRuleSuggestion,
+	testCanIgnoreSuggestion,
+	testMultipleSuggestionsAndUndo,
 } from './testUtils';
 
 const TEST_PAGE_URL = 'http://localhost:8081/github_textarea.html';
 
-testBasicSuggestionTextarea(TEST_PAGE_URL);
-testCanIgnoreTextareaSuggestion(TEST_PAGE_URL);
+async function textareaSetup(page: Page) {
+	await page.waitForTimeout(2000);
+	await page.reload();
+}
+
+testBasicSuggestion(TEST_PAGE_URL, getTextarea, textareaSetup);
+testCanIgnoreSuggestion(TEST_PAGE_URL, getTextarea, textareaSetup);
+testCanBlockRuleSuggestion(TEST_PAGE_URL, getTextarea);
+testMultipleSuggestionsAndUndo(TEST_PAGE_URL, getTextarea, textareaSetup);
 
 test('Wraps correctly', async ({ page }) => {
 	await page.goto(TEST_PAGE_URL);
+
+	await page.waitForTimeout(2000);
+	await page.reload();
 
 	const editor = getTextarea(page);
 	await replaceEditorContent(
@@ -23,16 +34,19 @@ test('Wraps correctly', async ({ page }) => {
 		'This is a test of the Harper grammar checker, specifically   if \nit is wrapped around a line weirdl y',
 	);
 
-	await page.waitForTimeout(6000);
+	await page.waitForTimeout(12000);
 
 	await assertHarperHighlightBoxes(page, [
-		{ height: 18, width: 25.21875, x: 512.28125, y: 63 },
-		{ height: 18, width: 67.21875, x: 260.234375, y: 103 },
+		{ x: 260.234375, y: 103, width: 67.21875, height: 18 },
+		{ x: 512.28125, y: 63, width: 25.21875, height: 18 },
 	]);
 });
 
 test('Scrolls correctly', async ({ page }) => {
 	await page.goto(TEST_PAGE_URL);
+
+	await page.waitForTimeout(2000);
+	await page.reload();
 
 	const editor = getTextarea(page);
 	await replaceEditorContent(

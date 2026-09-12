@@ -1,12 +1,12 @@
+use std::borrow::Cow;
 use std::hash::{BuildHasher, Hasher};
 use std::sync::Arc;
 
 use foldhash::quality::FixedState;
 use itertools::Itertools;
 
-use super::{FstDictionary, WordId};
-use super::{FuzzyMatchResult, dictionary::Dictionary};
-use crate::{CharString, WordMetadata};
+use super::{FstDictionary, FuzzyMatchResult, WordId, dictionary::Dictionary};
+use crate::{CharString, DictWordMetadata};
 
 /// A simple wrapper over [`Dictionary`] that allows
 /// one to merge multiple dictionaries without copying.
@@ -93,14 +93,28 @@ impl Dictionary for MergedDictionary {
         false
     }
 
-    fn get_word_metadata(&self, word: &[char]) -> Option<&WordMetadata> {
-        for child in &self.children {
-            if let Some(found_item) = child.get_word_metadata(word) {
-                return Some(found_item);
-            }
-        }
+    fn get_word_metadata(&self, word: &[char]) -> Option<Cow<'_, DictWordMetadata>> {
+        let mut meta_iter = self
+            .children
+            .iter()
+            .filter_map(|d| d.get_word_metadata(word));
 
-        None
+        let first = meta_iter.next()?;
+
+        // Check if multiple entries were found for the word.
+        if let Some(second) = meta_iter.next() {
+            // If so, merge them.
+            let mut first = first.into_owned();
+            first.merge(&second);
+            meta_iter.for_each(|additional_md| {
+                first.merge(&additional_md);
+            });
+
+            Some(Cow::Owned(first))
+        } else {
+            // If not, return the sole found entry.
+            Some(first)
+        }
     }
 
     fn words_iter(&self) -> Box<dyn Iterator<Item = &'_ [char]> + Send + '_> {
@@ -114,37 +128,41 @@ impl Dictionary for MergedDictionary {
 
     fn contains_exact_word_str(&self, word: &str) -> bool {
         let chars: CharString = word.chars().collect();
-        self.contains_word(&chars)
+        self.contains_exact_word(&chars)
     }
 
-    fn get_word_metadata_str(&self, word: &str) -> Option<&WordMetadata> {
+    fn get_word_metadata_str(&self, word: &str) -> Option<Cow<'_, DictWordMetadata>> {
         let chars: CharString = word.chars().collect();
         self.get_word_metadata(&chars)
     }
 
     fn fuzzy_match(
-        &self,
+        &'_ self,
         word: &[char],
         max_distance: u8,
         max_results: usize,
-    ) -> Vec<FuzzyMatchResult> {
+    ) -> Vec<FuzzyMatchResult<'_>> {
         self.children
             .iter()
             .flat_map(|d| d.fuzzy_match(word, max_distance, max_results))
+            .sorted_by_key(|r| r.word)
+            .dedup_by(|a, b| a.word == b.word)
             .sorted_by_key(|r| r.edit_distance)
             .take(max_results)
             .collect()
     }
 
     fn fuzzy_match_str(
-        &self,
+        &'_ self,
         word: &str,
         max_distance: u8,
         max_results: usize,
-    ) -> Vec<FuzzyMatchResult> {
+    ) -> Vec<FuzzyMatchResult<'_>> {
         self.children
             .iter()
             .flat_map(|d| d.fuzzy_match_str(word, max_distance, max_results))
+            .sorted_by_key(|r| r.word)
+            .dedup_by(|a, b| a.word == b.word)
             .sorted_by_key(|r| r.edit_distance)
             .take(max_results)
             .collect()
@@ -158,5 +176,49 @@ impl Dictionary for MergedDictionary {
         self.children
             .iter()
             .find_map(|dict| dict.get_word_from_id(id))
+    }
+
+    fn find_words_with_prefix(&self, prefix: &[char]) -> Vec<Cow<'_, [char]>> {
+        self.children
+            .iter()
+            .flat_map(|dict| dict.find_words_with_prefix(prefix))
+            .sorted()
+            .dedup()
+            .collect()
+    }
+
+    fn find_words_with_common_prefix(&self, word: &[char]) -> Vec<Cow<'_, [char]>> {
+        self.children
+            .iter()
+            .flat_map(|dict| dict.find_words_with_common_prefix(word))
+            .sorted()
+            .dedup()
+            .collect()
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use std::sync::Arc;
+
+    use crate::DictWordMetadata;
+    use crate::spell::{Dictionary, MergedDictionary, MutableDictionary};
+
+    #[test]
+    fn merged_contains_exact_word_str_is_case_sensitive() {
+        let mut user_dict = MutableDictionary::new();
+        user_dict.append_word_str("Foo", DictWordMetadata::default());
+
+        let mut merged = MergedDictionary::new();
+        merged.add_dictionary(Arc::new(user_dict));
+
+        assert!(merged.contains_word_str("Foo"));
+        assert!(merged.contains_word_str("foo"));
+
+        assert!(merged.contains_exact_word(&['F', 'o', 'o']));
+        assert!(!merged.contains_exact_word(&['f', 'o', 'o']));
+
+        assert!(merged.contains_exact_word_str("Foo"));
+        assert!(!merged.contains_exact_word_str("foo"));
     }
 }

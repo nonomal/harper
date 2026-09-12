@@ -1,3 +1,4 @@
+use crate::linting::expr_linter::Chunk;
 use crate::{
     Token,
     expr::SequenceExpr,
@@ -6,33 +7,31 @@ use crate::{
 };
 
 pub struct HopeYoure {
-    expr: Box<dyn crate::expr::Expr>,
+    expr: SequenceExpr,
 }
 
 impl Default for HopeYoure {
     fn default() -> Self {
-        let loc = WordSet::new(&["here", "there"]);
+        let loc = WordSet::new(["here", "there"]);
 
         let prep = SequenceExpr::default().t_ws().then_preposition();
 
-        let expr = SequenceExpr::aco("hope")
-            .t_ws()
-            .t_aco("your")
+        let expr = SequenceExpr::word_seq(&["hope", "your"])
             .t_ws()
             .then_adjective()
             .then_optional(prep)
             .t_ws()
             .then(loc);
 
-        Self {
-            expr: Box::new(expr),
-        }
+        Self { expr }
     }
 }
 
 impl ExprLinter for HopeYoure {
+    type Unit = Chunk;
+
     fn expr(&self) -> &dyn crate::expr::Expr {
-        self.expr.as_ref()
+        &self.expr
     }
 
     fn match_to_lint(&self, toks: &[Token], src: &[char]) -> Option<Lint> {

@@ -59,7 +59,9 @@
 			"target": [
 				{
 					"metadata": {
-						"adverb": {}
+						"adverb": {
+							"is_manner": true
+						}
 					}
 				}
 			],
@@ -82,7 +84,7 @@
 			"base_metadata": {}
 		},
 		"H": {
-			"#": "'-ieth' suffix",
+			"#": "'-(ie)th' suffix",
 			"kind": "suffix",
 			"cross_product": false,
 			"replacements": [
@@ -143,7 +145,7 @@
 		},
 		">": {
 			"#": "'-(i)er' comparative suffix; agent suffix. see also 'c' which marks a comparative form",
-			"//": "mnemonic: greater than is better",
+			"//": "mnemonic: greater than is better; singular of 'Z'",
 			"kind": "suffix",
 			"cross_product": true,
 			"replacements": [
@@ -265,6 +267,7 @@
 		},
 		"Z": {
 			"#": "'-(i)(e)rs' suffix",
+			"//": "plural of '>' agent noun suffix '-(i)(e)r'",
 			"kind": "suffix",
 			"cross_product": true,
 			"replacements": [
@@ -379,7 +382,18 @@
 					"condition": "[^aeiou]e"
 				}
 			],
-			"target": [],
+			"target": [
+				{
+					"if_base": {
+						"verb": {}
+					},
+					"metadata": {
+						"adjective": {
+							"degree": "Positive"
+						}
+					}
+				}
+			],
 			"base_metadata": {}
 		},
 		"S": {
@@ -425,7 +439,7 @@
 					},
 					"metadata": {
 						"verb": {
-							"verb_form": "ThirdPersonSingularPresentForm"
+							"verb_form": "THIRD_PERSON_SINGULAR"
 						}
 					}
 				}
@@ -433,7 +447,7 @@
 			"base_metadata": {}
 		},
 		"d": {
-			"#": "'-(e)d' suffix",
+			"#": "'-(e)d' suffix; verb past",
 			"kind": "suffix",
 			"cross_product": true,
 			"replacements": [
@@ -461,7 +475,9 @@
 			"target": [
 				{
 					"metadata": {
-						"adjective": {}
+						"adjective": {
+							"degree": "Positive"
+						}
 					}
 				},
 				{
@@ -469,7 +485,9 @@
 						"verb": {}
 					},
 					"metadata": {
-						"verb": {}
+						"verb": {
+							"verb_form": "PAST"
+						}
 					}
 				}
 			],
@@ -495,10 +513,12 @@
 				{
 					"metadata": {
 						"verb": {
-							"verb_form": "ProgressiveForm"
+							"verb_form": "PROGRESSIVE"
 						},
-						"noun": null,
-						"adjective": null
+						"noun": {
+							"is_mass": true
+						},
+						"adjective": {}
 					}
 				}
 			],
@@ -515,7 +535,13 @@
 					"condition": "."
 				}
 			],
-			"target": [],
+			"target": [
+				{
+					"metadata": {
+						"adverb": {}
+					}
+				}
+			],
 			"base_metadata": {},
 			"rename_ok": true
 		},
@@ -602,6 +628,7 @@
 		},
 		"O": {
 			"#": "proper noun property",
+			"propagate": true,
 			"metadata": {
 				"noun": {
 					"is_proper": true
@@ -610,7 +637,7 @@
 		},
 		"l": {
 			"#": "linking verb property",
-			"//": "see also m: auxiliary verb property",
+			"//": "see also A: auxiliary verb property",
 			"metadata": {
 				"verb": {
 					"is_linking": true
@@ -623,6 +650,14 @@
 				"verb": {}
 			}
 		},
+		"j": {
+			"#": "verb past property",
+			"metadata": {
+				"verb": {
+					"verb_form": "PAST"
+				}
+			}
+		},
 		"J": {
 			"#": "adjective property",
 			"metadata": {
@@ -631,10 +666,22 @@
 		},
 		"x": {
 			"#": "swear word property",
-			"//": "'xxx' used to be a placeholder for swear words",
+			"//": "mnemonic: 'xxx' used to be a placeholder for swear words",
 			"propagate": true,
 			"metadata": {
 				"swear": true
+			}
+		},
+		"†": {
+			"#": "slang/informal/nonstandard (always) property",
+			"metadata": {
+				"slang": true
+			}
+		},
+		"‡": {
+			"#": "slang/informal/nonstandard (some senses only) property",
+			"metadata": {
+				"slang": true
 			}
 		},
 		"C": {
@@ -672,7 +719,8 @@
 			"metadata": {
 				"common": true
 			},
-			"rename_ok": true
+			"rename_ok": true,
+			"propagate": true
 		},
 		"P": {
 			"#": "preposition property",
@@ -827,6 +875,14 @@
 				"dialects": "AUSTRALIAN"
 			}
 		},
+		"₹": {
+			"#": "IN property",
+			"//": "mnemonic: rupee symbol",
+			"propagate": true,
+			"metadata": {
+				"dialects": "INDIAN"
+			}
+		},
 		"F": {
 			"#": "reflexive property",
 			"metadata": {
@@ -876,6 +932,125 @@
 					"is_countable": true,
 					"is_mass": true
 				}
+			}
+		},
+		"b": {
+			"#": "verb lemma form property",
+			"//": "mnemonic: 'b' for 'base form'",
+			"metadata": {
+				"verb": {
+					"verb_form": "LEMMA"
+				}
+			}
+		},
+		"t": {
+			"#": "verb preterite / simple past form property",
+			"metadata": {
+				"verb": {
+					"verb_form": "PRETERITE"
+				}
+			}
+		},
+		"T": {
+			"#": "verb past participle form property",
+			"metadata": {
+				"verb": {
+					"verb_form": "PAST_PARTICIPLE"
+				}
+			}
+		},
+		"6": {
+			"#": "verb progressive form property",
+			"//": "mnemonic: '6' looks like 'g' in 'ing'",
+			"metadata": {
+				"verb": {
+					"verb_form": "PROGRESSIVE"
+				}
+			}
+		},
+		"h": {
+			"#": "verb third person singular present form property",
+			"metadata": {
+				"verb": {
+					"verb_form": "THIRD_PERSON_SINGULAR"
+				}
+			}
+		},
+		"y": {
+			"#": "adverb of manner property",
+			"//": "mnemonic: 'y' looks like 'ly'",
+			"metadata": {
+				"adverb": {
+					"is_manner": true
+				}
+			}
+		},
+		"8": {
+			"#": "adverb of frequency property",
+			"//": "mnemonic: '8' looks like '♾️'",
+			"metadata": {
+				"adverb": {
+					"is_frequency": true
+				}
+			}
+		},
+		"%": {
+			"#": "adverb of degree property",
+			"//": "mnemonic: '%' reminds of '°'",
+			"metadata": {
+				"adverb": {
+					"is_degree": true
+				}
+			}
+		},
+		"♂": {
+			"#": "masculine property",
+			"metadata": {
+				"//": "not yet implemented"
+			}
+		},
+		"♀": {
+			"#": "feminine property",
+			"metadata": {
+				"//": "not yet implemented"
+			}
+		},
+		"ª": {
+			"#": "animate property",
+			"metadata": {
+				"//": "not yet implemented"
+			}
+		},
+		"(": {
+			"#": "prefix property",
+			"metadata": {
+				"affix": {
+					"is_prefix": true
+				}
+			}
+		},
+		"/": {
+			"#": "phrasal verb property",
+			"metadata": {
+				"verb": {
+					"is_phrasal": true
+				}
+			}
+		},
+		"☁": {
+			"#": "abstract noun property",
+			"//": "mnemonic: cloud = intangible",
+			"metadata": {
+				"noun": {
+					"is_abstract": true
+				}
+			}
+		},
+		"4": {
+			"#": "abbreviation property",
+			"//": "mnemonic: 4 looks like A",
+			"metadata": {
+				"abbreviation": true
 			}
 		}
 	}

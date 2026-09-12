@@ -1,10 +1,8 @@
-use crate::expr::Expr;
-use crate::expr::LongestMatchOf;
-use crate::expr::SequenceExpr;
-use crate::expr::SpelledNumberExpr;
-use crate::{Lrc, Token, TokenStringExt, patterns::WordSet};
-
-use super::{ExprLinter, Lint, LintKind, Suggestion};
+use crate::{
+    CharStringExt, Token, TokenStringExt,
+    expr::{DurationExpr, Expr, SequenceExpr},
+    linting::{ExprLinter, Lint, LintKind, Suggestion, expr_linter::Chunk},
+};
 
 const AGO_VARIANTS: [&[char]; 3] = [&['a', 'g', 'o'], &['A', 'g', 'o'], &['A', 'G', 'O']];
 const FOR_VARIANTS: [&[char]; 3] = [&['f', 'o', 'r'], &['F', 'o', 'r'], &['F', 'O', 'R']];
@@ -22,50 +20,33 @@ fn match_case_string<'a>(template: &[char], variants: [&'a [char]; 3]) -> &'a [c
 }
 
 pub struct SinceDuration {
-    expr: Box<dyn Expr>,
+    expr: SequenceExpr,
 }
 
 impl Default for SinceDuration {
     fn default() -> Self {
-        let units = WordSet::new(&[
-            "minute", "minutes", "hour", "hours", "day", "days", "week", "weeks", "month",
-            "months", "year", "years",
-        ]);
-
-        let pattern_without_ago = Lrc::new(
-            SequenceExpr::default()
-                .then_any_capitalization_of("since")
-                .then_whitespace()
-                .then_longest_of(vec![
-                    Box::new(SpelledNumberExpr),
-                    Box::new(SequenceExpr::default().then_number()),
-                ])
-                .then_whitespace()
-                .then(units),
-        );
-
-        let pattern_with_ago = SequenceExpr::default()
-            .then(pattern_without_ago.clone())
-            .then_whitespace()
-            .then_any_capitalization_of("ago");
-
         Self {
-            expr: Box::new(LongestMatchOf::new(vec![
-                Box::new(pattern_without_ago),
-                Box::new(pattern_with_ago),
-            ])),
+            expr: SequenceExpr::any_capitalization_of("since")
+                .then_whitespace()
+                .then(DurationExpr)
+                .then_optional(SequenceExpr::default().t_ws().then_word_set(["ago", "old"])),
         }
     }
 }
 
 impl ExprLinter for SinceDuration {
+    type Unit = Chunk;
+
     fn expr(&self) -> &dyn Expr {
-        self.expr.as_ref()
+        &self.expr
     }
 
     fn match_to_lint(&self, toks: &[Token], src: &[char]) -> Option<Lint> {
         let last = toks.last()?;
-        if last.span.get_content_string(src).to_lowercase() == "ago" {
+        if last
+            .get_ch(src)
+            .eq_any_ignore_ascii_case_chars(&[&['a', 'g', 'o'], &['o', 'l', 'd']])
+        {
             return None;
         }
 
@@ -73,7 +54,7 @@ impl ExprLinter for SinceDuration {
 
         let mut since_point_in_time = since_duration_span.get_content(src).to_vec();
         since_point_in_time.push(' ');
-        let unit_template = toks.last()?.span.get_content(src);
+        let unit_template = toks.last()?.get_ch(src);
         since_point_in_time.extend(
             match_case_string(unit_template, AGO_VARIANTS)
                 .iter()
@@ -82,7 +63,7 @@ impl ExprLinter for SinceDuration {
         let ago_suggestion = Suggestion::ReplaceWith(since_point_in_time);
 
         let duration = toks[1..].span()?.get_content(src);
-        let since_template = toks.first()?.span.get_content(src);
+        let since_template = toks.first()?.get_ch(src);
         let mut for_duration = match_case_string(since_template, FOR_VARIANTS).to_vec();
         for_duration.extend(duration);
         let for_suggestion = Suggestion::ReplaceWith(for_duration);
@@ -91,7 +72,7 @@ impl ExprLinter for SinceDuration {
             span: since_duration_span,
             lint_kind: LintKind::Miscellaneous,
             suggestions: vec![for_suggestion, ago_suggestion],
-            message: "For a duration, use 'for' instead of 'since'. Or for a point in time, add 'ago' at the end.".to_string(),
+            message: "For a duration, use 'for' instead of 'since'. Or for a point in time, add 'ago' at the end.".to_owned(),
             priority: 50,
         })
     }
@@ -103,8 +84,8 @@ impl ExprLinter for SinceDuration {
 
 #[cfg(test)]
 mod tests {
-    use crate::linting::SinceDuration;
-    use crate::linting::tests::{assert_lint_count, assert_top3_suggestion_result};
+    use super::SinceDuration;
+    use crate::linting::tests::{assert_lint_count, assert_no_lints, assert_suggestion_result};
 
     #[test]
     fn catches_spelled() {
@@ -117,10 +98,9 @@ mod tests {
 
     #[test]
     fn permits_spelled_with_ago() {
-        assert_lint_count(
+        assert_no_lints(
             "I have been waiting since two hours ago.",
             SinceDuration::default(),
-            0,
         );
     }
 
@@ -135,16 +115,15 @@ mod tests {
 
     #[test]
     fn permits_numerals_with_ago() {
-        assert_lint_count(
+        assert_no_lints(
             "I have been waiting since 2 hours ago.",
             SinceDuration::default(),
-            0,
         );
     }
 
     #[test]
     fn correct_without_issues() {
-        assert_top3_suggestion_result(
+        assert_suggestion_result(
             "I'm running v2.2.1 on bare metal (no docker, vm) since two weeks without issues.",
             SinceDuration::default(),
             "I'm running v2.2.1 on bare metal (no docker, vm) for two weeks without issues.",
@@ -153,7 +132,7 @@ mod tests {
 
     #[test]
     fn correct_anything_back() {
-        assert_top3_suggestion_result(
+        assert_suggestion_result(
             "I have not heard anything back since three months.",
             SinceDuration::default(),
             "I have not heard anything back for three months.",
@@ -162,7 +141,7 @@ mod tests {
 
     #[test]
     fn correct_get_done() {
-        assert_top3_suggestion_result(
+        assert_suggestion_result(
             "I am trying to get this done since two days, someone please help.",
             SinceDuration::default(),
             "I am trying to get this done for two days, someone please help.",
@@ -171,7 +150,7 @@ mod tests {
 
     #[test]
     fn correct_deprecated() {
-        assert_top3_suggestion_result(
+        assert_suggestion_result(
             "This project is now officially deprecated, since I worked with virtualabs on the next version of Mirage since three years now: an ecosystem of tools named WHAD.",
             SinceDuration::default(),
             "This project is now officially deprecated, since I worked with virtualabs on the next version of Mirage for three years now: an ecosystem of tools named WHAD.",
@@ -180,7 +159,7 @@ mod tests {
 
     #[test]
     fn correct_same() {
-        assert_top3_suggestion_result(
+        assert_suggestion_result(
             "Same! Since two days.",
             SinceDuration::default(),
             "Same! For two days.",
@@ -189,7 +168,7 @@ mod tests {
 
     #[test]
     fn correct_what_changed() {
-        assert_top3_suggestion_result(
+        assert_suggestion_result(
             "What changed since two weeks?",
             SinceDuration::default(),
             "What changed since two weeks ago?",
@@ -198,7 +177,7 @@ mod tests {
 
     #[test]
     fn correct_with_period() {
-        assert_top3_suggestion_result(
+        assert_suggestion_result(
             "I have been waiting since two hours.",
             SinceDuration::default(),
             "I have been waiting since two hours ago.",
@@ -207,7 +186,7 @@ mod tests {
 
     #[test]
     fn correct_with_exclamation() {
-        assert_top3_suggestion_result(
+        assert_suggestion_result(
             "I have been waiting since two hours!",
             SinceDuration::default(),
             "I have been waiting since two hours ago!",
@@ -216,7 +195,7 @@ mod tests {
 
     #[test]
     fn correct_with_question_mark() {
-        assert_top3_suggestion_result(
+        assert_suggestion_result(
             "Have you been waiting since two hours?",
             SinceDuration::default(),
             "Have you been waiting for two hours?",
@@ -225,7 +204,7 @@ mod tests {
 
     #[test]
     fn correct_with_comma() {
-        assert_top3_suggestion_result(
+        assert_suggestion_result(
             "Since two days, I have been trying to get this done.",
             SinceDuration::default(),
             "For two days, I have been trying to get this done.",
@@ -234,7 +213,7 @@ mod tests {
 
     #[test]
     fn correct_for_title_case() {
-        assert_top3_suggestion_result(
+        assert_suggestion_result(
             "Since 45 Minutes I See The Following Picture In The Terminal.",
             SinceDuration::default(),
             "For 45 Minutes I See The Following Picture In The Terminal.",
@@ -243,7 +222,7 @@ mod tests {
 
     #[test]
     fn correct_for_all_caps() {
-        assert_top3_suggestion_result(
+        assert_suggestion_result(
             "STOPPED SINCE 12 HOURS WITH EXIT CODE 0",
             SinceDuration::default(),
             "STOPPED FOR 12 HOURS WITH EXIT CODE 0",
@@ -252,7 +231,7 @@ mod tests {
 
     #[test]
     fn correct_ago_title_case() {
-        assert_top3_suggestion_result(
+        assert_suggestion_result(
             "It Is In Development Since Two Years.",
             SinceDuration::default(),
             "It Is In Development Since Two Years Ago.",
@@ -261,7 +240,7 @@ mod tests {
 
     #[test]
     fn correct_ago_all_caps() {
-        assert_top3_suggestion_result(
+        assert_suggestion_result(
             "BUG: SINCE 6 MONTHS UNLOAD CHECKPOINT",
             SinceDuration::default(),
             "BUG: SINCE 6 MONTHS AGO UNLOAD CHECKPOINT",
@@ -271,7 +250,7 @@ mod tests {
     #[test]
     #[ignore = "We can't yet handle modifiers like 'over'. Plus it doesn't work with 'ago'."]
     fn not_yet_handled() {
-        assert_top3_suggestion_result(
+        assert_suggestion_result(
             "It's an asked feature since over 9 years",
             SinceDuration::default(),
             "It's an asked feature for over 9 years.",
@@ -281,7 +260,7 @@ mod tests {
     #[test]
     #[ignore = "We can't yet handle modifiers like 'more than'. Plus it doesn't work with 'ago'."]
     fn not_yet_handled_2() {
-        assert_top3_suggestion_result(
+        assert_suggestion_result(
             "It's an asked feature since more than 9 years",
             SinceDuration::default(),
             "It's an asked feature for more than 9 years.",
@@ -289,12 +268,59 @@ mod tests {
     }
 
     #[test]
-    #[ignore = "We can't yet handle indefinite numbers."]
     fn not_yet_handled_3() {
-        assert_top3_suggestion_result(
+        assert_suggestion_result(
             "I use a Wacom Cintiq 27QHDT since several years on Linux",
             SinceDuration::default(),
             "I use a Wacom Cintiq 27QHDT for several years on Linux",
+        );
+    }
+
+    #[test]
+    fn ignore_since_years_old() {
+        assert_no_lints(
+            "I've been coding since 11 years old and I'm now 57",
+            SinceDuration::default(),
+        );
+    }
+
+    fn correct_since_a_few_months() {
+        assert_suggestion_result(
+            "I am struggling since a few months with the rebuild of an old FORTRAN program.",
+            SinceDuration::default(),
+            "I am struggling for a few months with the rebuild of an old FORTRAN program.",
+        );
+    }
+
+    // Note: Expects "few" to be corrected to "a few" by a different linter
+    fn correct_since_few_days() {
+        assert_suggestion_result(
+            "I've been struggling since few days with the rebuild of an old FORTRAN program.",
+            SinceDuration::default(),
+            "I've been struggling for few days with the rebuild of an old FORTRAN program.",
+        );
+    }
+
+    fn dont_flag_since_a_couple_hours_ago() {
+        assert_no_lints(
+            "[BUG] since a couple hours ago, the claude code agent often gets stuck while working.",
+            SinceDuration::default(),
+        );
+    }
+
+    fn fix_since_a_couple_of_days() {
+        assert_suggestion_result(
+            "Since a couple of days, I got this error",
+            SinceDuration::default(),
+            "For a couple of days, I got this error",
+        );
+    }
+
+    fn fix_since_a_couple_days() {
+        assert_suggestion_result(
+            "Values at 0 all the time since a couple days · Issue #91551",
+            SinceDuration::default(),
+            "Values at 0 all the time since a couple days ago · Issue #91551",
         );
     }
 }

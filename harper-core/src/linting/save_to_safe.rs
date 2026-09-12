@@ -1,6 +1,7 @@
 use crate::expr::Expr;
 use crate::expr::OwnedExprExt;
 use crate::expr::SequenceExpr;
+use crate::linting::expr_linter::Chunk;
 use crate::{
     Token,
     linting::{ExprLinter, Lint, LintKind, Suggestion},
@@ -8,34 +9,33 @@ use crate::{
 };
 
 pub struct SaveToSafe {
-    expr: Box<dyn Expr>,
+    expr: SequenceExpr,
 }
 
 impl Default for SaveToSafe {
     fn default() -> Self {
-        let pattern = SequenceExpr::default()
-            .then(InflectionOfBe::new().or(Word::new("it")))
+        let pattern = SequenceExpr::with(InflectionOfBe::new().or(Word::new("it")))
             .then_whitespace()
             .t_aco("save")
             .then_whitespace()
             .t_aco("to")
             .then_whitespace()
             .then_verb();
-        Self {
-            expr: Box::new(pattern),
-        }
+        Self { expr: pattern }
     }
 }
 
 impl ExprLinter for SaveToSafe {
+    type Unit = Chunk;
+
     fn expr(&self) -> &dyn Expr {
-        self.expr.as_ref()
+        &self.expr
     }
 
     fn match_to_lint(&self, toks: &[Token], src: &[char]) -> Option<Lint> {
         let save_tok = &toks.get(2)?;
         let verb_tok = &toks.get(4)?;
-        let verb = verb_tok.span.get_content_string(src).to_lowercase();
+        let verb = verb_tok.get_str(src).to_lowercase();
         Some(Lint {
             span: save_tok.span,
             lint_kind: LintKind::WordChoice,

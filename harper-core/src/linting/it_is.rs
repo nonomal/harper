@@ -1,70 +1,59 @@
-use crate::expr::Expr;
-use crate::expr::SequenceExpr;
+use crate::expr::{Expr, SequenceExpr};
+use crate::linting::expr_linter::Chunk;
 use crate::{
-    Token,
+    Token, TokenKind,
     linting::{ExprLinter, Lint, LintKind, Suggestion},
-    patterns::{Pattern, WordSet},
 };
 
 pub struct ItIs {
-    expr: Box<dyn Expr>,
+    expr: SequenceExpr,
 }
 
 impl Default for ItIs {
     fn default() -> Self {
-        let exceptions = WordSet::new(&[
-            "own",
-            "1st",
-            "mainline",
-            "team",
-            "body",
-            "mean",
-            "animal",
-            "head",
-            "material",
-            "frontline",
-            "center",
-            "centre",
-            "business",
-            "state",
-            "runtime",
-            "size",
-            "power",
-            "budget",
-            "regulation",
-            "woman",
-            "turnover",
-            "utility",
-            "key",
-            "assault",
-        ]);
         let pattern = SequenceExpr::default()
             .t_aco("its")
             .then_whitespace()
-            .then(move |tok: &Token, src: &[char]| {
-                if let Some(Some(meta)) = tok.kind.as_word() {
-                    if !meta.is_adjective() {
-                        return false;
-                    }
-                    if exceptions.matches(&[tok.clone()], src).is_some() {
-                        return false;
-                    }
-                    true
-                } else {
-                    false
-                }
-            })
+            .then_kind_except(
+                TokenKind::is_adjective,
+                &[
+                    "1st",
+                    "animal",
+                    "assault",
+                    "body",
+                    "budget",
+                    "business",
+                    "center",
+                    "centre",
+                    "frontline",
+                    "head",
+                    "key",
+                    "mainline",
+                    "material",
+                    "mean",
+                    "own",
+                    "power",
+                    "regulation",
+                    "runtime",
+                    "size",
+                    "state",
+                    "team",
+                    "turnover",
+                    "utility",
+                    "woman",
+                ],
+            )
             .then_whitespace()
             .then_preposition();
-        Self {
-            expr: Box::new(pattern),
-        }
+        Self { expr: pattern }
     }
 }
 
 impl ExprLinter for ItIs {
+    type Unit = Chunk;
+
     fn expr(&self) -> &dyn Expr {
-        self.expr.as_ref()
+        &self.expr
     }
 
     fn match_to_lint(&self, tokens: &[Token], source: &[char]) -> Option<Lint> {
@@ -78,8 +67,7 @@ impl ExprLinter for ItIs {
                 "it's".chars().collect(),
                 text,
             )],
-            message: "Consider using 'it's' (it is) instead of 'its' (possessive form)."
-                .to_string(),
+            message: "Consider using 'it's' (it is) instead of 'its' (possessive form).".to_owned(),
             priority: 31,
         })
     }

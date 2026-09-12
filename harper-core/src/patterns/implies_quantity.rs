@@ -13,12 +13,12 @@ pub struct ImpliesQuantity;
 impl ImpliesQuantity {
     pub fn implies_plurality(token: &Token, source: &[char]) -> Option<bool> {
         match &token.kind {
-            TokenKind::Word(Some(word_metadata)) => {
-                if word_metadata.is_determiner() {
+            TokenKind::Word(Some(lexeme_metadata)) => {
+                if lexeme_metadata.is_determiner() {
                     return Some(false);
                 }
 
-                let source = token.span.get_content(source);
+                let source = token.get_ch(source);
 
                 match source {
                     ['a'] => Some(false),

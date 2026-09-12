@@ -1,13 +1,14 @@
 use blanket::blanket;
+use std::borrow::Cow;
 
 use super::FuzzyMatchResult;
 use super::WordId;
-use crate::WordMetadata;
+use crate::DictWordMetadata;
 
 /// An in-memory database that contains everything necessary to parse and analyze English text.
 ///
 /// See also: [`super::FstDictionary`] and [`super::MutableDictionary`].
-#[blanket(derive(Arc))]
+#[blanket(derive(Arc, Ref))]
 pub trait Dictionary: Send + Sync {
     /// Check if the dictionary contains any capitalization of a given word.
     fn contains_word(&self, word: &[char]) -> bool;
@@ -19,25 +20,25 @@ pub trait Dictionary: Send + Sync {
     fn contains_exact_word_str(&self, word: &str) -> bool;
     /// Gets best fuzzy match from dictionary
     fn fuzzy_match(
-        &self,
+        &'_ self,
         word: &[char],
         max_distance: u8,
         max_results: usize,
-    ) -> Vec<FuzzyMatchResult>;
+    ) -> Vec<FuzzyMatchResult<'_>>;
     /// Gets best fuzzy match from dictionary
     fn fuzzy_match_str(
-        &self,
+        &'_ self,
         word: &str,
         max_distance: u8,
         max_results: usize,
-    ) -> Vec<FuzzyMatchResult>;
+    ) -> Vec<FuzzyMatchResult<'_>>;
     fn get_correct_capitalization_of(&self, word: &[char]) -> Option<&'_ [char]>;
-    /// Get the associated [`WordMetadata`] for any capitalization of a given word.
-    fn get_word_metadata(&self, word: &[char]) -> Option<&WordMetadata>;
-    /// Get the associated [`WordMetadata`] for any capitalization of a given word.
+    /// Get the associated [`DictWordMetadata`] for any capitalization of a given word.
+    fn get_word_metadata(&self, word: &[char]) -> Option<Cow<'_, DictWordMetadata>>;
+    /// Get the associated [`DictWordMetadata`] for any capitalization of a given word.
     /// If the word isn't in the dictionary, the resulting metadata will be
     /// empty.
-    fn get_word_metadata_str(&self, word: &str) -> Option<&WordMetadata>;
+    fn get_word_metadata_str(&self, word: &str) -> Option<Cow<'_, DictWordMetadata>>;
 
     /// Iterate over the words in the dictionary.
     fn words_iter(&self) -> Box<dyn Iterator<Item = &'_ [char]> + Send + '_>;
@@ -47,4 +48,10 @@ pub trait Dictionary: Send + Sync {
 
     /// Returns the correct capitalization of the word with the given ID.
     fn get_word_from_id(&self, id: &WordId) -> Option<&[char]>;
+
+    /// Look for words with a specific prefix
+    fn find_words_with_prefix(&self, prefix: &[char]) -> Vec<Cow<'_, [char]>>;
+
+    /// Look for words that share a prefix with the provided word
+    fn find_words_with_common_prefix(&self, word: &[char]) -> Vec<Cow<'_, [char]>>;
 }

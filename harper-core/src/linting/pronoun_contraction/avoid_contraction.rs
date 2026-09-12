@@ -1,8 +1,8 @@
-use crate::Token;
-use crate::expr::Expr;
-use crate::expr::SequenceExpr;
+use crate::expr::{Expr, SequenceExpr};
+use crate::{Token, TokenKind};
 
 use super::super::{ExprLinter, Lint, LintKind, Suggestion};
+use crate::linting::expr_linter::Chunk;
 
 pub struct AvoidContraction {
     expr: Box<dyn Expr>,
@@ -10,12 +10,9 @@ pub struct AvoidContraction {
 
 impl Default for AvoidContraction {
     fn default() -> Self {
-        let pattern =
-            SequenceExpr::aco("you're")
-                .then_whitespace()
-                .then(|tok: &Token, _source: &[char]| {
-                    tok.kind.is_nominal() && !tok.kind.is_likely_homograph()
-                });
+        let pattern = SequenceExpr::aco("you're")
+            .then_whitespace()
+            .then_kind_is_but_is_not(TokenKind::is_nominal, TokenKind::is_likely_homograph);
 
         Self {
             expr: Box::new(pattern),
@@ -24,12 +21,14 @@ impl Default for AvoidContraction {
 }
 
 impl ExprLinter for AvoidContraction {
+    type Unit = Chunk;
+
     fn expr(&self) -> &dyn Expr {
         self.expr.as_ref()
     }
 
     fn match_to_lint(&self, matched_tokens: &[Token], source: &[char]) -> Option<Lint> {
-        let word = matched_tokens[0].span.get_content(source);
+        let word = matched_tokens[0].get_ch(source);
 
         Some(Lint {
             span: matched_tokens[0].span,

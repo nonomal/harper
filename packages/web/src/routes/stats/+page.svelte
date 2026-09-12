@@ -1,5 +1,4 @@
 <script lang="ts">
-import LintKindChart from '$lib/LintKindChart.svelte';
 import {
 	Fileupload,
 	Table,
@@ -8,10 +7,12 @@ import {
 	TableBodyRow,
 	TableHead,
 	TableHeadCell,
-} from 'flowbite-svelte';
-import { binary, type Summary, WorkerLinter } from 'harper.js';
+} from 'components';
+import { type Summary, WorkerLinter } from 'harper.js';
+import { binary } from 'harper.js/binary';
+import LintKindChart from '$lib/components/LintKindChart.svelte';
 
-let linter = new WorkerLinter({ binary: binary });
+let linter = new WorkerLinter({ binary });
 let files = $state<FileList | undefined>();
 let summary: Summary | undefined = $state();
 

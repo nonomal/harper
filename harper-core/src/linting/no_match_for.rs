@@ -1,3 +1,4 @@
+use crate::linting::expr_linter::Chunk;
 use crate::{
     CharStringExt, Token, TokenStringExt,
     expr::{Expr, FirstMatchOf, SequenceExpr},
@@ -6,21 +7,20 @@ use crate::{
 };
 
 pub struct NoMatchFor {
-    expr: Box<dyn Expr>,
+    expr: SequenceExpr,
 }
 
 impl Default for NoMatchFor {
     fn default() -> Self {
-        let pre_context = FirstMatchOf::new(vec![
-            Box::new(InflectionOfBe::default()),
-            Box::new(WordSet::new(&[
+        let pre_context = FirstMatchOf::new([
+            Box::new(InflectionOfBe::default()) as Box<dyn Expr>,
+            Box::new(WordSet::new([
                 "I'm", "we're", "you're", "he's", "she's", "it's", "they're", "Im", "were",
                 "youre", "hes", "shes", "its", "theyre",
             ])),
         ]);
 
-        let expr = SequenceExpr::default()
-            .then(pre_context)
+        let expr = SequenceExpr::with(pre_context)
             .then_whitespace()
             .t_aco("no")
             .then_whitespace()
@@ -28,21 +28,21 @@ impl Default for NoMatchFor {
             .then_whitespace()
             .then_preposition();
 
-        Self {
-            expr: Box::new(expr),
-        }
+        Self { expr }
     }
 }
 
 impl ExprLinter for NoMatchFor {
+    type Unit = Chunk;
+
     fn expr(&self) -> &dyn Expr {
-        self.expr.as_ref()
+        &self.expr
     }
 
     fn match_to_lint(&self, toks: &[Token], src: &[char]) -> Option<Lint> {
         let prep_tok = toks.last()?;
-        let prep_chars = prep_tok.span.get_content(src);
-        if prep_chars.eq_ignore_ascii_case_chars(&['f', 'o', 'r']) {
+        let prep_chars = prep_tok.get_ch(src);
+        if prep_chars.eq_ch(&['f', 'o', 'r']) {
             return None;
         }
 

@@ -60,6 +60,12 @@ or if you have the `nix-command` and `flakes` experimental features enabled:
 nix shell 'nixpkgs#harper'
 ```
 
+### Termux
+You can install Harper on Termux using the built-in package manager:
+```bash
+apt install harper
+```
+
 ### Cargo
 
 If you have Rust installed, `harper-ls` is on [crates.io](https://crates.io/crates/harper-ls), so you can simply run:
@@ -68,7 +74,7 @@ If you have Rust installed, `harper-ls` is on [crates.io](https://crates.io/crat
 cargo install harper-ls --locked
 ```
 
-For this to work, make sure that `~/.cargo/bin` is in your system `$PATH`. If you are on a Debian-based Linux distribution, you may need to install `build-essential`.
+For this to work, make sure that `~/.cargo/bin` is in your system `$PATH`. If you are on a Debian-based Linux distribution, you may need to install `build-essential`. We only support the latest stable version of Rust. If you are not sure if you have the latest version already, you may compare the output of `rustc --version` to the content of [this page.](https://blog.rust-lang.org/releases/latest)
 
 ### GitHub Releases
 
@@ -76,11 +82,11 @@ If none of the previous installation methods are available to you, we also provi
 
 ## Dictionaries
 
-`harper-ls` has three kinds of dictionaries: user, file-local, and static dictionaries. All three dictionaries are combined and used together when spell checking files.
+`harper-ls` has four kinds of dictionaries: user, workspace, file-local, and static dictionaries. All four dictionaries are combined and used together when spell checking files.
 
 ### User Dictionary
 
-Each user of `harper-ls` has their own dictionary, which by default, is located at the following paths on each operating system:
+Each user of `harper-ls` has their own dictionary, created on-demand the first time that a word is added to it, which by default, is located at the following paths on each operating system:
 
 | Operating System |                                                                                Location |
 | :--------------- | --------------------------------------------------------------------------------------: |
@@ -88,7 +94,13 @@ Each user of `harper-ls` has their own dictionary, which by default, is located 
 | macOS            |                            `$HOME/Library/Application Support/harper-ls/dictionary.txt` |
 | Windows          |                                    `%FOLDERID_RoamingAppData%/harper-ls/dictionary.txt` |
 
-This dictionary is a simple line-separated word list in plaintext. You can add and remove words at will. Code actions on misspelled words allow you to add elements to this list. Additionally, [its location is configurable](#Dictionaries_).
+This dictionary is a simple line-separated word list in plaintext. You can add and remove words at will. Code actions on misspelled words allow you to add elements to this list. Additionally, [its location is configurable](#Directories).
+
+### Workspace Dictionary
+
+Each workspace in which you use `harper-ls` has its own dictionary, which by default is located at `.harper-dictionary.txt` in the root of the workspace.
+
+This dictionary is a simple line-separated word list in plaintext. You can add and remove words at will. Code actions on misspelled words allow you to add elements to this list. Additionally, [its location is configurable](#Directories).
 
 ### File-Local Dictionary
 
@@ -102,7 +114,7 @@ You can find the file-local dictionaries in the following directories by default
 | macOS            |                                  `$HOME/Library/Application Support/harper-ls/file_dictionaries` |
 | Windows          |                                            `%FOLDERID_LocalAppData%/harper-ls/file_dictionaries` |
 
-The format of these files is identical to user dictionaries and [their location can also be configured](#Dictionaries_).
+The format of these files is identical to user dictionaries and [their location can also be configured](#Directories).
 
 ### Static Dictionary
 
@@ -114,12 +126,13 @@ We _do_ take pull requests or issues for adding words to the static dictionary. 
 
 `harper-ls` has code actions that help in quickly dealing with spelling or grammar errors you encounter. The examples below assume that you have misspelled "contained" as "containes" and have selected it to apply a code action to it.
 
-| Code Action or Command | Description                                                | Example                                     |
-| ---------------------- | ---------------------------------------------------------- | ------------------------------------------- |
-| Quick Fixes            | Suggests fixes for the selected error                      | `Replace with: "contained"`                 |
-| `HarperIgnoreLint`     | Ignores the selected error for the duration of the session | `Ignore Harper error.`                      |
-| `HarperAddToUserDict`  | Adds the selected word to the user dictionary              | `Add "containes" to the global dictionary.` |
-| `HarperAddToFileDict`  | Adds the selected word to a file-local dictionary          | `Add "containes" to the file dictionary.`   |
+| Code Action or Command | Description                                                | Example                                        |
+| ---------------------- | ---------------------------------------------------------- | ---------------------------------------------- |
+| Quick Fixes            | Suggests fixes for the selected error                      | `Replace with: "contained"`                    |
+| `HarperIgnoreLint`     | Ignores the selected error for the duration of the session | `Ignore Harper error.`                         |
+| `HarperAddToUserDict`  | Adds the selected word to the user dictionary              | `Add "containes" to the user dictionary.`      |
+| `HarperAddToWSDict`    | Adds the selected word to the workspace dictionary         | `Add "containes" to the workspace dictionary.` |
+| `HarperAddToFileDict`  | Adds the selected word to a file-local dictionary          | `Add "containes" to the file dictionary.`      |
 
 ## Ignore Comments
 
@@ -163,13 +176,16 @@ In the above example, "spellcheckd", "this this", and other spelling or grammar 
 }
 ```
 
-### Directories 
+### Directories
 
-| Config         | Type     | Default Value | Description                                                     |
-| -------------- | -------- | ------------- | --------------------------------------------------------------- |
-| `userDictPath` | `string` | `""`          | Set the file path where the user dictionary is located          |
-| `fileDictPath` | `string` | `""`          | Set the directory where the file-local dictionaries are located |
-| `ignoredLintsPath` | `string` | `""`          | Set the directory where the ignored lint lists are located |
+| Config              | Type     | Default Value | Description                                                     |
+| ------------------- | -------- | ------------- | --------------------------------------------------------------- |
+| `userDictPath`      | `string` | `""`          | Set the file path where the user dictionary is located          |
+| `workspaceDictPath` | `string` | `""`          | Set the file path where the workspace dictionary is located     |
+| `fileDictPath`      | `string` | `""`          | Set the directory where the file-local dictionaries are located |
+| `ignoredLintsPath`  | `string` | `""`          | Set the directory where the ignored lint lists are located      |
+
+These paths are always resolved relative to the root of the workspace in which `harper-ls` was invoked.
 
 ### Linters
 
@@ -196,11 +212,10 @@ The list of linters together with their descriptions can be found at our [rules 
 			"AnA": true,
 			"SentenceCapitalization": true,
 			"UnclosedQuotes": true,
-			"WrongQuotes": false,
+			"WrongApostrophe": false,
 			"LongSentences": true,
 			"RepeatedWords": true,
 			"Spaces": true,
-			"Matcher": true,
 			"CorrectNumberSuffix": true
 		}
 	}
@@ -245,51 +260,63 @@ These configs are under the `markdown` key:
 
 ### Other Configs
 
-| Config               | Type                                                    | Default Value | Description                                                                                                                                                               |
-| -------------------- | ------------------------------------------------------- | ------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `diagnosticSeverity` | `"error"`, `"hint"`, `"information"`, `"warning"`       | `"hint"`      | Configures how severe diagnostics appear in your editor                                                                                                                   |
-| `isolateEnglish`     | `boolean`                                               | `false`       | In documents that are a mixture of English and another language, only lint English text. This feature is incredibly new and unstable. Do not expect it to work perfectly. |
-| `dialect`            | `"American"`, `"British"`, `"Australian"`, `"Canadian"` | `"American"`  | Set the dialect of English Harper should expect.                                                                                                                          |
-| `maxFileLength`      | `number`                                                | `120000`      | Maximum length of file to be linted (in bytes). If a file is larger/longer than this, it will not be linted.                                                              |
+| Config               | Type                                                                | Default Value | Description                                                                                                                                                               |
+| -------------------- | ------------------------------------------------------------------- | ------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `diagnosticSeverity` | `"error"`, `"hint"`, `"information"`, `"warning"`                   | `"hint"`      | Configures how severe diagnostics appear in your editor                                                                                                                   |
+| `isolateEnglish`     | `boolean`                                                           | `false`       | In documents that are a mixture of English and another language, only lint English text. This feature is incredibly new and unstable. Do not expect it to work perfectly. |
+| `dialect`            | `"American"`, `"British"`, `"Australian"`, `"Canadian"`, `"Indian"` | `"American"`  | Set the dialect of English Harper should expect.                                                                                                                          |
+| `maxFileLength`      | `number`                                                            | `120000`      | Maximum length of file to be linted (in bytes). If a file is larger/longer than this, it will not be linted.                                                              |
+| `excludePatterns`    | `array`                                                             | `[]`          | A set of globs to ignore. If a file matches any of the globs, it will not be linted.                                                                                      |
 
 ## Supported Languages
 
 `harper-ls` supports a wide variety of programming and markup languages.
 
-| Language          |          Language ID          | Comments Only |
-| :---------------- | :---------------------------: | ------------: |
-| C                 |              `c`              |            ✅ |
-| CMake             |            `cmake`            |            ✅ |
-| C++               |             `cpp`             |            ✅ |
-| C#                |           `csharp`            |            ✅ |
-| Dart              |            `dart`             |            ✅ |
-| Email             |            `mail`             |               |
-| Git Commit        |   `git-commit`/`gitcommit`    |               |
-| Go                |             `go`              |            ✅ |
-| Haskell           |           `haskell`           |            ✅ |
-| HTML              |            `html`             |               |
-| Java              |            `java`             |            ✅ |
-| JavaScript        |         `javascript`          |            ✅ |
-| JavaScript React  |       `javascriptreact`       |            ✅ |
-| Literate Haskell  | `literate haskell`/`lhaskell` |               |
-| Lua               |             `lua`             |            ✅ |
-| Markdown          |          `markdown`           |               |
-| Nix               |             `nix`             |            ✅ |
-| PHP               |             `php`             |            ✅ |
-| Plain Text        |      `plaintext`/`text`       |               |
-| Python            |           `python`            |            ✅ |
-| Ruby              |            `ruby`             |            ✅ |
-| Rust              |            `rust`             |            ✅ |
-| Scala             |           `scala`             |            ✅ |
-| Shell/Bash Script |         `shellscript`         |            ✅ |
-| Solidity          |          `solidity`           |            ✅ |
-| Swift             |            `swift`            |            ✅ |
-| TOML              |            `toml`             |            ✅ |
-| TypeScript        |         `typescript`          |            ✅ |
-| TypeScript React  |       `typescriptreact`       |            ✅ |
-| Typst             |            `typst`            |               |
-| Kotlin            |            `kotlin`           |            ✅ |
-| Clojure           |            `clojure`          |            ✅ |
+| Language            |          Language ID          | Comments Only |
+| :------------------ | :---------------------------: | ------------: |
+| AsciiDoc            |          `asciidoc`           |               |
+| C                   |              `c`              |            ✅ |
+| Clojure             |           `clojure`           |            ✅ |
+| CMake               |            `cmake`            |            ✅ |
+| C++                 |             `cpp`             |            ✅ |
+| C#                  |           `csharp`            |            ✅ |
+| DAML                |            `daml`             |            ✅ |
+| Dart                |            `dart`             |            ✅ |
+| Elixir              |            `elixir`           |            ✅ |
+| Git Commit          |   `git-commit`/`gitcommit`    |               |
+| Gleam               |            `gleam`            |            ✅ |
+| Go                  |             `go`              |            ✅ |
+| Groovy              |           `groovy`            |            ✅ |
+| Haskell             |           `haskell`           |            ✅ |
+| HTML                |            `html`             |               |
+| Ink                 |             `ink`             |               |
+| Java                |            `java`             |            ✅ |
+| JavaScript          |         `javascript`          |            ✅ |
+| JavaScript React    |       `javascriptreact`       |            ✅ |
+| Jujutsu Description |  `jj-commit`/`jjdescription`  |               |
+| Kotlin              |           `kotlin`            |            ✅ |
+| Literate Haskell    | `lhaskell`/`literate haskell` |               |
+| Lua                 |             `lua`             |            ✅ |
+| Email               |            `mail`             |               |
+| Markdown            |          `markdown`           |               |
+| Nix                 |             `nix`             |            ✅ |
+| Org Mode            |             `org`             |               |
+| PHP                 |             `php`             |            ✅ |
+| PowerShell          |         `powershell`          |            ✅ |
+| Plain Text          |      `plaintext`/`text`       |               |
+| Python              |           `python`            |            ✅ |
+| Ruby                |            `ruby`             |            ✅ |
+| Rust                |            `rust`             |            ✅ |
+| Scala               |            `scala`            |            ✅ |
+| Shell/Bash Script   |         `shellscript`         |            ✅ |
+| Solidity            |          `solidity`           |            ✅ |
+| Swift               |            `swift`            |            ✅ |
+| TOML                |            `toml`             |            ✅ |
+| TypeScript          |         `typescript`          |            ✅ |
+| TypeScript React    |       `typescriptreact`       |            ✅ |
+| Typst               |            `typst`            |               |
+| Zig                 |             `zig`             |            ✅ |
+| LaTeX/TeX           | `latex`/`tex`/`plaintex`      |               |
 
 Want your language added?
 Let us know by [commenting on this issue](https://github.com/Automattic/harper/issues/79).

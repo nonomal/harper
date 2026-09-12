@@ -4,6 +4,7 @@ use std::{
 };
 
 use harper_core::Dialect;
+use itertools::Itertools;
 use rayon::iter::{IntoParallelRefIterator, ParallelIterator};
 
 fn get_tests_dir() -> PathBuf {
@@ -17,19 +18,12 @@ fn get_text_dir() -> PathBuf {
 /// dialect overrides found is not 1.
 #[must_use]
 fn try_get_dialect_override(path: &Path) -> Option<Dialect> {
-    let file_name = path.file_stem()?;
-    let mut dialect_overrides: Vec<_> = file_name
+    path.file_stem()?
         .to_string_lossy()
         .split('.')
-        .map(Dialect::try_from_abbr)
-        .filter(Option::is_some)
-        .collect();
-    if dialect_overrides.len() == 1 {
-        dialect_overrides.pop().unwrap()
-    } else {
-        // If we find multiple overrides, it's unlikely that a dialect override is intended.
-        None
-    }
+        .filter_map(Dialect::try_from_abbr)
+        .exactly_one() // If we find multiple overrides, it's unlikely that a dialect override is intended.
+        .ok()
 }
 
 pub fn get_text_files() -> Vec<PathBuf> {
@@ -78,10 +72,12 @@ fn tag_file(
         "No snapshot!".into()
     })
 }
+
 fn get_snapshot_file(text_file: &Path, snapshot_dir: &Path, ext: &str) -> PathBuf {
     let snapshot_name = text_file.file_stem().unwrap().to_string_lossy().to_string() + ext;
     snapshot_dir.join(snapshot_name)
 }
+
 #[allow(dead_code)]
 pub fn snapshot_all_text_files(
     out_dir: &str,

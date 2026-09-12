@@ -52,29 +52,37 @@ pub enum LintKind {
     Usage,
     /// For choosing between different words or phrases in a given context
     WordChoice,
+    /// For errors where words are in an unnatural sequence or incorrect syntactic position
+    /// (e.g., "no longer I" vs. "I no longer")
+    WordOrder,
 }
 
 impl LintKind {
-    pub fn new_from_str(s: &str) -> Option<Self> {
-        Some(match s {
-            "Agreement" => LintKind::Agreement,
-            "BoundaryError" => LintKind::BoundaryError,
-            "Capitalization" => LintKind::Capitalization,
-            "Eggcorn" => LintKind::Eggcorn,
-            "Enhancement" => LintKind::Enhancement,
-            "Formatting" => LintKind::Formatting,
-            "Grammar" => LintKind::Grammar,
-            "Miscellaneous" => LintKind::Miscellaneous,
-            "Readability" => LintKind::Readability,
-            "Redundancy" => LintKind::Redundancy,
-            "Regionalism" => LintKind::Regionalism,
-            "Repetition" => LintKind::Repetition,
-            "Spelling" => LintKind::Spelling,
-            "Style" => LintKind::Style,
-            "Typo" => LintKind::Typo,
-            "Word Choice" => LintKind::WordChoice,
-            _ => return None,
-        })
+    /// The inverse of [`Self::to_string_key`]
+    pub fn from_string_key(s: &str) -> Option<Self> {
+        match s {
+            "Agreement" => Some(LintKind::Agreement),
+            "BoundaryError" => Some(LintKind::BoundaryError),
+            "Capitalization" => Some(LintKind::Capitalization),
+            "Eggcorn" => Some(LintKind::Eggcorn),
+            "Enhancement" => Some(LintKind::Enhancement),
+            "Formatting" => Some(LintKind::Formatting),
+            "Grammar" => Some(LintKind::Grammar),
+            "Malapropism" => Some(LintKind::Malapropism),
+            "Miscellaneous" => Some(LintKind::Miscellaneous),
+            "Nonstandard" => Some(LintKind::Nonstandard),
+            "Punctuation" => Some(LintKind::Punctuation),
+            "Readability" => Some(LintKind::Readability),
+            "Redundancy" => Some(LintKind::Redundancy),
+            "Regionalism" => Some(LintKind::Regionalism),
+            "Repetition" => Some(LintKind::Repetition),
+            "Spelling" => Some(LintKind::Spelling),
+            "Style" => Some(LintKind::Style),
+            "Typo" => Some(LintKind::Typo),
+            "Usage" => Some(LintKind::Usage),
+            "WordChoice" => Some(LintKind::WordChoice),
+            _ => None,
+        }
     }
 
     /// Produce a string representation, which can be used as keys in a map or CSS variables.
@@ -100,6 +108,7 @@ impl LintKind {
             LintKind::Typo => "Typo",
             LintKind::Usage => "Usage",
             LintKind::WordChoice => "WordChoice",
+            LintKind::WordOrder => "WordOrder",
         }
         .to_owned()
     }
@@ -128,6 +137,7 @@ impl Display for LintKind {
             LintKind::Typo => "Typo",
             LintKind::Usage => "Usage",
             LintKind::WordChoice => "Word Choice",
+            LintKind::WordOrder => "Word Order",
         };
 
         write!(f, "{s}")

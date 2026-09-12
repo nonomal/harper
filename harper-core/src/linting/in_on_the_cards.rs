@@ -1,14 +1,16 @@
 use crate::{
-    Dialect, Token,
-    expr::{Expr, FirstMatchOf, FixedPhrase, SequenceExpr},
+    CharStringExt, Dialect, Token,
+    expr::{Expr, FirstMatchOf, SequenceExpr},
     linting::{LintKind, Suggestion},
     patterns::{InflectionOfBe, WordSet},
 };
 
 use super::{ExprLinter, Lint};
+use crate::linting::expr_linter::Chunk;
 
 pub struct InOnTheCards {
-    expr: Box<dyn Expr>,
+    expr: SequenceExpr,
+    dialect: Dialect,
 }
 
 impl InOnTheCards {
@@ -19,49 +21,52 @@ impl InOnTheCards {
             _ => "on",
         };
 
-        let pre_context = FirstMatchOf::new(vec![
-            Box::new(InflectionOfBe::new()),
-            Box::new(WordSet::new(&[
+        let pre_context = FirstMatchOf::new([
+            Box::new(InflectionOfBe::new()) as Box<dyn Expr>,
+            Box::new(WordSet::new([
                 "isn't", "it's", "wasn't", "weren't", "not", "isnt", "its", "wasnt", "werent",
             ])),
         ]);
 
-        let expr = SequenceExpr::default()
-            .then(pre_context)
+        let expr = SequenceExpr::with(pre_context)
             .t_ws()
             .t_aco(preposition)
-            .then(FixedPhrase::from_phrase(" the cards"));
+            .then_fixed_phrase(" the cards");
 
-        Self {
-            expr: Box::new(expr),
-        }
+        Self { expr, dialect }
     }
 }
 
 impl ExprLinter for InOnTheCards {
+    type Unit = Chunk;
+
     fn expr(&self) -> &dyn Expr {
-        self.expr.as_ref()
+        &self.expr
     }
 
     fn match_to_lint(&self, toks: &[Token], src: &[char]) -> Option<Lint> {
         let prep_span = toks[2].span;
         let prep = prep_span.get_content(src);
 
-        let sugg = Suggestion::ReplaceWith(
-            [
-                match prep[0] {
-                    'i' => 'o',
-                    'o' => 'i',
-                    'I' => 'O',
-                    'O' => 'I',
-                    _ => return None,
-                },
-                prep[1],
-            ]
-            .to_vec(),
-        );
+        let new_prep = [
+            match prep[0] {
+                'i' => 'o',
+                'o' => 'i',
+                'I' => 'O',
+                'O' => 'I',
+                _ => return None,
+            },
+            prep[1],
+        ];
 
-        let message = "Corrects either `in the cards` or `on the cards` to the other, depending on the dialect.".into();
+        let sugg = Suggestion::ReplaceWith(new_prep.to_vec());
+
+        let message = format!(
+            "Use `{} the cards` instead of `{} the cards` in {} English.",
+            new_prep.to_string(),
+            prep.to_string(),
+            self.dialect,
+        );
 
         Some(Lint {
             span: prep_span,
@@ -79,12 +84,10 @@ impl ExprLinter for InOnTheCards {
 
 #[cfg(test)]
 mod tests {
+    use super::InOnTheCards;
     use crate::{
         Dialect,
-        linting::{
-            InOnTheCards,
-            tests::{assert_lint_count, assert_suggestion_result},
-        },
+        linting::tests::{assert_lint_count, assert_suggestion_result},
     };
 
     // On the cards

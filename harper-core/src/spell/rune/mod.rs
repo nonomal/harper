@@ -13,8 +13,8 @@ pub use self::word_list::parse_word_list;
 #[cfg(test)]
 mod tests {
     use hashbrown::HashSet;
-    use once_cell::sync::Lazy;
     use serde_json::json;
+    use std::sync::LazyLock;
 
     use super::super::word_map::WordMap;
     use super::word_list::parse_word_list;
@@ -30,7 +30,7 @@ mod tests {
 
     pub const TEST_WORD_LIST_WITH_COMMENTS: &str = "4\nhello       # a word without attributes\ntry/B   \t  # a word with empty attributes\nwork/AB\t   #a word with one attribute\nblank/      #a word with two attributes";
 
-    pub static TEST_AFFIX_JSON: Lazy<serde_json::Value> = Lazy::new(|| {
+    pub static TEST_AFFIX_JSON: LazyLock<serde_json::Value> = LazyLock::new(|| {
         json!({
             "affixes": {
                 "A": {
@@ -81,7 +81,7 @@ mod tests {
 
         let mut expanded = WordMap::default();
 
-        attributes.expand_marked_words(words, &mut expanded);
+        attributes.expand_annotated_words(words, &mut expanded);
 
         let expanded: HashSet<String> = expanded
             .into_iter()
@@ -127,7 +127,7 @@ mod tests {
 
         let mut expanded = WordMap::default();
 
-        attributes.expand_marked_words(words, &mut expanded);
+        attributes.expand_annotated_words(words, &mut expanded);
         let expanded: HashSet<String> = expanded
             .into_iter()
             .map(|v| v.canonical_spelling.to_string())
@@ -206,7 +206,7 @@ mod tests {
 
         let mut expanded = WordMap::default();
 
-        attributes.expand_marked_words(words, &mut expanded);
+        attributes.expand_annotated_words(words, &mut expanded);
 
         let giant_data = expanded.get_with_str("giant").unwrap();
         assert!(giant_data.metadata.is_noun());

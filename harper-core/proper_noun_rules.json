@@ -14,7 +14,7 @@
 			"Gold Coast",
 			"Sunshine Coast"
 		],
-		"description": "When referring to the states of Australia, make sure to treat them as a proper noun."
+		"description": "When referring to states, territories, and cities in Australia, make sure to treat them as a proper noun."
 	},
 	"OceansAndSeas": {
 		"canonical": [
@@ -45,11 +45,14 @@
 			"Prince Edward Island",
 			"Quebec City"
 		],
-		"description": "When referring to the provinces of Canada, make sure to treat them as a proper noun."
+		"description": "When referring to provinces, territories, and cities in Canada, make sure to treat them as a proper noun."
+	},
+	"Laos": {
+		"canonical": ["La Mam", "Luang Namtha", "Luang Prabang", "Xam Neua"],
+		"description": "When referring to provinces and cities in Laos, make sure to treat them as a proper noun."
 	},
 	"Malaysia": {
 		"canonical": [
-			"Negeri Sembilan",
 			"Alor Setar",
 			"George Town",
 			"Johor Bahru",
@@ -57,6 +60,7 @@
 			"Kota Kinabalu",
 			"Kuala Lumpur",
 			"Kuala Terengganu",
+			"Negeri Sembilan",
 			"Shah Alam"
 		],
 		"description": "When referring to the states of Malaysia and their capitals, make sure to treat them as a proper noun."
@@ -278,7 +282,10 @@
 			"Google AdSense",
 			"Google Pixel",
 			"Google Nest",
-			"Google Workspace"
+			"Google Workspace",
+			"Chrome Extension",
+			"Chrome Web Store",
+			"Google Chrome Web Store"
 		],
 		"description": "When referring to Google products and services, make sure to treat them as proper nouns."
 	},
@@ -324,26 +331,33 @@
 	},
 	"AppleNames": {
 		"canonical": [
-			"Apple iPhone",
-			"Apple iPad",
-			"Apple iMac",
-			"Apple MacBook",
-			"Apple Watch",
-			"Apple TV",
-			"Apple Music",
-			"Apple Arcade",
-			"Apple iCloud",
-			"Apple Safari",
-			"Apple HomeKit",
-			"Apple CarPlay",
-			"Apple MacBook Pro",
-			"Apple MacBook Air",
-			"Apple Mac Pro",
-			"Apple Mac Mini",
+			"AirPods Max",
+			"AirPods Pro",
 			"Apple AirPods",
-			"Apple AirPods Pro",
 			"Apple AirPods Max",
-			"Apple Vision Pro"
+			"Apple AirPods Pro",
+			"Apple Arcade",
+			"Apple CarPlay",
+			"Apple HomeKit",
+			"Apple iCloud",
+			"Apple iMac",
+			"Apple iPad",
+			"Apple iPhone",
+			"Apple iPod",
+			"Apple Mac Mini",
+			"Apple Mac Pro",
+			"Apple MacBook",
+			"Apple MacBook Air",
+			"Apple MacBook Pro",
+			"Apple Music",
+			"Apple Safari",
+			"Apple TV",
+			"Apple Vision Pro",
+			"Apple Watch",
+			"Mac Mini",
+			"Mac Pro",
+			"MacBook Air",
+			"MacBook Pro"
 		],
 		"description": "When referring to Apple products and services, make sure to treat them as proper nouns."
 	},
@@ -516,6 +530,7 @@
 		"canonical": [
 			"Big Sur",
 			"Bretton Woods",
+			"Coney Island",
 			"Darien Gap",
 			"Des Moines",
 			"El Paso",
@@ -524,6 +539,7 @@
 			"Las Vegas",
 			"Los Angeles",
 			"New York",
+			"New York City",
 			"Niagara Falls",
 			"Novi Sad",
 			"Panama Canal",
@@ -533,7 +549,7 @@
 		"description": "Ensure proper capitalization of notable places that are significant regional centers, travel destinations, or have international importance."
 	},
 	"ProperNouns": {
-		"canonical": ["Bhagavad Gita", "Gilded Age", "Pax Americana"],
+		"canonical": ["Bhagavad Gita", "Gilded Age", "Jim Crow", "Pax Americana"],
 		"description": "Ensure proper capitalization of proper nouns."
 	},
 	"CompaniesProductsAndTrademarks": {

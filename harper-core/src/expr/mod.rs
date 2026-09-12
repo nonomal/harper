@@ -16,12 +16,16 @@
 mod all;
 mod anchor_end;
 mod anchor_start;
+mod duration_expr;
 mod expr_map;
+mod filter;
 mod first_match_of;
 mod fixed_phrase;
 mod longest_match_of;
 mod mergeable_words;
+mod not;
 mod optional;
+mod pronoun_be;
 mod reflexive_pronoun;
 mod repeating;
 mod sequence_expr;
@@ -40,12 +44,16 @@ use std::sync::Arc;
 pub use all::All;
 pub use anchor_end::AnchorEnd;
 pub use anchor_start::AnchorStart;
+pub use duration_expr::DurationExpr;
 pub use expr_map::ExprMap;
+pub use filter::Filter;
 pub use first_match_of::FirstMatchOf;
 pub use fixed_phrase::FixedPhrase;
 pub use longest_match_of::LongestMatchOf;
 pub use mergeable_words::MergeableWords;
+pub use not::Not;
 pub use optional::Optional;
+pub use pronoun_be::PronounBe;
 pub use reflexive_pronoun::ReflexivePronoun;
 pub use repeating::Repeating;
 pub use sequence_expr::SequenceExpr;
@@ -82,6 +90,12 @@ impl<E> Expr for Arc<E>
 where
     E: Expr,
 {
+    fn run(&self, cursor: usize, tokens: &[Token], source: &[char]) -> Option<Span<Token>> {
+        self.as_ref().run(cursor, tokens, source)
+    }
+}
+
+impl Expr for Box<dyn Expr> {
     fn run(&self, cursor: usize, tokens: &[Token], source: &[char]) -> Option<Span<Token>> {
         self.as_ref().run(cursor, tokens, source)
     }
@@ -128,7 +142,7 @@ where
         &'a self,
         tokens: &'a [Token],
         source: &'a [char],
-    ) -> Box<(dyn Iterator<Item = Span<Token>> + 'a)> {
+    ) -> Box<dyn Iterator<Item = Span<Token>> + 'a> {
         let mut last_end = 0usize;
 
         Box::new((0..tokens.len()).filter_map(move |i| {
@@ -145,13 +159,15 @@ where
     fn iter_matches_in_doc<'a>(
         &'a self,
         doc: &'a Document,
-    ) -> Box<(dyn Iterator<Item = Span<Token>> + 'a)> {
+    ) -> Box<dyn Iterator<Item = Span<Token>> + 'a> {
         Box::new(self.iter_matches(doc.get_tokens(), doc.get_source()))
     }
 }
 
 pub trait OwnedExprExt {
     fn or(self, other: impl Expr + 'static) -> FirstMatchOf;
+    fn and(self, other: impl Expr + 'static) -> All;
+    fn but_not(self, other: impl Expr + 'static) -> All;
     fn or_longest(self, other: impl Expr + 'static) -> LongestMatchOf;
 }
 
@@ -161,13 +177,58 @@ where
 {
     /// Returns an expression that matches either the current one or the expression contained in `other`.
     fn or(self, other: impl Expr + 'static) -> FirstMatchOf {
-        FirstMatchOf::new(vec![Box::new(self), Box::new(other)])
+        let exprs: Vec<Box<dyn Expr>> = vec![Box::new(self), Box::new(other)];
+        FirstMatchOf::new(exprs)
+    }
+
+    /// Returns an expression that matches only if both the current one and the expression contained in `other` do.
+    fn and(self, other: impl Expr + 'static) -> All {
+        let exprs: Vec<Box<dyn Expr>> = vec![Box::new(self), Box::new(other)];
+        All::new(exprs)
+    }
+
+    /// Returns an expression that matches only if the current one matches and the expression contained in `other` does not.
+    fn but_not(self, other: impl Expr + 'static) -> All {
+        self.and(UnlessStep::new(other, |_tok: &Token, _src: &[char]| true))
     }
 
     /// Returns an expression that matches the longest of the current one or the expression contained in `other`.
     ///
     /// If you don't need the longest match, prefer using the short-circuiting [`Self::or()`] instead.
     fn or_longest(self, other: impl Expr + 'static) -> LongestMatchOf {
-        LongestMatchOf::new(vec![Box::new(self), Box::new(other)])
+        let exprs: Vec<Box<dyn Expr>> = vec![Box::new(self), Box::new(other)];
+        LongestMatchOf::new(exprs)
+    }
+}
+
+pub trait IntoBoxedExpr {
+    fn into_boxed(self) -> Box<dyn Expr>;
+}
+
+impl<T: Expr + 'static> IntoBoxedExpr for Box<T> {
+    fn into_boxed(self) -> Box<dyn Expr> {
+        self
+    }
+}
+
+impl IntoBoxedExpr for Box<dyn Expr> {
+    fn into_boxed(self) -> Box<dyn Expr> {
+        self
+    }
+}
+
+pub trait AsBoxedExpr {
+    fn into_boxed_expr(self) -> Box<dyn Expr>;
+}
+
+impl<T: Expr + 'static> AsBoxedExpr for Box<T> {
+    fn into_boxed_expr(self) -> Box<dyn Expr> {
+        self
+    }
+}
+
+impl AsBoxedExpr for Box<dyn Expr> {
+    fn into_boxed_expr(self) -> Box<dyn Expr> {
+        self
     }
 }

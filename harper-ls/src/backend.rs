@@ -3,27 +3,33 @@ use std::fs::OpenOptions;
 use std::io::{BufWriter, Write};
 use std::path::PathBuf;
 use std::sync::Arc;
+use std::time::Duration;
 
 use crate::config::Config;
-use crate::dictionary_io::{load_dict, save_dict};
 use crate::document_state::DocumentState;
-use crate::git_commit_parser::GitCommitParser;
 use crate::ignored_lints_io::{load_ignored_lints, save_ignored_lints};
 use crate::io_utils::fileify_path;
 use anyhow::{Context, Result, anyhow};
 use futures::future::join;
+use harper_asciidoc::AsciidocParser;
 use harper_comments::CommentParser;
-use harper_core::linting::{LintGroup, LintGroupConfig};
+use harper_core::linting::{FlatConfig, LintGroup};
 use harper_core::parsers::{
     CollapseIdentifiers, IsolateEnglish, Markdown, OrgMode, Parser, PlainEnglish,
 };
 use harper_core::spell::{Dictionary, FstDictionary, MergedDictionary, MutableDictionary};
-use harper_core::{Dialect, Document, IgnoredLints, WordMetadata};
+use harper_core::{Dialect, DictWordMetadata, Document, IgnoredLints};
+use harper_dictionary_wordlist::{load_dict, save_dict};
+use harper_git_commit::GitCommitParser;
 use harper_html::HtmlParser;
+use harper_ink::InkParser;
+use harper_jjdescription::JJDescriptionParser;
 use harper_literate_haskell::LiterateHaskellParser;
+use harper_python::PythonParser;
 use harper_stats::{Record, Stats};
+use harper_tex::TeX;
 use harper_typst::Typst;
-use serde_json::Value;
+use serde_json::{Value, json};
 use tokio::sync::{Mutex, RwLock};
 use tower_lsp_server::jsonrpc::Result as JsonResult;
 use tower_lsp_server::lsp_types::notification::PublishDiagnostics;
@@ -45,20 +51,25 @@ pub fn ls_version() -> &'static str {
     env!("CARGO_PKG_VERSION")
 }
 
+#[derive(Clone)]
 pub struct Backend {
     client: Client,
-    config: RwLock<Config>,
-    stats: RwLock<Stats>,
-    doc_state: Mutex<HashMap<Uri, DocumentState>>,
+    root: Arc<RwLock<PathBuf>>,
+    config: Arc<RwLock<Config>>,
+    stats: Arc<RwLock<Stats>>,
+    doc_state: Arc<Mutex<HashMap<Uri, DocumentState>>>,
+    pending_diagnostic_tasks: Arc<Mutex<HashMap<Uri, tokio::task::JoinHandle<()>>>>,
 }
 
 impl Backend {
     pub fn new(client: Client, config: Config) -> Self {
         Self {
             client,
-            stats: RwLock::new(Stats::new()),
-            config: RwLock::new(config),
-            doc_state: Mutex::new(HashMap::new()),
+            root: Arc::new(RwLock::new(".".into())),
+            stats: Arc::new(RwLock::new(Stats::new())),
+            config: Arc::new(RwLock::new(config)),
+            doc_state: Arc::new(Mutex::new(HashMap::new())),
+            pending_diagnostic_tasks: Arc::new(Mutex::new(HashMap::new())),
         }
     }
 
@@ -77,7 +88,7 @@ impl Backend {
             .await
             .context("Unable to get the file path.")?;
 
-        load_dict(path)
+        load_dict(path, self.config.read().await.dialect)
             .await
             .map_err(|err| info!("{err}"))
             .or(Ok(MutableDictionary::new()))
@@ -141,7 +152,7 @@ impl Backend {
     async fn load_user_dictionary(&self) -> MutableDictionary {
         let config = self.config.read().await;
 
-        load_dict(&config.user_dict_path)
+        load_dict(&config.user_dict_path, self.config.read().await.dialect)
             .await
             .map_err(|err| info!("{err}"))
             .unwrap_or(MutableDictionary::new())
@@ -151,6 +162,24 @@ impl Backend {
         let config = self.config.read().await;
 
         save_dict(&config.user_dict_path, dict)
+            .await
+            .map_err(|err| anyhow!("Unable to save the dictionary to file: {err}"))
+    }
+
+    async fn load_workspace_dictionary(&self) -> MutableDictionary {
+        let config = self.config.read().await;
+        load_dict(
+            &config.workspace_dict_path,
+            self.config.read().await.dialect,
+        )
+        .await
+        .map_err(|err| info!("{err}"))
+        .unwrap_or(MutableDictionary::new())
+    }
+
+    async fn save_workspace_dictionary(&self, dict: impl Dictionary) -> Result<()> {
+        let config = self.config.read().await;
+        save_dict(&config.workspace_dict_path, dict)
             .await
             .map_err(|err| anyhow!("Unable to save the dictionary to file: {err}"))
     }
@@ -180,6 +209,8 @@ impl Backend {
         dict.add_dictionary(FstDictionary::curated());
         let user_dict = self.load_user_dictionary().await;
         dict.add_dictionary(Arc::new(user_dict));
+        let ws_dict = self.load_workspace_dictionary().await;
+        dict.add_dictionary(Arc::new(ws_dict));
         Ok(dict)
     }
 
@@ -190,7 +221,7 @@ impl Backend {
         );
 
         let mut global_dictionary =
-            global_dictionary.context("Unable to load the global dictionary.")?;
+            global_dictionary.context("Unable to load the user dictionary.")?;
         global_dictionary.add_dictionary(Arc::new(
             file_dictionary.context("Unable to load the file dictionary.")?,
         ));
@@ -218,7 +249,14 @@ impl Backend {
         self.pull_config().await;
 
         // Copy necessary configuration to avoid holding lock.
-        let (lint_config, markdown_options, isolate_english, dialect, max_file_length) = {
+        let (
+            lint_config,
+            markdown_options,
+            isolate_english,
+            dialect,
+            max_file_length,
+            exclude_patterns,
+        ) = {
             let config = self.config.read().await;
             (
                 config.lint_config.clone(),
@@ -226,17 +264,29 @@ impl Backend {
                 config.isolate_english,
                 config.dialect,
                 config.max_file_length,
+                config.exclude_patterns.clone(),
             )
         };
+
+        let mut doc_lock = self.doc_state.lock().await;
+
+        if !exclude_patterns.is_empty()
+            && exclude_patterns.is_match(
+                uri.to_file_path()
+                    .ok_or_else(|| anyhow!("Unable to convert URI to file path."))?,
+            )
+        {
+            doc_lock.remove(uri);
+            return Ok(());
+        }
+
+        let ignored_lints = self.load_ignored_lints(uri).await.unwrap_or_default();
 
         let dict = Arc::new(
             self.generate_file_dictionary(uri)
                 .await
                 .context("Unable to generate the file dictionary.")?,
         );
-
-        let mut doc_lock = self.doc_state.lock().await;
-        let ignored_lints = self.load_ignored_lints(uri).await.unwrap_or_default();
 
         let doc_state = doc_lock.entry(uri.clone()).or_insert_with(|| {
             info!("Constructing new LintGroup for new document.");
@@ -270,7 +320,7 @@ impl Backend {
             parser: impl Parser + 'static,
             uri: &'a Uri,
             doc_state: &'a mut DocumentState,
-            lint_config: &LintGroupConfig,
+            lint_config: &FlatConfig,
             dialect: Dialect,
         ) -> Result<Box<dyn Parser>> {
             if doc_state.ident_dict != new_dict {
@@ -315,7 +365,16 @@ impl Backend {
                     Some(Box::new(ts_parser))
                 }
             }
-            "literate haskell" | "lhaskell" => {
+            "git-commit" | "gitcommit" | "octo" | "scminput" => {
+                Some(Box::new(GitCommitParser::default()))
+            }
+            "html" => Some(Box::new(HtmlParser::default())),
+            "asciidoc" => Some(Box::new(AsciidocParser::default())),
+            "ink" => Some(Box::new(InkParser::default())),
+            "jj-commit" | "jjdescription" => {
+                Some(Box::new(JJDescriptionParser::new(markdown_options)))
+            }
+            "lhaskell" | "literate haskell" => {
                 let parser = LiterateHaskellParser::new_markdown(markdown_options);
 
                 if let Some(new_dict) =
@@ -337,14 +396,13 @@ impl Backend {
                     Some(Box::new(parser))
                 }
             }
-            "markdown" => Some(Box::new(Markdown::new(markdown_options))),
-            "git-commit" | "gitcommit" => {
-                Some(Box::new(GitCommitParser::new_markdown(markdown_options)))
-            }
-            "html" => Some(Box::new(HtmlParser::default())),
-            "mail" | "plaintext" | "text" => Some(Box::new(PlainEnglish)),
-            "typst" => Some(Box::new(Typst)),
+            "mail" => Some(Box::new(PlainEnglish)),
+            "markdown" | "quarto" => Some(Box::new(Markdown::new(markdown_options))),
             "org" => Some(Box::new(OrgMode)),
+            "plaintext" | "text" => Some(Box::new(PlainEnglish)),
+            "python" => Some(Box::new(PythonParser::default())),
+            "typst" => Some(Box::new(Typst)),
+            "tex" | "plaintex" | "latex" => Some(Box::new(TeX::default())),
             _ => None,
         };
 
@@ -414,10 +472,19 @@ impl Backend {
             .await;
     }
 
+    /// The async pending diagnostics are discarded and diagnostics are created
+    /// and published immediately.
+    async fn publish_diagnostics_immediately(&self, uri: &Uri) {
+        self.abort_pending_diagnostics(uri).await;
+        self.publish_diagnostics(uri).await;
+    }
+
     /// Update the configuration of the server and publish document updates that
     /// match it.
     async fn update_config_from_obj(&self, json_obj: Value) {
-        if let Ok(new_config) = Config::from_lsp_config(json_obj).map_err(|err| error!("{err}")) {
+        if let Ok(new_config) = Config::from_lsp_config(&self.root.read().await, json_obj)
+            .map_err(|err| error!("{err}"))
+        {
             let mut config = self.config.write().await;
             *config = new_config;
         }
@@ -431,16 +498,64 @@ impl Backend {
                 section: None,
             }])
             .await
-            .unwrap();
+            .unwrap_or(vec![json!({ "harper-ls": {} })]);
 
         if let Some(first) = new_config.pop() {
             self.update_config_from_obj(first).await;
         }
     }
+
+    /// Aborts a pending diagnostic run, e.g. because the document was changed.
+    async fn abort_pending_diagnostics(&self, uri: &Uri) {
+        let mut tasks = self.pending_diagnostic_tasks.lock().await;
+        if let Some(task) = tasks.remove(uri) {
+            task.abort();
+        }
+    }
+
+    /// Schedule diagnostics in `delay_ms` milliseconds
+    /// Configure this with the `diagnosticDelayMs` option.
+    /// ```toml
+    /// [language-server.harper-ls.config.harper-ls]
+    /// diagnosticDelayMs = 1000
+    /// ```
+    pub async fn schedule_diagnostics(&self, uri: &Uri, delay_ms: u64) {
+        let task_uri = uri.clone();
+        let backend = self.clone();
+        let handle = tokio::spawn(async move {
+            tokio::time::sleep(Duration::from_millis(delay_ms)).await;
+            backend.publish_diagnostics(&task_uri).await;
+        });
+
+        let mut tasks = self.pending_diagnostic_tasks.lock().await;
+        tasks.insert(uri.clone(), handle);
+    }
 }
 
 impl LanguageServer for Backend {
-    async fn initialize(&self, _: InitializeParams) -> JsonResult<InitializeResult> {
+    async fn initialize(&self, params: InitializeParams) -> JsonResult<InitializeResult> {
+        if let Some(root) = params
+            .workspace_folders
+            .as_ref()
+            // We take the first workspace folder
+            .and_then(|v| v.first())
+            .map(|f| &f.uri)
+            // Or failing that, the root_uri (which is deprecated in favour of workspace_folders)
+            .or(
+                #[allow(deprecated)]
+                params.root_uri.as_ref(),
+            )
+            .and_then(|u| u.to_file_path().map(PathBuf::from))
+            // Or failing that, the root_path (which is deprecated in favour of root_uri)
+            .or(
+                #[allow(deprecated)]
+                params.root_path.as_deref().map(PathBuf::from),
+            )
+        {
+            // Save the workspace root away for use during the configuration step
+            *self.root.write().await = root;
+        }
+
         Ok(InitializeResult {
             server_info: Some(ServerInfo {
                 name: "harper-ls".to_owned(),
@@ -452,6 +567,7 @@ impl LanguageServer for Backend {
                     commands: vec![
                         "HarperRecordLint".to_owned(),
                         "HarperAddToUserDict".to_owned(),
+                        "HarperAddToWSDict".to_owned(),
                         "HarperAddToFileDict".to_owned(),
                         "HarperOpen".to_owned(),
                         "HarperIgnoreLint".to_owned(),
@@ -511,7 +627,8 @@ impl LanguageServer for Backend {
         .map_err(|err| error!("{err}"))
         .err();
 
-        self.publish_diagnostics(&params.text_document.uri).await;
+        self.publish_diagnostics_immediately(&params.text_document.uri)
+            .await;
     }
 
     async fn did_change(&self, params: DidChangeTextDocumentParams) {
@@ -526,14 +643,24 @@ impl LanguageServer for Backend {
             error!("{err}")
         }
 
-        self.publish_diagnostics(&params.text_document.uri).await;
+        let delay_ms = self.config.read().await.diagnostic_delay_ms;
+        if delay_ms > 0 {
+            // Diagnostics delay is configured, abort pending diagnostic task
+            // and schedule a new diagnostic run in delay_ms milliseconds.
+            self.abort_pending_diagnostics(&params.text_document.uri)
+                .await;
+            self.schedule_diagnostics(&params.text_document.uri, delay_ms)
+                .await;
+        } else {
+            self.publish_diagnostics(&params.text_document.uri).await;
+        }
     }
 
     async fn did_close(&self, _params: DidCloseTextDocumentParams) {
         let uri = _params.text_document.uri;
         let mut doc_lock = self.doc_state.lock().await;
         doc_lock.remove(&uri);
-
+        self.abort_pending_diagnostics(&uri).await;
         self.client
             .send_notification::<PublishDiagnostics>(PublishDiagnosticsParams {
                 uri: uri.clone(),
@@ -565,6 +692,7 @@ impl LanguageServer for Backend {
         }
 
         for uri in &uris_to_clear {
+            self.abort_pending_diagnostics(uri).await;
             self.client
                 .send_notification::<PublishDiagnostics>(PublishDiagnosticsParams {
                     uri: uri.clone(),
@@ -609,7 +737,7 @@ impl LanguageServer for Backend {
                 let file_uri = second.parse().unwrap();
 
                 let mut dict = self.load_user_dictionary().await;
-                dict.append_word(word, WordMetadata::default());
+                dict.append_word(word, DictWordMetadata::default());
                 self.save_user_dictionary(dict)
                     .await
                     .map_err(|err| error!("{err}"))
@@ -618,7 +746,28 @@ impl LanguageServer for Backend {
                     .await
                     .map_err(|err| error!("{err}"))
                     .err();
-                self.publish_diagnostics(&file_uri).await;
+                self.publish_diagnostics_immediately(&file_uri).await;
+            }
+            "HarperAddToWSDict" => {
+                let word = &first.chars().collect::<Vec<_>>();
+
+                let Some(second) = string_args.next() else {
+                    return Ok(None);
+                };
+
+                let file_uri = second.parse().unwrap();
+
+                let mut dict = self.load_workspace_dictionary().await;
+                dict.append_word(word, DictWordMetadata::default());
+                self.save_workspace_dictionary(dict)
+                    .await
+                    .map_err(|err| error!("{err}"))
+                    .err();
+                self.update_document_from_file(&file_uri, None)
+                    .await
+                    .map_err(|err| error!("{err}"))
+                    .err();
+                self.publish_diagnostics_immediately(&file_uri).await;
             }
             "HarperAddToFileDict" => {
                 let word = &first.chars().collect::<Vec<_>>();
@@ -639,7 +788,7 @@ impl LanguageServer for Backend {
                         return Ok(None);
                     }
                 };
-                dict.append_word(word, WordMetadata::default());
+                dict.append_word(word, DictWordMetadata::default());
 
                 self.save_file_dictionary(&file_uri, dict)
                     .await
@@ -649,7 +798,7 @@ impl LanguageServer for Backend {
                     .await
                     .map_err(|err| error!("{err}"))
                     .err();
-                self.publish_diagnostics(&file_uri).await;
+                self.publish_diagnostics_immediately(&file_uri).await;
             }
             "HarperOpen" => match open::that(&first) {
                 Ok(()) => {
@@ -699,7 +848,7 @@ impl LanguageServer for Backend {
 
                 drop(doc_lock);
 
-                self.publish_diagnostics(&uri).await;
+                self.publish_diagnostics_immediately(&uri).await;
             }
             _ => (),
         }
@@ -728,7 +877,7 @@ impl LanguageServer for Backend {
                 .await
                 .map_err(|err| error!("{err}"))
                 .err();
-            self.publish_diagnostics(&uri).await;
+            self.publish_diagnostics_immediately(&uri).await;
         }
     }
 
@@ -748,6 +897,7 @@ impl LanguageServer for Backend {
 
         // Clears the diagnostics for open buffers.
         for uri in doc_states.keys() {
+            self.abort_pending_diagnostics(uri).await;
             let result = PublishDiagnosticsParams {
                 uri: uri.clone(),
                 diagnostics: vec![],

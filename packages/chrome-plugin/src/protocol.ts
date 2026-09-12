@@ -1,41 +1,71 @@
-import type { Dialect, LintConfig, Summary } from 'harper.js';
-import type { UnpackedLint, UnpackedSuggestion } from './unpackLint';
+import type { Dialect, LintConfig, LintOptions, StructuredLintConfig } from 'harper.js';
+import type { UnpackedLintGroups } from 'lint-framework';
 
 export type Request =
 	| LintRequest
 	| GetConfigRequest
+	| GetStructuredConfigRequest
 	| SetConfigRequest
 	| GetLintDescriptionsRequest
 	| SetDialectRequest
 	| GetDialectRequest
+	| GetIsolateEnglishRequest
+	| SetIsolateEnglishRequest
+	| GetDelayRequest
+	| SetDelayRequest
 	| SetDomainStatusRequest
 	| SetDefaultStatusRequest
 	| GetDomainStatusRequest
 	| GetDefaultStatusRequest
+	| GetEnabledDomainsRequest
 	| AddToUserDictionaryRequest
 	| SetUserDictionaryRequest
 	| IgnoreLintRequest
-	| GetUserDictionaryRequest;
+	| GetUserDictionaryRequest
+	| GetActivationKeyRequest
+	| SetActivationKeyRequest
+	| GetHotkeyRequest
+	| SetHotkeyRequest
+	| OpenOptionsRequest
+	| GetInstalledOnRequest
+	| GetReviewedRequest
+	| SetReviewedRequest
+	| OpenReportErrorRequest
+	| PostFormDataRequest
+	| GetWeirpacksRequest
+	| AddWeirpackRequest
+	| RemoveWeirpackRequest;
 
 export type Response =
 	| LintResponse
 	| GetConfigResponse
+	| GetStructuredConfigResponse
 	| UnitResponse
 	| GetLintDescriptionsResponse
 	| GetDialectResponse
+	| GetIsolateEnglishResponse
+	| GetDelayResponse
 	| GetDomainStatusResponse
 	| GetDefaultStatusResponse
-	| GetUserDictionaryResponse;
+	| GetEnabledDomainsResponse
+	| GetUserDictionaryResponse
+	| GetHotkeyResponse
+	| GetActivationKeyResponse
+	| GetInstalledOnResponse
+	| GetReviewedResponse
+	| PostFormDataResponse
+	| GetWeirpacksResponse;
 
 export type LintRequest = {
 	kind: 'lint';
 	domain: string;
 	text: string;
+	options?: LintOptions;
 };
 
 export type LintResponse = {
 	kind: 'lints';
-	lints: UnpackedLint[];
+	lints: UnpackedLintGroups;
 };
 
 export type GetConfigRequest = {
@@ -47,6 +77,15 @@ export type GetConfigResponse = {
 	config: LintConfig;
 };
 
+export type GetStructuredConfigRequest = {
+	kind: 'getStructuredConfig';
+};
+
+export type GetStructuredConfigResponse = {
+	kind: 'getStructuredConfig';
+	config: StructuredLintConfig;
+};
+
 export type SetConfigRequest = {
 	kind: 'setConfig';
 	config: LintConfig;
@@ -55,6 +94,20 @@ export type SetConfigRequest = {
 export type SetDialectRequest = {
 	kind: 'setDialect';
 	dialect: Dialect;
+};
+
+export type GetDelayRequest = {
+	kind: 'getDelay';
+};
+
+export type GetDelayResponse = {
+	kind: 'getDelay';
+	delay: number;
+};
+
+export type SetDelayRequest = {
+	kind: 'setDelay';
+	delay: number;
 };
 
 export type GetLintDescriptionsRequest = {
@@ -73,6 +126,20 @@ export type GetDialectRequest = {
 export type GetDialectResponse = {
 	kind: 'getDialect';
 	dialect: Dialect;
+};
+
+export type GetIsolateEnglishRequest = {
+	kind: 'getIsolateEnglish';
+};
+
+export type GetIsolateEnglishResponse = {
+	kind: 'getIsolateEnglish';
+	isolateEnglish: boolean;
+};
+
+export type SetIsolateEnglishRequest = {
+	kind: 'setIsolateEnglish';
+	isolateEnglish: boolean;
 };
 
 export type GetDomainStatusRequest = {
@@ -95,10 +162,21 @@ export type GetDefaultStatusResponse = {
 	enabled: boolean;
 };
 
+export type GetEnabledDomainsRequest = {
+	kind: 'getEnabledDomains';
+};
+
+export type GetEnabledDomainsResponse = {
+	kind: 'getEnabledDomains';
+	domains: string[];
+};
+
 export type SetDomainStatusRequest = {
 	kind: 'setDomainStatus';
 	domain: string;
 	enabled: boolean;
+	/** Dictates whether this should override a previous setting. */
+	overrideValue: boolean;
 };
 
 export type SetDefaultStatusRequest = {
@@ -125,6 +203,29 @@ export type GetUserDictionaryResponse = {
 	words: string[];
 };
 
+export type GetInstalledOnRequest = {
+	kind: 'getInstalledOn';
+};
+
+export type GetInstalledOnResponse = {
+	kind: 'getInstalledOn';
+	installedOn: string | null;
+};
+
+export type GetReviewedRequest = {
+	kind: 'getReviewed';
+};
+
+export type GetReviewedResponse = {
+	kind: 'getReviewed';
+	reviewed: boolean;
+};
+
+export type SetReviewedRequest = {
+	kind: 'setReviewed';
+	reviewed: boolean;
+};
+
 export type IgnoreLintRequest = {
 	kind: 'ignoreLint';
 	contextHash: string;
@@ -138,3 +239,93 @@ export type UnitResponse = {
 export function createUnitResponse(): UnitResponse {
 	return { kind: 'unit' };
 }
+
+export enum ActivationKey {
+	Off = 'off',
+	Shift = 'shift',
+	Control = 'control',
+}
+
+export type GetActivationKeyRequest = {
+	kind: 'getActivationKey';
+};
+
+export type GetHotkeyRequest = {
+	kind: 'getHotkey';
+};
+
+export type GetActivationKeyResponse = {
+	kind: 'getActivationKey';
+	key: ActivationKey;
+};
+
+export type PostFormDataResponse = {
+	kind: 'postFormData';
+	success: boolean;
+};
+
+export type SetActivationKeyRequest = {
+	kind: 'setActivationKey';
+	key: ActivationKey;
+};
+
+export type OpenOptionsRequest = {
+	kind: 'openOptions';
+};
+
+export type GetHotkeyResponse = {
+	kind: 'getHotkey';
+	hotkey: Hotkey;
+};
+
+export type SetHotkeyRequest = {
+	kind: 'setHotkey';
+	hotkey: Hotkey;
+};
+
+export type Modifier = 'Ctrl' | 'Shift' | 'Alt';
+
+export type Hotkey = {
+	modifiers: Modifier[];
+	key: string;
+};
+export type OpenReportErrorRequest = {
+	kind: 'openReportError';
+	example: string;
+	rule_id: string;
+	feedback: string;
+};
+
+export type PostFormDataRequest = {
+	kind: 'postFormData';
+	url: string;
+	formData: Record<string, string>;
+};
+
+export type WeirpackMeta = {
+	id: string;
+	name: string;
+	filename: string;
+	version: string | null;
+	installedAt: string;
+};
+
+export type GetWeirpacksRequest = {
+	kind: 'getWeirpacks';
+};
+
+export type GetWeirpacksResponse = {
+	kind: 'getWeirpacks';
+	weirpacks: WeirpackMeta[];
+};
+
+export type AddWeirpackRequest = {
+	kind: 'addWeirpack';
+	filename: string;
+	bytes: number[];
+};
+
+export type RemoveWeirpackRequest = {
+	kind: 'removeWeirpack';
+	id: string;
+};

@@ -1,15 +1,16 @@
 use std::sync::Arc;
 
-use super::{Expr, SequenceExpr, SpaceOrHyphen};
+use super::{Expr, SequenceExpr};
 use crate::spell::{Dictionary, FstDictionary};
-use crate::{CharString, Span, Token, WordMetadata};
+use crate::{CharString, DictWordMetadata, Span, Token};
 
-type PredicateFn = dyn Fn(Option<&WordMetadata>, Option<&WordMetadata>) -> bool + Send + Sync;
+type PredicateFn =
+    dyn Fn(Option<&DictWordMetadata>, Option<&DictWordMetadata>) -> bool + Send + Sync;
 
-/// A [`Expr`] that identifies adjacent words that could potentially be merged into a single word.
+/// An [`Expr`] that identifies adjacent words that could potentially be merged into a single word.
 ///
 /// This checks if two adjacent words could form a valid compound word, but first verifies
-/// that the two words aren't already a valid lexeme in the dictionary (like "straight away").
+/// that the two words aren't already a valid entry in the dictionary (like "straight away").
 pub struct MergeableWords {
     inner: SequenceExpr,
     dict: Arc<FstDictionary>,
@@ -18,13 +19,13 @@ pub struct MergeableWords {
 
 impl MergeableWords {
     pub fn new(
-        predicate: impl Fn(Option<&WordMetadata>, Option<&WordMetadata>) -> bool + Send + Sync + 'static,
+        predicate: impl Fn(Option<&DictWordMetadata>, Option<&DictWordMetadata>) -> bool
+        + Send
+        + Sync
+        + 'static,
     ) -> Self {
         Self {
-            inner: SequenceExpr::default()
-                .then_any_word()
-                .then(SpaceOrHyphen)
-                .then_any_word(),
+            inner: SequenceExpr::any_word().t_ws_h().then_any_word(),
             dict: FstDictionary::curated(),
             predicate: Box::new(predicate),
         }
@@ -38,8 +39,8 @@ impl MergeableWords {
         word_b: &Token,
         source: &[char],
     ) -> Option<CharString> {
-        let a_chars: CharString = word_a.span.get_content(source).into();
-        let b_chars: CharString = word_b.span.get_content(source).into();
+        let a_chars: CharString = word_a.get_ch(source).into();
+        let b_chars: CharString = word_b.get_ch(source).into();
 
         // First check if the open compound exists in the dictionary
         let mut compound = a_chars.clone();
@@ -51,7 +52,7 @@ impl MergeableWords {
         compound.remove(a_chars.len());
         let meta_closed = self.dict.get_word_metadata(&compound);
 
-        if (self.predicate)(meta_closed, meta_open) {
+        if (self.predicate)(meta_closed.as_deref(), meta_open.as_deref()) {
             return Some(compound);
         }
 
@@ -81,9 +82,12 @@ impl Expr for MergeableWords {
 #[cfg(test)]
 mod tests {
     use super::MergeableWords;
-    use crate::{Document, WordMetadata};
+    use crate::{DictWordMetadata, Document};
 
-    fn predicate(meta_closed: Option<&WordMetadata>, meta_open: Option<&WordMetadata>) -> bool {
+    fn predicate(
+        meta_closed: Option<&DictWordMetadata>,
+        meta_open: Option<&DictWordMetadata>,
+    ) -> bool {
         meta_open.is_none() && meta_closed.is_some_and(|m| m.is_noun() && !m.is_proper_noun())
     }
 

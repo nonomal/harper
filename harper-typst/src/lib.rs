@@ -1,7 +1,6 @@
 mod offset_cursor;
 mod typst_translator;
 
-use offset_cursor::OffsetCursor;
 use typst_translator::TypstTranslator;
 
 use harper_core::{Token, parsers::Parser};
@@ -28,11 +27,7 @@ impl Parser for Typst {
         let mut buf = Vec::new();
         let exprs = typst_tree.exprs().collect_vec();
         let exprs = convert_parbreaks(&mut buf, &exprs);
-        exprs
-            .into_iter()
-            .filter_map(|ex| parse_helper.parse_expr(ex, OffsetCursor::new(&typst_document)))
-            .flatten()
-            .collect_vec()
+        parse_helper.parse_exprs(&exprs)
     }
 }
 
@@ -54,20 +49,20 @@ fn convert_parbreaks<'a>(buf: &'a mut Vec<SyntaxNode>, exprs: &'a [Expr]) -> Vec
 
     let should_parbreak = |e1, e2, e3| {
         matches!(e2, Expr::Space(_))
-            && (matches!(e1, Expr::Heading(_) | Expr::List(_))
-                || matches!(e3, Expr::Heading(_) | Expr::List(_)))
+            && (matches!(e1, Expr::Heading(_) | Expr::ListItem(_))
+                || matches!(e3, Expr::Heading(_) | Expr::ListItem(_)))
     };
 
     let mut res: Vec<Expr> = Vec::new();
     let mut last_element: Option<Expr> = None;
     for ((i, expr), (_, next_expr)) in exprs.iter().enumerate().tuple_windows() {
         let mut current_expr = *expr;
-        if let Some(last_element) = last_element {
-            if should_parbreak(last_element, *expr, *next_expr) {
-                let pbreak = typst_syntax::ast::Parbreak::from_untyped(&buf[i])
-                    .expect("Unable to convert expression to Parbreak");
-                current_expr = Expr::Parbreak(pbreak);
-            }
+        if let Some(last_element) = last_element
+            && should_parbreak(last_element, *expr, *next_expr)
+        {
+            let pbreak = typst_syntax::ast::Parbreak::from_untyped(&buf[i])
+                .expect("Unable to convert expression to Parbreak");
+            current_expr = Expr::Parbreak(pbreak);
         }
         res.push(current_expr);
         last_element = Some(*expr)
@@ -78,4 +73,28 @@ fn convert_parbreaks<'a>(buf: &'a mut Vec<SyntaxNode>, exprs: &'a [Expr]) -> Vec
     }
 
     res
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use harper_core::parsers::StrParser;
+
+    #[test]
+    fn issue_1898() {
+        Typst.parse_str("#for ");
+        Typst.parse_str("#(.$#$$$. ");
+        Typst.parse_str("=#{m\"\".'m\"\"#p#");
+    }
+
+    #[test]
+    fn issue_2126_show_rule_preserves_token_order() {
+        let tokens = Typst.parse_str("#show \"a\": \"a\"");
+        let spans = tokens
+            .iter()
+            .map(|token| (token.span.start, token.span.end))
+            .collect_vec();
+
+        assert_eq!(spans, vec![(7, 8), (12, 13)]);
+    }
 }

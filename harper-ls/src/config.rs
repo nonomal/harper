@@ -1,8 +1,9 @@
-use std::path::PathBuf;
+use std::path::{Path, PathBuf};
 
 use anyhow::{Result, bail};
 use dirs::{config_dir, data_local_dir};
-use harper_core::{Dialect, linting::LintGroupConfig, parsers::MarkdownOptions};
+use globset::{Glob, GlobSet};
+use harper_core::{Dialect, linting::FlatConfig, parsers::MarkdownOptions};
 use resolve_path::PathResolveExt;
 use serde::{Deserialize, Serialize};
 use serde_json::Value;
@@ -65,9 +66,10 @@ impl CodeActionConfig {
 pub struct Config {
     pub user_dict_path: PathBuf,
     pub file_dict_path: PathBuf,
+    pub workspace_dict_path: PathBuf,
     pub ignored_lints_path: PathBuf,
     pub stats_path: PathBuf,
-    pub lint_config: LintGroupConfig,
+    pub lint_config: FlatConfig,
     pub diagnostic_severity: DiagnosticSeverity,
     pub code_action_config: CodeActionConfig,
     pub isolate_english: bool,
@@ -76,11 +78,18 @@ pub struct Config {
     /// Maximum length (in bytes) a file can have before it's skipped.
     /// Above this limit, the file will not be linted.
     pub max_file_length: usize,
+    pub exclude_patterns: GlobSet,
+    /// Delay in milliseconds after typing stops before diagnostics are published.
+    /// Set to 0 to publish diagnostics immediately.
+    pub diagnostic_delay_ms: u64,
 }
 
 impl Config {
-    pub fn from_lsp_config(value: Value) -> Result<Self> {
+    pub fn from_lsp_config(workspace_root: &Path, value: Value) -> Result<Self> {
         let mut base = Config::default();
+
+        let workspace_root = workspace_root.canonicalize()?;
+        let workspace_root = workspace_root.as_path();
 
         let Value::Object(value) = value else {
             bail!("Settings must be an object.");
@@ -97,7 +106,7 @@ impl Config {
 
             let path = v.as_str().unwrap();
             if !path.is_empty() {
-                base.user_dict_path = path.try_resolve()?.to_path_buf();
+                base.user_dict_path = path.try_resolve_in(workspace_root)?.to_path_buf();
             }
         }
 
@@ -108,8 +117,24 @@ impl Config {
 
             let path = v.as_str().unwrap();
             if !path.is_empty() {
-                base.file_dict_path = path.try_resolve()?.to_path_buf();
+                base.file_dict_path = path.try_resolve_in(workspace_root)?.to_path_buf();
             }
+        }
+
+        if let Some(v) = value.get("workspaceDictPath") {
+            if !v.is_string() {
+                bail!("workspaceDict path must be a string.");
+            }
+            let path = v.as_str().unwrap();
+            if !path.is_empty() {
+                base.workspace_dict_path = path.try_resolve_in(workspace_root)?.to_path_buf();
+            }
+        } else {
+            // Resolve the default path in the project root
+            base.workspace_dict_path = base
+                .workspace_dict_path
+                .try_resolve_in(workspace_root)?
+                .to_path_buf();
         }
 
         if let Some(v) = value.get("ignoredLintsPath") {
@@ -119,15 +144,15 @@ impl Config {
 
             let path = v.as_str().unwrap();
             if !path.is_empty() {
-                base.ignored_lints_path = path.try_resolve()?.to_path_buf();
+                base.ignored_lints_path = path.try_resolve_in(workspace_root)?.to_path_buf();
             }
         }
 
         if let Some(v) = value.get("statsPath") {
             if let Value::String(path) = v {
-                base.file_dict_path = path.try_resolve()?.to_path_buf();
+                base.stats_path = path.try_resolve_in(workspace_root)?.to_path_buf();
             } else {
-                bail!("fileDict path must be a string.");
+                bail!("statsPath must be a string.");
             }
         }
 
@@ -159,10 +184,31 @@ impl Config {
             base.max_file_length = serde_json::from_value(v.clone())?;
         }
 
-        if let Some(v) = value.get("markdown") {
-            if let Some(v) = v.get("IgnoreLinkTitle") {
-                base.markdown_options.ignore_link_title = serde_json::from_value(v.clone())?;
+        if let Some(v) = value.get("markdown")
+            && let Some(v) = v.get("IgnoreLinkTitle")
+        {
+            base.markdown_options.ignore_link_title = serde_json::from_value(v.clone())?;
+        }
+
+        if let Some(v) = value.get("excludePatterns") {
+            let Some(a) = v.as_array() else {
+                bail!("excludePatterns must be an array.");
+            };
+
+            let patterns: Vec<Value> = a.to_vec();
+            if !patterns.is_empty() {
+                let mut builder = GlobSet::builder();
+
+                for pattern in patterns {
+                    builder.add(Glob::new(pattern.as_str().unwrap())?);
+                }
+
+                base.exclude_patterns = builder.build()?;
             }
+        }
+
+        if let Some(v) = value.get("diagnosticDelayMs") {
+            base.diagnostic_delay_ms = serde_json::from_value(v.clone())?;
         }
 
         Ok(base)
@@ -176,15 +222,68 @@ impl Default for Config {
             file_dict_path: data_local_dir()
                 .unwrap()
                 .join("harper-ls/file_dictionaries/"),
+            workspace_dict_path: ".harper-dictionary.txt".into(),
             ignored_lints_path: data_local_dir().unwrap().join("harper-ls/ignored_lints/"),
             stats_path: data_local_dir().unwrap().join("harper-ls/stats.txt"),
-            lint_config: LintGroupConfig::default(),
+            lint_config: FlatConfig::default(),
             diagnostic_severity: DiagnosticSeverity::Hint,
             code_action_config: CodeActionConfig::default(),
             isolate_english: false,
             markdown_options: MarkdownOptions::default(),
             dialect: Dialect::American,
             max_file_length: 120_000,
+            exclude_patterns: GlobSet::empty(),
+            diagnostic_delay_ms: 0,
         }
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use serde_json::json;
+
+    use super::Config;
+
+    #[test]
+    fn parses_diagnostic_delay() {
+        let config = Config::from_lsp_config(
+            std::path::Path::new("."),
+            json!({
+                "harper-ls": {
+                    "diagnosticDelayMs": 750
+                }
+            }),
+        )
+        .unwrap();
+
+        assert_eq!(config.diagnostic_delay_ms, 750);
+    }
+
+    #[test]
+    fn defaults_diagnostic_delay_to_zero() {
+        let config = Config::default();
+
+        assert_eq!(config.diagnostic_delay_ms, 0);
+    }
+
+    #[test]
+    fn parses_stats_path_without_touching_file_dict_path() {
+        let config = Config::from_lsp_config(
+            std::path::Path::new("."),
+            json!({
+                "harper-ls": {
+                    "statsPath": ".harper-stats.txt"
+                }
+            }),
+        )
+        .unwrap();
+
+        assert!(config.stats_path.ends_with(".harper-stats.txt"));
+        assert!(
+            config
+                .file_dict_path
+                .ends_with("harper-ls/file_dictionaries/"),
+            "file dictionary path should keep its default value"
+        );
     }
 }

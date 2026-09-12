@@ -1,11 +1,25 @@
-<script>
-import { page } from '$app/stores';
+<script lang="ts">
 /// This page exists to be embedded via an `iframe`.
-import Editor from '$lib/Editor.svelte';
+
+import { Isolate } from 'components';
+import type { Linter } from 'harper.js';
+import { Editor } from 'harper-editor';
+import { onMount } from 'svelte';
+import { page } from '$app/stores';
+import { createEditorLinter } from '$lib/createEditorLinter';
 
 let content = $page.url.searchParams.get('initialText') ?? '';
+let linter: Linter | null = null;
+
+onMount(() => {
+	(async () => {
+		linter = await createEditorLinter();
+	})();
+});
 </script>
 
-<div class="absolute top-0 left-0 w-full h-full z-[1000] bg-white dark:bg-black">
-	<Editor {content}></Editor>
-</div>
+<Isolate>
+	{#if linter}
+		<Editor {content} {linter}></Editor>
+	{/if}
+</Isolate>

@@ -1,5 +1,5 @@
-import type { ExtensionContext } from 'vscode';
-import { commands, StatusBarAlignment, type StatusBarItem, Uri, window, workspace } from 'vscode';
+import type { ExtensionContext, QuickPickItem, StatusBarItem } from 'vscode';
+import { ConfigurationTarget, commands, StatusBarAlignment, Uri, window, workspace } from 'vscode';
 import type { Executable, LanguageClientOptions } from 'vscode-languageclient/node';
 import { LanguageClient, ResponseError, TransportKind } from 'vscode-languageclient/node';
 
@@ -28,7 +28,12 @@ const clientOptions: LanguageClientOptions = {
 		},
 		executeCommand(command, args, next) {
 			if (
-				['HarperAddToUserDict', 'HarperAddToFileDict', 'HarperIgnoreLint'].includes(command) &&
+				[
+					'HarperAddToUserDict',
+					'HarperAddToWSDict',
+					'HarperAddToFileDict',
+					'HarperIgnoreLint',
+				].includes(command) &&
 				args.find((a) => typeof a === 'string' && a.startsWith('untitled:'))
 			) {
 				window
@@ -65,6 +70,14 @@ export async function activate(context: ExtensionContext): Promise<void> {
 		.filter((e) => e.startsWith('onLanguage:'))
 		.flatMap((e) => {
 			const language = e.split(':')[1];
+
+			// The Source Control commit message box is a document with the
+			// `scminput` language id. It is not backed by a file on disk, so it is
+			// matched by language alone rather than by scheme.
+			if (language === 'scminput') {
+				return [{ language: 'scminput' }];
+			}
+
 			return [
 				{ language, scheme: 'file' },
 				{ language, scheme: 'untitled' },
@@ -95,6 +108,8 @@ export async function activate(context: ExtensionContext): Promise<void> {
 		commands.registerCommand('harper.languageserver.restart', startLanguageServer),
 	);
 
+	context.subscriptions.push(commands.registerCommand('harper.changeDialect', changeDialect));
+
 	await startLanguageServer();
 
 	// VS Code:
@@ -106,6 +121,7 @@ export async function activate(context: ExtensionContext): Promise<void> {
 	// 101 is left of line/column
 	dialectStatusBarItem = window.createStatusBarItem(StatusBarAlignment.Right, 100);
 	dialectStatusBarItem.tooltip = 'Harper English dialect';
+	dialectStatusBarItem.command = 'harper.changeDialect';
 	context.subscriptions.push(dialectStatusBarItem);
 
 	context.subscriptions.push(
@@ -190,6 +206,86 @@ function updateDialectStatusBar(): void {
 	console.log(`** dialect set to ${dialect} **`, dialect);
 }
 
+async function changeDialect(): Promise<void> {
+	const dialectNames = ['American', 'British', 'Australian', 'Canadian', 'Indian'];
+	const dialects: QuickPickItem[] = dialectNames.map((name) => ({
+		label: name,
+	}));
+
+	const currentDialect = getCurrentDialect();
+	const selected = await showDialectQuickPick(dialects, currentDialect);
+
+	if (selected && typeof selected !== 'string') {
+		await workspace
+			.getConfiguration('harper')
+			.update('dialect', selected.label, ConfigurationTarget.Global);
+	}
+}
+
+/**
+ Retrieves the currently active Harper dialect for the active editor.
+ This function reads the `harper.dialect` configuration scoped to the
+ currently active document (if one exists). If no active editor is present
+ or no dialect has been explicitly set, it returns an empty string.
+ @returns {string} The current dialect (e.g., "American", "British"),
+ or an empty string if no dialect is configured.
+ */
+
+function getCurrentDialect(): string {
+	const activeDocumentUri = window.activeTextEditor?.document.uri;
+	return workspace.getConfiguration('harper', activeDocumentUri).get<string>('dialect', '');
+}
+
+/**
+
+ Displays a VS Code QuickPick UI for selecting a Harper dialect, 
+ preselecting the currently active dialect.
+
+ Unlike `window.showQuickPick`, this implementation explicitly sets 
+ the active (highlighted) item to match the current dialect, ensuring
+ the UI reflects the actual document state instead of defaulting to "US".
+ The function resolves with the selected item when the user confirms, or 
+ `undefined` if the picker is dismissed without selection.
+
+ @param {QuickPickItem[]} dialects - List of available dialect options.
+ @param {string} currentDialect - The currently active dialect label.
+ @returns {Promise<QuickPickItem | undefined>} The selected dialect item,
+
+ or `undefined` if the user cancels.
+ */
+async function showDialectQuickPick(
+	dialects: QuickPickItem[],
+	currentDialect: string,
+): Promise<QuickPickItem | undefined> {
+	const quickPick = window.createQuickPick<QuickPickItem>();
+	quickPick.items = dialects;
+	quickPick.placeholder = 'Select Harper dialect';
+
+	const activeDialect = dialects.find((dialect) => dialect.label === currentDialect);
+	if (activeDialect) {
+		quickPick.activeItems = [activeDialect];
+	}
+
+	return await new Promise((resolve) => {
+		let accepted = false;
+
+		quickPick.onDidAccept(() => {
+			accepted = true;
+			resolve(quickPick.selectedItems[0]);
+			quickPick.hide();
+		});
+
+		quickPick.onDidHide(() => {
+			quickPick.dispose();
+			if (!accepted) {
+				resolve(undefined);
+			}
+		});
+
+		quickPick.show();
+	});
+}
+
 export function deactivate(): Thenable<void> | undefined {
 	if (!client) {
 		return undefined;
@@ -204,5 +300,6 @@ function getFlagAndCode(dialect: string): string[] | undefined {
 		Australian: ['🇦🇺', 'AU'],
 		British: ['🇬🇧', 'GB'],
 		Canadian: ['🇨🇦', 'CA'],
+		Indian: ['🇮🇳', 'IN'],
 	}[dialect];
 }

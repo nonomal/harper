@@ -1,29 +1,56 @@
+use crate::char_ext::CharExt;
 use std::borrow::Cow;
+use std::iter::Iterator;
 
 use smallvec::SmallVec;
 
+// TODO: remove this when `SmallVec` allows retrieving this value in a const context.
+pub(crate) const CHAR_STRING_INLINE_SIZE: usize = 16;
+
 /// A char sequence that improves cache locality.
 /// Most English words are fewer than 12 characters.
-pub type CharString = SmallVec<[char; 16]>;
+pub type CharString = SmallVec<[char; CHAR_STRING_INLINE_SIZE]>;
+
+mod private {
+    pub trait Sealed {}
+
+    impl Sealed for [char] {}
+}
 
 /// Extensions to character sequences that make them easier to wrangle.
-pub trait CharStringExt {
+pub trait CharStringExt: private::Sealed {
     /// Convert all characters to lowercase, returning a new owned vector if any changes were made.
-    fn to_lower(&self) -> Cow<[char]>;
+    fn to_lower(&'_ self) -> Cow<'_, [char]>;
 
     /// Normalize the character sequence according to the dictionary's standard character set.
-    fn normalized(&self) -> Cow<[char]>;
+    fn normalized(&'_ self) -> Cow<'_, [char]>;
 
     /// Convert the character sequence to a String.
     fn to_string(&self) -> String;
 
     /// Case-insensitive comparison with a character slice, assuming the right-hand side is lowercase ASCII.
     /// Only normalizes the left side to lowercase and avoids allocations.
-    fn eq_ignore_ascii_case_chars(&self, other: &[char]) -> bool;
+    fn eq_ch(&self, other: &[char]) -> bool;
 
     /// Case-insensitive comparison with a string slice, assuming the right-hand side is lowercase ASCII.
     /// Only normalizes the left side to lowercase and avoids allocations.
-    fn eq_ignore_ascii_case_str(&self, other: &str) -> bool;
+    fn eq_str(&self, other: &str) -> bool;
+
+    /// Case-insensitive comparison with any of a list of string slices, assuming the right-hand side is lowercase ASCII.
+    /// Only normalizes the left side to lowercase and avoids allocations.
+    fn eq_any_ignore_ascii_case_str(&self, others: &[&str]) -> bool;
+
+    /// Case-insensitive comparison with any of a list of character slices, assuming the right-hand side is lowercase ASCII.
+    /// Only normalizes the left side to lowercase and avoids allocations.
+    fn eq_any_ignore_ascii_case_chars(&self, others: &[&[char]]) -> bool;
+
+    /// Case-insensitive check if the string starts with the given ASCII prefix.
+    /// The prefix is assumed to be lowercase.
+    fn starts_with_ignore_ascii_case_str(&self, prefix: &str) -> bool;
+
+    /// Case-insensitive check if the string starts with any of the given ASCII prefixes.
+    /// The prefixes are assumed to be lowercase.
+    fn starts_with_any_ignore_ascii_case_str(&self, prefixes: &[&str]) -> bool;
 
     /// Case-insensitive check if the string ends with the given ASCII suffix.
     /// The suffix is assumed to be lowercase.
@@ -32,10 +59,20 @@ pub trait CharStringExt {
     /// Case-insensitive check if the string ends with the given ASCII suffix.
     /// The suffix is assumed to be lowercase.
     fn ends_with_ignore_ascii_case_str(&self, suffix: &str) -> bool;
+
+    /// Case-insensitive check if the string ends with any of the given ASCII suffixes.
+    /// The suffixes are assumed to be lowercase.
+    fn ends_with_any_ignore_ascii_case_chars(&self, suffixes: &[&[char]]) -> bool;
+
+    /// Check if the string contains any vowels
+    fn contains_vowel(&self) -> bool;
+
+    /// Strip a prefix from the string, case-insensitively
+    fn strip_prefix_ignore_ascii_case_chars(&self, prefix: &[char]) -> Option<&[char]>;
 }
 
 impl CharStringExt for [char] {
-    fn to_lower(&self) -> Cow<[char]> {
+    fn to_lower(&'_ self) -> Cow<'_, [char]> {
         if self.iter().all(|c| c.is_lowercase()) {
             return Cow::Borrowed(self);
         }
@@ -53,13 +90,13 @@ impl CharStringExt for [char] {
 
     /// Convert a given character sequence to the standard character set
     /// the dictionary is in.
-    fn normalized(&self) -> Cow<[char]> {
-        if self.as_ref().iter().any(|c| char_to_normalized(*c) != *c) {
+    fn normalized(&'_ self) -> Cow<'_, [char]> {
+        if self.as_ref().iter().any(|c| c.normalized() != *c) {
             Cow::Owned(
                 self.as_ref()
                     .iter()
                     .copied()
-                    .map(char_to_normalized)
+                    .map(|c| c.normalized())
                     .collect(),
             )
         } else {
@@ -67,15 +104,43 @@ impl CharStringExt for [char] {
         }
     }
 
-    fn eq_ignore_ascii_case_str(&self, other: &str) -> bool {
-        self.len() == other.len()
-            && self
-                .iter()
-                .zip(other.chars())
-                .all(|(a, b)| a.to_ascii_lowercase() == b)
+    fn eq_str(&self, other: &str) -> bool {
+        // Assert that the right-hand side is all-lowercase as required
+        debug_assert!(
+            other
+                .chars()
+                .all(|c| c.is_ascii_lowercase() || !c.is_ascii_alphabetic()),
+            "eq_str requires right-hand side to be lowercase ASCII, but got: {:?}",
+            other
+        );
+
+        let mut chit = self.iter();
+        let mut strit = other.chars();
+
+        loop {
+            let (c, s) = (chit.next(), strit.next());
+            match (c, s) {
+                (Some(c), Some(s)) => {
+                    if c.to_ascii_lowercase() != s {
+                        return false;
+                    }
+                }
+                (None, None) => return true,
+                _ => return false,
+            }
+        }
     }
 
-    fn eq_ignore_ascii_case_chars(&self, other: &[char]) -> bool {
+    fn eq_ch(&self, other: &[char]) -> bool {
+        // Assert that the right-hand side is all-lowercase as required
+        debug_assert!(
+            other
+                .iter()
+                .all(|c| c.is_ascii_lowercase() || !c.is_ascii_alphabetic()),
+            "eq_ch requires right-hand side to be lowercase ASCII, but got: {:?}",
+            other
+        );
+
         self.len() == other.len()
             && self
                 .iter()
@@ -83,8 +148,33 @@ impl CharStringExt for [char] {
                 .all(|(a, b)| a.to_ascii_lowercase() == *b)
     }
 
+    fn eq_any_ignore_ascii_case_str(&self, others: &[&str]) -> bool {
+        others.iter().any(|str| self.eq_str(str))
+    }
+
+    fn eq_any_ignore_ascii_case_chars(&self, others: &[&[char]]) -> bool {
+        others.iter().any(|chars| self.eq_ch(chars))
+    }
+
+    fn starts_with_ignore_ascii_case_str(&self, prefix: &str) -> bool {
+        let prefix_len = prefix.chars().count();
+        if self.len() < prefix_len {
+            return false;
+        }
+        self.iter()
+            .take(prefix_len)
+            .zip(prefix.chars())
+            .all(|(a, b)| a.to_ascii_lowercase() == b)
+    }
+
+    fn starts_with_any_ignore_ascii_case_str(&self, prefixes: &[&str]) -> bool {
+        prefixes
+            .iter()
+            .any(|prefix| self.starts_with_ignore_ascii_case_str(prefix))
+    }
+
     fn ends_with_ignore_ascii_case_str(&self, suffix: &str) -> bool {
-        let suffix_len = suffix.len();
+        let suffix_len = suffix.chars().count();
         if self.len() < suffix_len {
             return false;
         }
@@ -108,14 +198,24 @@ impl CharStringExt for [char] {
             .zip(suffix.iter())
             .all(|(a, b)| a.to_ascii_lowercase() == *b)
     }
-}
 
-fn char_to_normalized(c: char) -> char {
-    match c {
-        '’' => '\'',
-        '‘' => '\'',
-        '＇' => '\'',
-        _ => c,
+    fn ends_with_any_ignore_ascii_case_chars(&self, suffixes: &[&[char]]) -> bool {
+        suffixes
+            .iter()
+            .any(|suffix| self.ends_with_ignore_ascii_case_chars(suffix))
+    }
+
+    fn contains_vowel(&self) -> bool {
+        self.iter().any(|c| c.is_vowel())
+    }
+
+    fn strip_prefix_ignore_ascii_case_chars(&self, prefix: &[char]) -> Option<&[char]> {
+        (self.len() >= prefix.len()
+            && self
+                .iter()
+                .zip(prefix)
+                .all(|(a, b)| a.eq_ignore_ascii_case(b)))
+        .then_some(&self[prefix.len()..])
     }
 }
 
@@ -135,22 +235,22 @@ mod tests {
 
     #[test]
     fn eq_ignore_ascii_case_chars_matches_lowercase() {
-        assert!(['H', 'e', 'l', 'l', 'o'].eq_ignore_ascii_case_chars(&['h', 'e', 'l', 'l', 'o']));
+        assert!(['H', 'e', 'l', 'l', 'o'].eq_ch(&['h', 'e', 'l', 'l', 'o']));
     }
 
     #[test]
     fn eq_ignore_ascii_case_chars_does_not_match_different_word() {
-        assert!(!['H', 'e', 'l', 'l', 'o'].eq_ignore_ascii_case_chars(&['w', 'o', 'r', 'l', 'd']));
+        assert!(!['H', 'e', 'l', 'l', 'o'].eq_ch(&['w', 'o', 'r', 'l', 'd']));
     }
 
     #[test]
     fn eq_ignore_ascii_case_str_matches_lowercase() {
-        assert!(['H', 'e', 'l', 'l', 'o'].eq_ignore_ascii_case_str("hello"));
+        assert!(['H', 'e', 'l', 'l', 'o'].eq_str("hello"));
     }
 
     #[test]
     fn eq_ignore_ascii_case_str_does_not_match_different_word() {
-        assert!(!['H', 'e', 'l', 'l', 'o'].eq_ignore_ascii_case_str("world"));
+        assert!(!['H', 'e', 'l', 'l', 'o'].eq_str("world"));
     }
 
     #[test]
@@ -174,5 +274,27 @@ mod tests {
     #[test]
     fn ends_with_ignore_ascii_case_str_does_not_match_different_suffix() {
         assert!(!['H', 'e', 'l', 'l', 'o'].ends_with_ignore_ascii_case_str("world"));
+    }
+
+    #[test]
+    fn differs_only_by_length_1() {
+        assert!(!['b', 'b'].eq_str("b"));
+    }
+
+    #[test]
+    fn differs_only_by_length_2() {
+        assert!(!['c'].eq_str("cc"));
+    }
+
+    #[test]
+    #[should_panic]
+    fn right_side_must_be_all_lowercase_str() {
+        assert!(['c'].eq_str("C"))
+    }
+
+    #[test]
+    #[should_panic]
+    fn right_side_must_be_all_lowercase_ch() {
+        assert!(['c'].eq_ch(&['C']))
     }
 }

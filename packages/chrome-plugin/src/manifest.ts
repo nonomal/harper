@@ -1,7 +1,7 @@
 import { defineManifest } from '@crxjs/vite-plugin';
 import packageData from '../package.json';
 
-//@ts-ignore
+//@ts-expect-error
 const isDev = process.env.NODE_ENV == 'development';
 
 /**
@@ -15,24 +15,31 @@ export function makeExtensionCSP(isDev: boolean): string {
 	const scriptSrc = ["'self'", "'wasm-unsafe-eval'"]; // minimum, cannot add more
 	const objectSrc = ["'self'"]; // standard
 	const connectSrc = ["'self'"]; // WebSocket goes here
+	const styleSrc = ["'self'", "'unsafe-inline'", 'https://fonts.googleapis.com'];
+	const fontSrc = ["'self'", 'https://fonts.gstatic.com', 'data:'];
 
 	if (isDev) {
 		// `ws://` and `http://` use the same host:port → list both
 		connectSrc.push('http://localhost:5173', 'ws://localhost:5173');
 		// include the 127.0.0.1 loopback in case you switch hosts
 		connectSrc.push('http://127.0.0.1:*', 'ws://127.0.0.1:*');
+		styleSrc.push('http://localhost:5173', 'http://127.0.0.1:*');
 	}
+
+	connectSrc.push('https://writewithharper.com');
 
 	// Assemble the semicolon-delimited CSP
 	return `${[
 		`script-src ${scriptSrc.join(' ')}`,
 		`object-src ${objectSrc.join(' ')}`,
 		`connect-src ${connectSrc.join(' ')}`,
+		`style-src ${styleSrc.join(' ')}`,
+		`font-src ${fontSrc.join(' ')}`,
 	].join('; ')};`;
 }
 
 export default defineManifest({
-	name: `Private Grammar Checking - Harper${isDev ? ' ➡️ Dev' : ''}`,
+	name: `Private Grammar Checker - Harper${isDev ? ' ➡️ Dev' : ''}`,
 	description: packageData.description,
 	version: packageData.version,
 	manifest_version: 3,
@@ -43,7 +50,7 @@ export default defineManifest({
 	browser_specific_settings: {
 		gecko: {
 			id: 'harper@writewithharper.com',
-			strict_min_version: '135.0',
+			strict_min_version: '146.0',
 		},
 	},
 	background: {
@@ -53,9 +60,17 @@ export default defineManifest({
 	},
 	content_scripts: [
 		{
+			matches: ['https://docs.google.com/document/*'],
+			all_frames: false,
+			js: ['src/contentScript/googleDocsBootstrap.js'],
+			run_at: 'document_start',
+			world: 'MAIN',
+		},
+		{
 			matches: ['<all_urls>'],
 			all_frames: true,
 			match_about_blank: true,
+			match_origin_as_fallback: true,
 			js: ['src/contentScript/index.ts'],
 			run_at: 'document_idle',
 		},
@@ -63,7 +78,12 @@ export default defineManifest({
 	web_accessible_resources: [
 		{
 			matches: ['<all_urls>'],
-			resources: ['wasm/harper_wasm_bg.wasm'],
+			resources: [
+				'wasm/harper_wasm_bg.wasm',
+				'google-docs-bridge.js',
+				'google-docs-protocol.js',
+				'google-docs-bridge-request-handler.js',
+			],
 		},
 	],
 	icons: {
@@ -73,4 +93,5 @@ export default defineManifest({
 	content_security_policy: {
 		extension_pages: makeExtensionCSP(isDev),
 	},
+	host_permissions: ['https://writewithharper.com/*'],
 });

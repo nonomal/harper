@@ -1,27 +1,28 @@
+use crate::TokenKind;
 use crate::expr::Expr;
 use crate::expr::SequenceExpr;
-use crate::{CharString, CharStringExt, Token, char_string::char_string, patterns::WordSet};
+use crate::{CharString, CharStringExt, Token, char_string::char_string};
 
 use super::{ExprLinter, Lint, LintKind, Suggestion};
+use crate::linting::expr_linter::Chunk;
 
 pub struct PiqueInterest {
-    expr: Box<dyn Expr>,
+    expr: SequenceExpr,
 }
 
 impl Default for PiqueInterest {
     fn default() -> Self {
-        let pattern = SequenceExpr::default()
-            .then(WordSet::new(&[
-                "peak", "peaked", "peek", "peeked", "peeking", "peaking",
-            ]))
-            .then_whitespace()
-            .then_non_plural_nominal()
-            .then_whitespace()
-            .t_aco("interest");
+        let pattern =
+            SequenceExpr::word_set(["peak", "peaked", "peek", "peeked", "peeking", "peaking"])
+                .then_whitespace()
+                .then_kind_either(
+                    TokenKind::is_non_plural_nominal,
+                    TokenKind::is_possessive_determiner,
+                )
+                .then_whitespace()
+                .t_aco("interest");
 
-        Self {
-            expr: Box::new(pattern),
-        }
+        Self { expr: pattern }
     }
 }
 
@@ -40,8 +41,10 @@ impl PiqueInterest {
 }
 
 impl ExprLinter for PiqueInterest {
+    type Unit = Chunk;
+
     fn expr(&self) -> &dyn Expr {
-        self.expr.as_ref()
+        &self.expr
     }
 
     fn match_to_lint(&self, matched_tokens: &[Token], source: &[char]) -> Option<Lint> {
@@ -54,7 +57,7 @@ impl ExprLinter for PiqueInterest {
             lint_kind: LintKind::WordChoice,
             suggestions: vec![Suggestion::replace_with_match_case(
                 correct.to_vec(),
-                matched_tokens[0].span.get_content(source),
+                matched_tokens[0].get_ch(source),
             )],
             message: format!(
                 "Did you mean `{}` instead of `{}`?",
@@ -126,6 +129,15 @@ mod tests {
             "She was peaking his interest with her stories.",
             PiqueInterest::default(),
             "She was piquing his interest with her stories.",
+        );
+    }
+
+    #[test]
+    fn corrects_peaked_my_interest() {
+        assert_suggestion_result(
+            "you've peaked my interest.",
+            PiqueInterest::default(),
+            "you've piqued my interest.",
         );
     }
 }
